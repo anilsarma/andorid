@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -30,6 +31,7 @@ import java.util.TimeZone;
 
 public class TrainStatusUpdate {
 
+    int multiplier = 3;
     public void updateRoutes(View rootView, ArrayList<HashMap<String, Object>> routes)
     {
         if( routes == null ){
@@ -50,6 +52,7 @@ public class TrainStatusUpdate {
 
         route_header.setText( dateFormat.format(date));
         route_header.setTextSize(Utils.pxFromDp(5, rootView.getContext()));
+        route_header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 5*multiplier);
         // route_header.setTextColor(Color.BLUE);
         //setContentView(route_header);
         TableLayout tl = (TableLayout)rootView.findViewById(R.id.routes);
@@ -100,6 +103,7 @@ public class TrainStatusUpdate {
                 tr.setBackgroundColor(Color.YELLOW);
             }
             tv.setTextSize(Utils.pxFromDp(6, rootView.getContext()));
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 6*multiplier);
             tr.addView(tv);
 
             TableRow tr2 = new TableRow(rootView.getContext());
