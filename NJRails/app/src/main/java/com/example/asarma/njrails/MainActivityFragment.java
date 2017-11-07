@@ -16,6 +16,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.InputType;
 import android.text.style.UpdateAppearance;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +51,7 @@ public class MainActivityFragment extends Fragment {
     RouteActivity activity = new RouteActivity();
     SQLHelper dbHelper;
     HashMap<String, String> stationcodes = new HashMap<>();
+    int multiplier=3;
 
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
@@ -423,6 +425,7 @@ public class MainActivityFragment extends Fragment {
         TextView tv = new TextView(context);
         tv.setText( text);
         tv.setTextSize(Utils.pxFromDp(font_size, getContext()));
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, font_size*multiplier);
         TableRow.LayoutParams params =  new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
         //params.setMargins(0, 5, 0, 5);
         parent.addView(tv, params);
@@ -448,8 +451,9 @@ public class MainActivityFragment extends Fragment {
 
         route_header.setText( dateFormat.format(date));
         route_header.setTextSize(Utils.pxFromDp(5, getContext()));
-
+        route_header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 5*multiplier);
         route_details.setTextSize(Utils.pxFromDp(5, getContext()));
+        route_details.setTextSize(TypedValue.COMPLEX_UNIT_SP, 5*multiplier);
 
         route_details.setText(Utils.capitalize(start) + "-->" + Utils.capitalize(stop));
         route_details.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
@@ -498,6 +502,7 @@ public class MainActivityFragment extends Fragment {
             TextView tv = new TextView(getContext());
             tv.setText( " " + Utils.formatToLocalTime(Utils.parseLocalTime(departture_time)) + " - " + Utils.formatToLocalTime(Utils.parseLocalTime(destination_time)));
             tv.setTextSize(Utils.pxFromDp(6, getContext()));
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 6*multiplier);
             tr.addView(tv);
 
             TableRow tr2 = new TableRow(getContext());
