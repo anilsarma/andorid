@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.asarma.njrails.RouteActivity">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:showDividers="middle"
+            android:divider="?android:dividerHorizontal"
+            android:orientation="vertical">
+
+            <TableLayout
+                android:id="@+id/menu"
+                android:layout_width="match_parent"
+                android:showDividers="middle"
+                android:divider="?android:dividerHorizontal"
+                android:padding="10dp"
+                android:layout_height="wrap_content">
+
+                <TableRow>
+                    <TableLayout>
+                        <TableRow>
+
+                            <TextView
+                                android:padding="3dip"
+                                android:text="djdjdjdj" />
+
+                            <TextView
+                                android:gravity="right"
+                                android:padding="3dip"
+                                android:text="" />
+                        </TableRow>
+
+                        <TableRow>
+
+                            <TextView
+                                android:padding="3dip"
+                                android:text="dd" />
+
+                            <TextView
+                                android:gravity="right"
+                                android:padding="3dip"
+                                android:text="d" />
+                        </TableRow>
+                    </TableLayout>
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="dd" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="449dp"
+                    android:layout_height="299dp">
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="ddd" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="dome" />
+                </TableRow>
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="djdjdjdj" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="d" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="dd" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="449dp"
+                    android:layout_height="299dp">
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="ddd" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="dome" />
+                </TableRow><TableRow>
+
+                <TextView
+                    android:padding="3dip"
+                    android:text="djdjdjdj" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="" />
+            </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="d" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="dd" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="449dp"
+                    android:layout_height="299dp">
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="ddd" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="dome" />
+                </TableRow>
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="djdjdjdj" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="d" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="dd" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="449dp"
+                    android:layout_height="299dp">
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="ddd" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="dd" />
+
+                    <TextView
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="dome" />
+                </TableRow>
+            </TableLayout>
+
+            <Button
+                android:id="@+id/toggle"
+                android:layout_width="386dp"
+                android:layout_height="wrap_content"
+                android:text="Click" />
+        </LinearLayout>
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>
