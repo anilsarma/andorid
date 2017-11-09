@@ -83,7 +83,7 @@ public class MainActivityFragment extends Fragment {
 
 
         final View rootView = inflater.inflate(R.layout.route_layout, container, false);
-        final SwipeRefreshLayout swipe = rootView.findViewById(R.id.swiperefresh);
+        final SwipeRefreshLayout swipe = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
         final MainActivityFragment frag = this;
 
         if(dbHelper==null ) {
@@ -187,7 +187,7 @@ public class MainActivityFragment extends Fragment {
 
         views.put(new Integer(index), rootView);
         if( index >= FIRST_PAGE ) {
-            Button button = rootView.findViewById(R.id.station_query_button);
+            Button button = (Button)rootView.findViewById(R.id.station_query_button);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -267,7 +267,7 @@ public class MainActivityFragment extends Fragment {
                 }
             }
 
-            Button button = rootView.findViewById(R.id.status_query_button);
+            Button button = (Button)rootView.findViewById(R.id.status_query_button);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -357,7 +357,7 @@ public class MainActivityFragment extends Fragment {
             }
         }
         status_result = result;
-        final SwipeRefreshLayout swipe = view.findViewById(R.id.swiperefresh);
+        final SwipeRefreshLayout swipe = (SwipeRefreshLayout)view.findViewById(R.id.swiperefresh);
 
 
         ViewPager mViewPager = (ViewPager) view.getRootView().findViewById(R.id.pager);
@@ -491,6 +491,7 @@ public class MainActivityFragment extends Fragment {
             } catch (Exception e) {
 
             }
+
             TableLayout tl2 = new TableLayout(getContext());
             TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 5, 0, 5);
@@ -522,7 +523,28 @@ public class MainActivityFragment extends Fragment {
             //tl2.addView(tr3, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
             //addTextView(this, tl2, "" + block_id + " " + departture_time + " " + destination_time, 6, 10);
             addTextView(getContext(), tl2, "" + route_name + "#" + block_id, 5, 10);
-            TextView th = addTextView(getContext(), tl2, "" + time+ " minutes", 5, 100);
+
+            String msg = "" + time+ " minutes";
+            try {
+                Date st_time = timeformat.parse(departture_time);
+                if ( days == 0 ) {
+                   long diff = st_time.getTime() - now.getTime();
+                   if ((diff >=-10) && (diff < 120)) {
+                       if ( diff >=0 ) {
+                           msg += "  in " + diff + " minutes";
+                       }
+                       if ( diff < 0 ) {
+                           msg += "  was scheduled to leave " + diff + " minutes ago";
+                       }
+                   }
+
+
+                }
+            } catch (Exception e) {
+
+            }
+
+            TextView th = addTextView(getContext(), tl2, msg, 5, 100);
             //addTextView(this, tl2, "" , 5, 5);
             //tl2.setOnClickListener( new TableRowListener(th, block_id + " "+ route_name + " " + departture_time));
 

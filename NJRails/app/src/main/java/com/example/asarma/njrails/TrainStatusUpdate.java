@@ -119,6 +119,9 @@ public class TrainStatusUpdate {
             //addTextView(this, tl2, "" + block_id + " " + departture_time + " " + destination_time, 6, 10);
             Utils.addTextView(rootView.getContext(), tl2, "Destination " + destination, 6, 10);
             Utils.addTextView(rootView.getContext(), tl2, "" + line + "#" + train, 6, 10);
+
+
+
             TextView th = Utils.addTextView(rootView.getContext(), tl2, "track " + track + " ", 5, 10);
             //addTextView(this, tl2, "" , 5, 5);
             tl2.setOnClickListener( new TableRowListener(th, train + " "+ line + " " + time));
