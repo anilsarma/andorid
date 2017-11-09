@@ -24,7 +24,7 @@ public class PagerActivity extends FragmentActivity {
         mViewPager.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mViewPager.setCurrentItem(MainActivityFragment.FIRST_PAGE);
+                mViewPager.setCurrentItem(MainActivityFragment.FIRST_PAGE + 2);
                 Toast.makeText(mViewPager.getContext(), "Current Act"+ mViewPager.getCurrentItem(), Toast.LENGTH_LONG).show();
             }
         }, 5000);

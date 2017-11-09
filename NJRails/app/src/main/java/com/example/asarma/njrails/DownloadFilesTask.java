@@ -93,9 +93,10 @@ public class DownloadFilesTask extends AsyncTask<String, Integer, Long> {
         //setProgressPercent(progress[0]);
     }
 
-    protected void onPostExecute(Long xx) {
-        parent.updateAdapter(view, result);
-        if( xx == -1 ){
+    protected void onPostExecute(Long status) {
+        parent.updateAdapter(view, status, result);
+        if( status == -1 ){
+            // should really let the UI handle this.
             Toast.makeText(parent.getContext(), "Connection timed out for status", Toast.LENGTH_LONG).show();;
         }
     }

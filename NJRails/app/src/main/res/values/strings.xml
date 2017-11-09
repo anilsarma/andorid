@@ -10,4 +10,6 @@
         <item>Uranus</item>
         <item>Neptune</item>
     </string-array>
+    <string name="title_activity_maps">Test Maps</string>
+    <string name="google_maps_key">AIzaSyBoIzv1e-aA-XI5EGj-TNgkjlL-HbEY39c</string>
 </resources>

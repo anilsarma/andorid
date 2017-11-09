@@ -7,17 +7,16 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.InputType;
-import android.text.style.UpdateAppearance;
 import android.util.TypedValue;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -29,7 +28,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.net.URL;
+import com.example.asarma.njrails.com.example.asarma.njrails.route.RoutePagerActivity;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -348,9 +348,14 @@ public class MainActivityFragment extends Fragment {
 
         return rootView;
     }
-    public void updateAdapter(View view, ArrayList<HashMap<String, Object>> result) {
+    public void updateAdapter(View view, Long s, ArrayList<HashMap<String, Object>> result) {
         // update thes
 
+        if( s != 0 ) {
+            if (result.isEmpty()) {
+                return;
+            }
+        }
         status_result = result;
         final SwipeRefreshLayout swipe = view.findViewById(R.id.swiperefresh);
 
@@ -528,6 +533,31 @@ public class MainActivityFragment extends Fragment {
                 tl2.setBackgroundColor(Color.parseColor("#18FFFF"));
             }
             tl2.setOnLongClickListener(new RouteLongClickListener(dbHelper, block_id, block_id + " "+ route_name + " " + departture_time, initstate));
+            tl2.setOnTouchListener(new View.OnTouchListener() {
+                GestureDetector gd = new GestureDetector(MainActivityFragment.this.getContext(), new GestureDetector.SimpleOnGestureListener() {
+
+                    @Override
+                    public boolean onDoubleTap(MotionEvent e) {
+                        Intent intent = new Intent(MainActivityFragment.this.getContext(), RoutePagerActivity.class);
+                        // EditText editText = (EditText) view.getContext().findViewById(R.id.editText);
+                        //String message = editText.getText().toString();
+                        //intent.putExtra(EXTRA_MESSAGE, message);
+                        MainActivityFragment.this.getContext().startActivity(intent);
+                        return super.onDoubleTap(e);
+                    }
+
+                    @Override
+                    public void onLongPress(MotionEvent e) {
+                        super.onLongPress(e);
+                    }
+                });
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    gd.onTouchEvent(motionEvent);
+                    return true;
+
+                }
+            });
             tl.addView(tl2, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
             //selected += 1;
 

@@ -1,13 +1,14 @@
 package com.example.asarma.njrails;
 
 
+import android.content.Intent;
 import android.graphics.Color;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
+import com.example.asarma.njrails.com.example.asarma.njrails.route.RoutePagerActivity;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -48,6 +49,13 @@ public class RouteLongClickListener implements   View.OnLongClickListener {
         SQLHelper.update_user_pref(helper.getWritableDatabase(), "favorites", Utils.join(",", names), new Date());
         Toast.makeText(view.getContext(),(String)"Train " + text,
                 Toast.LENGTH_LONG).show();
+
+
+        Intent intent = new Intent(view.getContext(), RoutePagerActivity.class);
+       // EditText editText = (EditText) view.getContext().findViewById(R.id.editText);
+        //String message = editText.getText().toString();
+        //intent.putExtra(EXTRA_MESSAGE, message);
+        //view.getContext().startActivity(intent);
 
         return true;
     }
