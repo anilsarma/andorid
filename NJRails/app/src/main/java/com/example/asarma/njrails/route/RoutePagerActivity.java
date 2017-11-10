@@ -31,7 +31,7 @@ public class RoutePagerActivity extends FragmentActivity {
             @Override
             public void run() {
                 mViewPager.setCurrentItem(MainActivityFragment.FIRST_PAGE);
-                Toast.makeText(mViewPager.getContext(), "Current Act"+ mViewPager.getCurrentItem(), Toast.LENGTH_LONG).show();
+               // Toast.makeText(mViewPager.getContext(), "Current Act"+ mViewPager.getCurrentItem(), Toast.LENGTH_LONG).show();
             }
         }, 5000);
     }

@@ -43,13 +43,6 @@ public class RouteGoogleMapFragment extends Fragment implements  OnMapReadyCallb
         System.out.println("got parcel:" + stations.data.size());
         // get the loction and station details form the bundle.
         final View rootView = inflater.inflate(R.layout.route_map_activity, container, false);
-
-        // SupportMapFragment mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.map);
-     //   if (rootView.getActivity()==null)
-       if (true) {
-            Toast.makeText(rootView.getContext(), "Activity is null " + getActivity().getSupportFragmentManager(), Toast.LENGTH_LONG).show();
-            //return rootView;
-        }
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -90,7 +83,7 @@ public class RouteGoogleMapFragment extends Fragment implements  OnMapReadyCallb
             googleMap.animateCamera(CameraUpdateFactory.zoomIn());
 
 // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo(6), 2000, null);
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(9), 2000, null);
 
         }
     }
