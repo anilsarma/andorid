@@ -6,8 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.example.asarma.njrails.MainActivityFragment;
-import com.example.asarma.njrails.route.RouteGoogleMapFragment;
+import com.example.asarma.njrails.ParcelResult;
 
 
 /**
@@ -16,9 +15,11 @@ import com.example.asarma.njrails.route.RouteGoogleMapFragment;
 
 public class RouteCollectionPagerAdapter extends FragmentStatePagerAdapter {
     FragmentManager fm;
-    public RouteCollectionPagerAdapter(FragmentManager fm) {
+    ParcelResult data;
+    public RouteCollectionPagerAdapter(FragmentManager fm, ParcelResult data) {
         super(fm);
         this.fm = fm;
+        this.data = data;
     }
 
     @Override
@@ -33,6 +34,7 @@ public class RouteCollectionPagerAdapter extends FragmentStatePagerAdapter {
                 Bundle args = new Bundle();
                 // Our object is just an integer :-P
                 args.putInt(RouteGoogleMapFragment.ARG_OBJECT, i );
+                args.putParcelable("data", this.data);
                 fragment.setArguments(args);
                 return fragment;
             }

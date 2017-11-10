@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.example.asarma.njrails.DemoCollectionPagerAdapter;
 import com.example.asarma.njrails.MainActivityFragment;
+import com.example.asarma.njrails.ParcelResult;
 import com.example.asarma.njrails.R;
 
 public class RoutePagerActivity extends FragmentActivity {
@@ -18,11 +19,12 @@ public class RoutePagerActivity extends FragmentActivity {
     ViewPager mViewPager;
 
     public void onCreate(Bundle savedInstanceState) {
+        ParcelResult obj = this.getIntent().getParcelableExtra("data");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.route_pager);
         // ViewPager and its adapters use support library
         // fragments, so use getSupportFragmentManager.
-        mDemoCollectionPagerAdapter =  new RouteCollectionPagerAdapter(getSupportFragmentManager());
+        mDemoCollectionPagerAdapter =  new RouteCollectionPagerAdapter(getSupportFragmentManager(), obj);
         mViewPager = (ViewPager) findViewById(R.id.route_pager);
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
         mViewPager.postDelayed(new Runnable() {
