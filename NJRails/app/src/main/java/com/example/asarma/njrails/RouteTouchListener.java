@@ -26,9 +26,7 @@ class ParcelResult implements Parcelable {
     }
     ParcelResult(Parcel in)
     {
-        if(true) {
-            return;
-        }
+     
         int sz = in.readInt();
         for (int i = 0; i < sz; i++) {
             HashMap<String, String> map = new HashMap<>();
@@ -92,7 +90,7 @@ public class RouteTouchListener implements View.OnTouchListener {
         gd = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                new DownloadFilesTask(RouteTouchListener.this).execute(tid);
+                new DownloadFilesTask(RouteTouchListener.this, RouteTouchListener.this.dbHelper).execute(tid);
                 return super.onDoubleTap(e);
             }
             @Override
@@ -142,8 +140,9 @@ public class RouteTouchListener implements View.OnTouchListener {
         SQLHelper db;
         ArrayList<HashMap<String, String>> data= new ArrayList<>();
         RouteTouchListener parent;
-        DownloadFilesTask(RouteTouchListener parent) {
+        DownloadFilesTask(RouteTouchListener parent, SQLHelper db) {
             this.parent = parent;
+            this.db = db;
         }
         protected Long doInBackground(String... args) {
             //Intent intent = new Intent(ctx, RoutePagerActivity.class);
