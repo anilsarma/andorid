@@ -17,6 +17,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -75,7 +76,15 @@ public class RouteGoogleMapFragment extends Fragment implements  OnMapReadyCallb
             }
             pt.add(tmp);
             String title = Utils.capitalize(stations.data.get(i).get("stop_name")) + " " + Utils.formatToLocalTime(Utils.parseLocalTime(stations.data.get(i).get("arrival_time")));
-            googleMap.addMarker(new MarkerOptions().position(tmp).title(title));
+            if( i == 0 ) {
+                googleMap.addMarker(new MarkerOptions().position(tmp).title(title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            }
+            else if ( i == stations.data.size()-1) {
+                googleMap.addMarker(new MarkerOptions().position(tmp).title(title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            }
+            else {
+                googleMap.addMarker(new MarkerOptions().position(tmp).title(title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+            }
         }
         Polyline line=googleMap.addPolyline(pt.width(5).color(Color.GREEN));
         if(start!=null) {
@@ -83,7 +92,7 @@ public class RouteGoogleMapFragment extends Fragment implements  OnMapReadyCallb
             googleMap.animateCamera(CameraUpdateFactory.zoomIn());
 
 // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo(9), 2000, null);
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(8), 2000, null);
 
         }
     }
