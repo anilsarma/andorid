@@ -152,7 +152,7 @@ timeformat.setTimeZone(tz);
             TextView th = addTextView(this, tl2, "" + time+ " minutes", 5, 150);
             //addTextView(this, tl2, "" , 5, 5);
             //tl2.setOnClickListener( new TableRowListener(th, block_id + " "+ route_name + " " + departture_time));
-            tl2.setOnTouchListener( new RouteTouchListener(th, block_id + " "+ route_name + " " + departture_time));
+           // tl2.setOnTouchListener( new RouteTouchListener(th, block_id + " "+ route_name + " " + departture_time));
 
             tl.addView(tl2, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
 

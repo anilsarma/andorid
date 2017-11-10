@@ -1,12 +1,9 @@
-package com.example.asarma.njrails.com.example.asarma.njrails.route;
+package com.example.asarma.njrails.route;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,14 +18,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RouteGoogleMapFragment extends Fragment implements  OnMapReadyCallback {
     public static final String ARG_OBJECT = "object";
     int multiplier=3;
-    ArrayList<LatLng> locs = new ArrayList<>();
-    ArrayList<String> stations = new ArrayList<>();
-    FragmentActivity myContext;
 
+    FragmentActivity myContext;
+    ArrayList<HashMap<String, String>> stations;
 
     public void onAttach(Activity activity) {
         myContext=(FragmentActivity) activity;
@@ -37,6 +34,8 @@ public class RouteGoogleMapFragment extends Fragment implements  OnMapReadyCallb
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
         Bundle args = getArguments();
+        stations = args.getParcelable("data");
+        System.out.println("got parcel:" + stations.size());
         // get the loction and station details form the bundle.
         final View rootView = inflater.inflate(R.layout.route_map_activity, container, false);
 

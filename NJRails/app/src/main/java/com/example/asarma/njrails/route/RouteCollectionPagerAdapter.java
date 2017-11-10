@@ -1,4 +1,4 @@
-package com.example.asarma.njrails.com.example.asarma.njrails.route;
+package com.example.asarma.njrails.route;
 
 
 import android.os.Bundle;
@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.example.asarma.njrails.MainActivityFragment;
+import com.example.asarma.njrails.route.RouteGoogleMapFragment;
 
 
 /**

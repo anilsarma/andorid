@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,7 +21,16 @@ import java.util.TimeZone;
 
 public class Utils {
 
+    static public String formatToLocalDate(Date dt)
+    {
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = cal.getTimeZone();
 
+        DateFormat dateFormat = new SimpleDateFormat("YYYY/MM/dd");
+        dateFormat.setTimeZone(tz);
+
+        return dateFormat.format(dt);
+    }
     static public String formatToLocalTime(Date dt)
     {
         Calendar cal = Calendar.getInstance();
@@ -118,6 +128,10 @@ public class Utils {
     public static float pxFromDp(float dp, Context mContext) {
         return dp * mContext.getResources().getDisplayMetrics().density;
     }
+    public static int pxFromSp(int sp, Context mContext) {
+        return (int)((double)sp * mContext.getResources().getDisplayMetrics().scaledDensity);
+    }
+
 
     public static TextView addTextView(Context context, ViewGroup parent, String text, int font_size, int padding)
     {
@@ -163,5 +177,18 @@ public class Utils {
             favA.add(x);
         }
         return favA;
+    }
+
+    public static ArrayList<HashMap<String, String>> coerce( ArrayList<HashMap<String, Object>>  data )
+    {
+        ArrayList<HashMap<String, String>> result  = new ArrayList<>();
+        for (int i = 0; i < data.size(); i++) {
+            HashMap<String, String> r = new HashMap<>();
+            for ( String key:data.get(i).keySet()) {
+                r.put(key, data.get(i).get(key).toString());
+            }
+            result.add(r);
+        }
+        return result;
     }
 }

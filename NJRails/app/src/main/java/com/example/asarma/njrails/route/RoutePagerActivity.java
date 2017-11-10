@@ -1,4 +1,4 @@
-package com.example.asarma.njrails.com.example.asarma.njrails.route;
+package com.example.asarma.njrails.route;
 
 
 import android.os.Bundle;

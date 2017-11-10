@@ -6,7 +6,7 @@ import android.graphics.Color;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.asarma.njrails.com.example.asarma.njrails.route.RoutePagerActivity;
+import com.example.asarma.njrails.route.RoutePagerActivity;
 
 import java.util.ArrayList;
 import java.util.Date;

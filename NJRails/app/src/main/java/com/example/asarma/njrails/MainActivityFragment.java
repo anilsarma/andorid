@@ -14,9 +14,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.InputType;
 import android.util.TypedValue;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -27,8 +25,6 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.asarma.njrails.com.example.asarma.njrails.route.RoutePagerActivity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -68,7 +64,7 @@ public class MainActivityFragment extends Fragment {
                         stationcodes.put(r.get(i).get("station_name").toString(), r.get(i).get("station_code").toString());
                     }
                 } catch (Exception e) {
-                   // e.printStackTrace();
+                    // e.printStackTrace();
                 }
             }
         }
@@ -141,7 +137,11 @@ public class MainActivityFragment extends Fragment {
         System.out.println("Spinner count:"+spinnerPosition);
 
         String start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", "NEW BRUNSWICK");
-        String stop = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "stop_station", "NEW YORK PENN STATION");
+        String stop  = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "stop_station", "NEW YORK PENN STATION");
+
+        SQLHelper.update_user_pref( dbHelper.getWritableDatabase(), "start_station", start, new Date());
+        SQLHelper.update_user_pref( dbHelper.getWritableDatabase(), "stop_station", stop, new Date());
+
 
         spinnerPosition = adapter.getPosition(Utils.capitalize(start));
         stop_station_spinner.setSelection(spinnerPosition);
@@ -233,7 +233,7 @@ public class MainActivityFragment extends Fragment {
             }
 
             TextView th =(TextView) rootView.findViewById(R.id.route_header);
-           // th.setText("Train Details + " + Integer.toString(args.getInt(ARG_OBJECT)));
+            // th.setText("Train Details + " + Integer.toString(args.getInt(ARG_OBJECT)));
             th.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -326,7 +326,7 @@ public class MainActivityFragment extends Fragment {
             td.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", null);
+                    String start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", "");
                     if (start == null ) {
                         return;
                     }
@@ -334,7 +334,6 @@ public class MainActivityFragment extends Fragment {
                     if (stop == null ) {
                         return;
                     }
-
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "start_station", stop, new Date());
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "stop_station", start, new Date());
 
@@ -434,7 +433,7 @@ public class MainActivityFragment extends Fragment {
         TableRow.LayoutParams params =  new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
         //params.setMargins(0, 5, 0, 5);
         parent.addView(tv, params);
-        tv.setPadding(10, padding, 0, 0);
+        tv.setPadding(Utils.pxFromSp(10, getContext()), Utils.pxFromSp(padding, getContext()) , 0, 0);
         return  tv;
     }
     void updateRoutes(View rootView, String start, String stop, int days, ArrayList<HashMap<String, Object>> routes)
@@ -478,6 +477,7 @@ public class MainActivityFragment extends Fragment {
             String destination_time = data.get("destination_time").toString();
             final String block_id = data.get("block_id").toString();
             final String route_name = data.get("route_long_name").toString();
+            final String trip_id = data.get("trip_id").toString();
             if ( i == 0 ) {
                 route_header.setText(route_name + " " + dateFormat.format(date) );
             }
@@ -525,26 +525,38 @@ public class MainActivityFragment extends Fragment {
             addTextView(getContext(), tl2, "" + route_name + "#" + block_id, 5, 10);
 
             String msg = "" + time+ " minutes";
+            String schedule = "";
             try {
-                Date st_time = timeformat.parse(departture_time);
+
                 if ( days == 0 ) {
-                   long diff = st_time.getTime() - now.getTime();
-                   if ((diff >=-10) && (diff < 120)) {
-                       if ( diff >=0 ) {
-                           msg += "  in " + diff + " minutes";
-                       }
-                       if ( diff < 0 ) {
-                           msg += "  was scheduled to leave " + diff + " minutes ago";
-                       }
-                   }
+                    DateFormat dateTimeFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                    Date st_time = dateTimeFormat.parse(Utils.formatToLocalDate(now) + " "  + departture_time);
+                    long diff = (st_time.getTime() - (now.getTime()))/(1000*60);
+
+                    if ((diff >=-10) && (diff < 120)) {
+                        if ( diff >=0 ) {
+                            schedule= "    " + diff + " minutes";
+                        }
+                        if ( diff < 0 ) {
+                            schedule= "    " + Math.abs(diff) + " minutes ago";
+                        }
+                    }
 
 
                 }
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
+            TextView th0 = addTextView(getContext(), tl2, "", 5, 5); // just a blank line
+            TextView th1 = addTextView(getContext(), tl2, schedule, 5, 0);
 
-            TextView th = addTextView(getContext(), tl2, msg, 5, 100);
+            if ( !schedule.isEmpty()) {
+                th1.setBackgroundColor(Color.GREEN);
+                if (schedule.contains("ago")) {
+                    th1.setBackgroundColor(Color.RED);
+                }
+            }
+            TextView th2  = addTextView(getContext(), tl2, msg, 5, 0);
             //addTextView(this, tl2, "" , 5, 5);
             //tl2.setOnClickListener( new TableRowListener(th, block_id + " "+ route_name + " " + departture_time));
 
@@ -555,31 +567,7 @@ public class MainActivityFragment extends Fragment {
                 tl2.setBackgroundColor(Color.parseColor("#18FFFF"));
             }
             tl2.setOnLongClickListener(new RouteLongClickListener(dbHelper, block_id, block_id + " "+ route_name + " " + departture_time, initstate));
-            tl2.setOnTouchListener(new View.OnTouchListener() {
-                GestureDetector gd = new GestureDetector(MainActivityFragment.this.getContext(), new GestureDetector.SimpleOnGestureListener() {
-
-                    @Override
-                    public boolean onDoubleTap(MotionEvent e) {
-                        Intent intent = new Intent(MainActivityFragment.this.getContext(), RoutePagerActivity.class);
-                        // EditText editText = (EditText) view.getContext().findViewById(R.id.editText);
-                        //String message = editText.getText().toString();
-                        //intent.putExtra(EXTRA_MESSAGE, message);
-                        MainActivityFragment.this.getContext().startActivity(intent);
-                        return super.onDoubleTap(e);
-                    }
-
-                    @Override
-                    public void onLongPress(MotionEvent e) {
-                        super.onLongPress(e);
-                    }
-                });
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    gd.onTouchEvent(motionEvent);
-                    return true;
-
-                }
-            });
+            tl2.setOnTouchListener(new RouteTouchListener(dbHelper, this.getContext(), tl2, trip_id,  block_id, block_id + " "+ route_name + " " + departture_time, initstate));
             tl.addView(tl2, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
             //selected += 1;
 
@@ -587,7 +575,7 @@ public class MainActivityFragment extends Fragment {
             if ( ddtime.getTime() < now.getTime()) {
                 int sz = tl2.getBottom() - tl2.getTop();
                 if ( sz <= 0 ) {
-                   sz = 70;
+                    sz = 70;
                 }
                 selected = i * sz;
             }
