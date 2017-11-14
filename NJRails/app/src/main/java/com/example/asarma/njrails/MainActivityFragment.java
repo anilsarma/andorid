@@ -33,6 +33,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivityFragment extends Fragment {
     static int STATUS_PAGE=0;
@@ -48,7 +50,11 @@ public class MainActivityFragment extends Fragment {
     SQLHelper dbHelper;
     HashMap<String, String> stationcodes = new HashMap<>();
     int multiplier=3;
+    int myPage = 0;
+    ArrayList<HashMap<String, Object>> routes = new ArrayList<>();
 
+    View rootView=null;
+    Timer timer = null;
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
         setupDB();
@@ -76,9 +82,9 @@ public class MainActivityFragment extends Fragment {
         // properly.
         Bundle args = getArguments();
         final int index = args.getInt(ARG_OBJECT);
+        myPage = index;
 
-
-        final View rootView = inflater.inflate(R.layout.route_layout, container, false);
+        rootView = inflater.inflate(R.layout.route_layout, container, false);
         final SwipeRefreshLayout swipe = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
         final MainActivityFragment frag = this;
 
@@ -208,7 +214,7 @@ public class MainActivityFragment extends Fragment {
                     dateFormat.setTimeZone(tz);
                     Date date = new Date();
                     int dt = Integer.parseInt(dateFormat.format(Utils.adddays(date, index-1)));
-                    ArrayList<HashMap<String, Object>> routes = Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getReadableDatabase(), start, stop, dt ));
+                    routes = Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getReadableDatabase(), start, stop, dt ));
                     if( routes.isEmpty()) {
                         Toast.makeText(getContext(),(String)"Start " + start + " Stop:" + stop  + " are not valid destinations",
                                 Toast.LENGTH_LONG).show();
@@ -338,7 +344,8 @@ public class MainActivityFragment extends Fragment {
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "stop_station", start, new Date());
 
                     int days = index-1;
-                    updateRoutes(rootView, stop, start, days, Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getWritableDatabase(), stop, start, Integer.parseInt(Utils.getLocaDate(days)))));
+                    routes = Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getWritableDatabase(), stop, start, Integer.parseInt(Utils.getLocaDate(days))));
+                    updateRoutes(rootView, stop, start, days, routes);
                 }
             });
 
@@ -468,7 +475,7 @@ public class MainActivityFragment extends Fragment {
         int selected = 0;
         String favs = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "favorites", "");
         ArrayList<String> fav = Utils.split(",", favs);
-
+        int location = rootView.getScrollY();
         Date now = new Date();
         for(int i=0;i< routes.size();i ++) {
             HashMap<String, Object> data = routes.get(i);
@@ -588,7 +595,9 @@ public class MainActivityFragment extends Fragment {
 
         }
 
-        final int pxdown = selected ;//* 200;
+
+
+        final int pxdown = location ;//* 200; selected
         final NestedScrollView v =(NestedScrollView) rootView.getRootView().findViewById(R.id.route_scroll);
         ViewTreeObserver vto = v.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -597,6 +606,7 @@ public class MainActivityFragment extends Fragment {
             public void onGlobalLayout() {
                 if(!done)  {
                     v.scrollTo(0, pxdown);
+                    Toast.makeText(getContext(),(String)"Pager scroll to " + pxdown, Toast.LENGTH_SHORT).show();
                 }
                 done= true;
             }
@@ -688,5 +698,54 @@ public class MainActivityFragment extends Fragment {
         });
 
         builder.show();
+    }
+    class UpdateTimeTask extends TimerTask {
+        View rootView;
+        UpdateTimeTask(View rootView) {
+            this.rootView = rootView;
+        }
+        public void run() {
+            //Code for the viewPager to change view
+            rootView.postInvalidate();
+            System.out.println("timer expired.");
+            rootView.post(new Runnable() {
+                @Override
+                public void run() {
+                    refresh();
+                }
+            });
+        }
+    }
+public void refresh() {
+    String start = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "start_station", "");
+    if (start == null) {
+        return;
+    }
+    String stop = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "stop_station", null);
+    if (stop == null) {
+        return;
+    }
+    int days = myPage - 1;
+    routes = Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getWritableDatabase(), stop, start, Integer.parseInt(Utils.getLocaDate(days))));
+    if (!routes.isEmpty()) {
+        updateRoutes(rootView, stop, start, days, routes);
+    }
+}
+    public void setMenuVisibility(final boolean visible) {
+        super.setMenuVisibility(visible);
+        if ( myPage == FIRST_PAGE ) {
+            if (visible && rootView != null) {
+                refresh();
+                timer = new Timer();
+                timer.schedule(new UpdateTimeTask(rootView), 30000, 30000);
+            }
+
+            if ( !visible) {
+                if ( timer != null ) {
+                    timer.cancel();
+                    timer = null;
+                }
+            }
+        }
     }
 }
