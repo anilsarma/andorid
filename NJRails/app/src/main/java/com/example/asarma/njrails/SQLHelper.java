@@ -61,6 +61,9 @@ class SQLHelper extends SQLiteOpenHelper {
         try {
             br = new BufferedReader(new InputStreamReader(amgr.open(filename)) );
             while ((line = br.readLine()) != null) {
+                if ( line.toCharArray()[0] == 0xFEFF) { // BOM
+                    line = line.substring(1);
+                }
                 // use comma as separator
                 String[] tokens = line.split(cvsSplitBy);
                 if (cols == null ) {

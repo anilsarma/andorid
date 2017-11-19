@@ -29,6 +29,7 @@ import android.widget.Toast;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,24 +59,23 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
         setupDB();
-
         // do this in the background
-
         if (stationcodes.size()==0) {
             ArrayList<HashMap<String, Object>> r = dbHelper.read_csv("station_codes.txt");
             //System.out.print(r);
             for (int i = 0; i < r.size(); i++) {
                 try {
                     if (true) {
-                        stationcodes.put(r.get(i).get("station_name").toString(), r.get(i).get("station_code").toString());
+                        stationcodes.put(Utils.capitalize(r.get(i).get("station_name").toString()), r.get(i).get("station_code").toString());
                     }
                 } catch (Exception e) {
                     // e.printStackTrace();
                 }
             }
         }
-        stationcodes.put("New Brunswick", "NB");
-        stationcodes.put("New York", "NY");
+        //stationcodes.put("New Brunswick", "NB");
+        //stationcodes.put("New York", "NY");
+
         System.out.println("Code Size" + stationcodes.size());
         System.out.println(stationcodes.keySet().toArray(new String[]{}));
         // The last two arguments ensure LayoutParams are inflated
@@ -173,7 +173,17 @@ public class MainActivityFragment extends Fragment {
                                 Date now = new Date();
                                 String status_code = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "status_code", "NY");
                                 if( status_result.isEmpty() || (( now.getTime() - date.getTime()) > 20000)) {
-                                    new DownloadFilesTask(rootView, frag).execute("", status_code);
+                                    new DownloadFilesTask(rootView, new IDownloadComple() {
+                                        @Override
+                                        public Context getContext() {
+                                            return MainActivityFragment.this.getContext();
+                                        }
+
+                                        @Override
+                                        public void updateAdapter(View view, Long s, ArrayList<HashMap<String, Object>> result) {
+                                            MainActivityFragment.this.updateAdapter(view, s, result);
+                                        }
+                                    }).execute("", status_code);
                                 }
                                 else {
                                     swipe.setRefreshing(false);
@@ -224,7 +234,7 @@ public class MainActivityFragment extends Fragment {
 
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "start_station", start, new Date());
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "stop_station", stop, new Date());
-                    updateRoutes(rootView, start, stop, index-1, routes);
+                    updateRoutes(rootView, start, stop, index-1, routes, false);
                     View station_query = (View) rootView.findViewById(R.id.station_query);
                     ViewGroup.LayoutParams params = station_query.getLayoutParams();
                     params.height = 0;
@@ -260,6 +270,7 @@ public class MainActivityFragment extends Fragment {
             /* move this to a section to a background thread */
             Spinner status_spinner = (Spinner) rootView.findViewById(R.id.station_status_spinner);
             String codes[] = stationcodes.keySet().toArray(new String[]{});
+            Arrays.sort(codes);
             ArrayAdapter<CharSequence> status_adaptor = new ArrayAdapter<CharSequence>(rootView.getContext(), android.R.layout.simple_spinner_item,  codes);
             status_adaptor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             status_spinner.setAdapter(status_adaptor);
@@ -288,7 +299,17 @@ public class MainActivityFragment extends Fragment {
                     String code = stationcodes.get(start);
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "status_code", code, new Date());
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "status_station", start, new Date());
-                    new DownloadFilesTask(rootView, frag).execute( start, code  );
+                    new DownloadFilesTask(rootView, new IDownloadComple() {
+                        @Override
+                        public Context getContext() {
+                            return rootView.getContext();
+                        }
+
+                        @Override
+                        public void updateAdapter(View view, Long s, ArrayList<HashMap<String, Object>> result) {
+                            MainActivityFragment.this.updateAdapter(view, s, result);
+                        }
+                    }).execute( start, code  );
 
                     View status_query = (View) rootView.findViewById(R.id.status_query);
                     ViewGroup.LayoutParams params = status_query.getLayoutParams();
@@ -302,7 +323,17 @@ public class MainActivityFragment extends Fragment {
             status.updateRoutes(rootView, status_result);
             try {
                 String status_code = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "status_code", "NY");
-                new DownloadFilesTask( rootView, this).execute("", status_code);
+                new DownloadFilesTask(rootView, new IDownloadComple() {
+                    @Override
+                    public Context getContext() {
+                        return this.getContext();
+                    }
+
+                    @Override
+                    public void updateAdapter(View view, Long s, ArrayList<HashMap<String, Object>> result) {
+                        MainActivityFragment.this.updateAdapter(view, s, result);
+                    }
+                }).execute("", status_code);
             }
             catch (Exception e)
             {
@@ -345,7 +376,7 @@ public class MainActivityFragment extends Fragment {
 
                     int days = index-1;
                     routes = Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getWritableDatabase(), stop, start, Integer.parseInt(Utils.getLocaDate(days))));
-                    updateRoutes(rootView, stop, start, days, routes);
+                    updateRoutes(rootView, stop, start, days, routes, false);
                 }
             });
 
@@ -353,6 +384,27 @@ public class MainActivityFragment extends Fragment {
         }
 
         return rootView;
+    }
+    static HashMap<String, String> status_details = new HashMap<>();
+    public void onStatusUpdate(View view, Long s, ArrayList<HashMap<String, Object>> result) {
+        this.status_result = result;
+        for ( HashMap<String, Object> set: result ) {
+            String train = set.get("train").toString();
+            String platform = set.get("track").toString();
+            String status = set.get("status").toString();
+            String ss = "";
+            if (! platform.isEmpty() ) {
+                ss = " track# " + platform;
+            }
+            if(!status.isEmpty()) {
+                ss += " Status: " + status;
+            }
+            if ( !ss.isEmpty()) {
+                status_details.put(train, ss);
+            }
+
+
+        }
     }
     public void updateAdapter(View view, Long s, ArrayList<HashMap<String, Object>> result) {
         // update thes
@@ -428,7 +480,8 @@ public class MainActivityFragment extends Fragment {
             start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", start);
             stop = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "stop_station", stop);
         }
-        updateRoutes(rootView, start, stop, index-1, Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getReadableDatabase(), start, stop, Integer.parseInt(Utils.getLocaDate(index-1)))));
+        routes = Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getReadableDatabase(), start, stop, Integer.parseInt(Utils.getLocaDate(index-1))));
+        updateRoutes(rootView, start, stop, index-1, routes, false);
     }
 
     TextView addTextView(Context context, ViewGroup parent, String text, int font_size, int padding)
@@ -443,7 +496,7 @@ public class MainActivityFragment extends Fragment {
         tv.setPadding(Utils.pxFromSp(10, getContext()), Utils.pxFromSp(padding, getContext()) , 0, 0);
         return  tv;
     }
-    void updateRoutes(View rootView, String start, String stop, int days, ArrayList<HashMap<String, Object>> routes)
+    void updateRoutes(View rootView, String start, String stop, int days, ArrayList<HashMap<String, Object>> routes, final boolean refresh)
     {
         Calendar cal = Calendar.getInstance();
         TimeZone tz = cal.getTimeZone();
@@ -473,9 +526,11 @@ public class MainActivityFragment extends Fragment {
         TableLayout tl = (TableLayout)rootView.findViewById(R.id.routes);
         tl.removeAllViews();
         int selected = 0;
+        TableLayout sel_view=null;
         String favs = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "favorites", "");
         ArrayList<String> fav = Utils.split(",", favs);
-        int location = rootView.getScrollY();
+        final NestedScrollView scrollView =(NestedScrollView) rootView.getRootView().findViewById(R.id.route_scroll);
+        int location = scrollView.getScrollY();
         Date now = new Date();
         for(int i=0;i< routes.size();i ++) {
             HashMap<String, Object> data = routes.get(i);
@@ -541,15 +596,32 @@ public class MainActivityFragment extends Fragment {
                     long diff = (st_time.getTime() - (now.getTime()))/(1000*60);
 
                     if ((diff >=-10) && (diff < 120)) {
+                        String platform = status_details.get(block_id);
+                        if( platform == null ) {
+                            platform = "";
+                        }
+                        // check the statusl for the train
+
+                        if( false ) {
+                            for (HashMap<String, Object> value : status_result) {
+                                System.out.println("Status_result count:" + status_result.size() + " " + value.get("train").toString() + " " + block_id
+                                        + " " + value.get("track"));
+                                if (value.get("train").toString().equals(block_id)) {
+                                    platform = value.get("track").toString();
+                                    if (!platform.isEmpty()) {
+                                        platform = " track#" + platform;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
                         if ( diff >=0 ) {
-                            schedule= "    " + diff + " minutes";
+                            schedule= "    " + diff + " minutes " + platform;
                         }
                         if ( diff < 0 ) {
-                            schedule= "    " + Math.abs(diff) + " minutes ago";
+                            schedule= "    " + Math.abs(diff) + " minutes ago " + platform;
                         }
                     }
-
-
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -584,7 +656,8 @@ public class MainActivityFragment extends Fragment {
                 if ( sz <= 0 ) {
                     sz = 70;
                 }
-                selected = i * sz;
+                selected = i;
+                sel_view = tl2;
             }
 
             for ( String key:data.keySet()
@@ -594,25 +667,37 @@ public class MainActivityFragment extends Fragment {
             }
 
         }
+        final int pxdown = location;//==0?selected:location ;//* 200; selected
+        final int sv_index = selected;
+        final TableLayout sv_selected = sel_view;
+        //final NestedScrollView v =(NestedScrollView) rootView.getRootView().findViewById(R.id.route_scroll);
+        scrollView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
 
+            }
+        }, 0);
 
-
-        final int pxdown = location ;//* 200; selected
-        final NestedScrollView v =(NestedScrollView) rootView.getRootView().findViewById(R.id.route_scroll);
-        ViewTreeObserver vto = v.getViewTreeObserver();
+        ViewTreeObserver vto = scrollView.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             boolean done = false;
             @Override
             public void onGlobalLayout() {
+
                 if(!done)  {
-                    v.scrollTo(0, pxdown);
-                    Toast.makeText(getContext(),(String)"Pager scroll to " + pxdown, Toast.LENGTH_SHORT).show();
+                    if(refresh) {
+                        scrollView.scrollTo(0, pxdown);
+                        //Toast.makeText(getContext(), (String) "Pager scroll to " + pxdown, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        int px = sv_selected.getHeight() * sv_index;
+                        scrollView.scrollTo(0, px);
+                        //Toast.makeText(getContext(), (String) "init Pager scroll to " + px, Toast.LENGTH_SHORT).show();
+                    }
                 }
                 done= true;
             }
         });
-
-
     }
 
     void buildTable(View rootView)
@@ -706,6 +791,7 @@ public class MainActivityFragment extends Fragment {
         }
         public void run() {
             //Code for the viewPager to change view
+            //Code for the viewPager to change viewsc
             rootView.postInvalidate();
             System.out.println("timer expired.");
             rootView.post(new Runnable() {
@@ -716,28 +802,63 @@ public class MainActivityFragment extends Fragment {
             });
         }
     }
-public void refresh() {
-    String start = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "start_station", "");
-    if (start == null) {
-        return;
+    Date lastime = Utils.make_cal(new Date(), Calendar.HOUR, -2).getTime();
+    public void refresh() {
+        Date now = new Date();
+        String start = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "start_station", "");
+        if (start == null) {
+            return;
+        }
+        String stop = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "stop_station", null);
+        if (stop == null) {
+            return;
+        }
+
+        if (( now.getTime() - lastime.getTime()) > 20000) {
+
+            if (!start.isEmpty()) {
+                String code = stationcodes.get(Utils.capitalize(start));
+                if(code !=null & !code.isEmpty()) {
+                    new DownloadFilesTask(rootView, new IDownloadComple() {
+                        @Override
+                        public Context getContext() {
+                            return rootView.getContext();
+                        }
+
+                        @Override
+                        public void updateAdapter(View view, Long s, ArrayList<HashMap<String, Object>> result) {
+                            MainActivityFragment.this.onStatusUpdate(view, s, result);
+                        }
+                    }).execute(start, code);
+                    lastime = now;
+                }
+                else {
+                    Toast.makeText(rootView.getContext(), "Did not find station code for " + start.toString(), Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
+        int days = myPage - 1;
+        if ( routes == null ) {
+            routes = Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getWritableDatabase(), start, stop, Integer.parseInt(Utils.getLocaDate(days))));
+        }
+        if (!routes.isEmpty()) {
+            updateRoutes(rootView, start, stop, days, routes, true);
+        }
     }
-    String stop = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "stop_station", null);
-    if (stop == null) {
-        return;
-    }
-    int days = myPage - 1;
-    routes = Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getWritableDatabase(), stop, start, Integer.parseInt(Utils.getLocaDate(days))));
-    if (!routes.isEmpty()) {
-        updateRoutes(rootView, stop, start, days, routes);
-    }
-}
+    @Override
     public void setMenuVisibility(final boolean visible) {
         super.setMenuVisibility(visible);
         if ( myPage == FIRST_PAGE ) {
+            //Toast.makeText(getContext(),(String)"setMenuVisible "+ visible + " " + myPage, Toast.LENGTH_SHORT).show();
             if (visible && rootView != null) {
                 refresh();
                 timer = new Timer();
-                timer.schedule(new UpdateTimeTask(rootView), 30000, 30000);
+                // time to next minute
+                int seconds = Calendar.getInstance().get(Calendar.HOUR);
+                int inital_delay = (60 - seconds)%10 + 1;
+                inital_delay = inital_delay * 1000;
+                timer.schedule(new UpdateTimeTask(rootView), inital_delay, 10000);
             }
 
             if ( !visible) {

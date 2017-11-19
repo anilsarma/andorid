@@ -41,7 +41,14 @@ public class Utils {
 
         return dateFormat.format(dt);
     }
+    static Calendar make_cal(Date date, int field, int ammount)
+    {
+        Calendar ca=Calendar.getInstance();
+        ca.setTime(date);
+        ca.add(field, ammount);
 
+        return ca;
+    }
     static public String formatToLocalDateTime(Date dt)
     {
         Calendar cal = Calendar.getInstance();
@@ -93,7 +100,7 @@ public class Utils {
         TimeZone tz = cal.getTimeZone();
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-       // Date date = new Date();
+        // Date date = new Date();
         dateFormat.setTimeZone(tz);
         SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss");
         timeformat.setTimeZone(tz);

@@ -10,7 +10,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,9 +29,9 @@ import java.util.List;
 */
 public class DownloadFilesTask extends AsyncTask<String, Integer, Long> {
 
-    MainActivityFragment parent;
+    IDownloadComple parent;
     View view;
-    public DownloadFilesTask(View view, MainActivityFragment parent)
+    public DownloadFilesTask(View view, IDownloadComple parent)
     {
         this.parent = parent;
         this.view = view;
@@ -73,7 +72,7 @@ public class DownloadFilesTask extends AsyncTask<String, Integer, Long> {
                 data.put("train", train);
                 data.put("station", station);
                 result.add(data);
-                System.out.println("Mege: " + time + " track:" + track + "  train:" + train + " to:" + to + " status:" + status );
+                //System.out.println("Mege: " + time + " track:" + track + "  train:" + train + " to:" + to + " status:" + status );
             }
            // System.out.println(table);
            // System.out.println("all done ..  =====================" + table);
@@ -97,7 +96,10 @@ public class DownloadFilesTask extends AsyncTask<String, Integer, Long> {
         parent.updateAdapter(view, status, result);
         if( status == -1 ){
             // should really let the UI handle this.
-            Toast.makeText(parent.getContext(), "Connection timed out for status", Toast.LENGTH_LONG).show();;
+            if ( parent.getContext()!= null ) {
+                Toast.makeText(parent.getContext(), "Connection timed out for status", Toast.LENGTH_LONG).show();
+                ;
+            }
         }
     }
 }
