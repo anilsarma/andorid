@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -138,9 +139,24 @@ public class MainActivityFragment extends Fragment {
         stop_station_spinner.setAdapter(adapter);
         routes_spinner.setAdapter(njt_adaptor);
 
-        int spinnerPosition = njt_adaptor.getPosition("Northeast Corridor");
+        //routes_spinner
+        String route_name = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "route_name", "Northeast Corridor");
+        int spinnerPosition = njt_adaptor.getPosition(route_name);
         routes_spinner.setSelection(spinnerPosition);
         System.out.println("Spinner count:"+spinnerPosition);
+        routes_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String route = parent.getSelectedItem().toString();
+                Toast.makeText(rootView.getContext(), "Selected :" + route , Toast.LENGTH_LONG).show();
+                // need to update adaptor value .. and refresh
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         String start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", "NEW BRUNSWICK");
         String stop  = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "stop_station", "NEW YORK PENN STATION");
@@ -204,6 +220,7 @@ public class MainActivityFragment extends Fragment {
         views.put(new Integer(index), rootView);
         if( index >= FIRST_PAGE ) {
             Button button = (Button)rootView.findViewById(R.id.station_query_button);
+
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -849,6 +866,16 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void setMenuVisibility(final boolean visible) {
         super.setMenuVisibility(visible);
+        OnPageVisible(visible);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+       OnPageVisible(true);
+    }
+
+    public void OnPageVisible(boolean visible ) {
         if ( myPage == FIRST_PAGE ) {
             //Toast.makeText(getContext(),(String)"setMenuVisible "+ visible + " " + myPage, Toast.LENGTH_SHORT).show();
             if (visible && rootView != null) {
@@ -864,6 +891,7 @@ public class MainActivityFragment extends Fragment {
             if ( !visible) {
                 if ( timer != null ) {
                     timer.cancel();
+                    Toast.makeText(rootView.getContext(), "Timer canceled ", Toast.LENGTH_LONG).show();
                     timer = null;
                 }
             }
