@@ -34,9 +34,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 
 public class MainActivityFragment extends Fragment {
     static int STATUS_PAGE=0;
@@ -57,6 +59,9 @@ public class MainActivityFragment extends Fragment {
 
     View rootView=null;
     Timer timer = null;
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
         setupDB();
@@ -74,13 +79,7 @@ public class MainActivityFragment extends Fragment {
                 }
             }
         }
-        //stationcodes.put("New Brunswick", "NB");
-        //stationcodes.put("New York", "NY");
 
-        System.out.println("Code Size" + stationcodes.size());
-        System.out.println(stationcodes.keySet().toArray(new String[]{}));
-        // The last two arguments ensure LayoutParams are inflated
-        // properly.
         Bundle args = getArguments();
         final int index = args.getInt(ARG_OBJECT);
         myPage = index;
@@ -99,8 +98,8 @@ public class MainActivityFragment extends Fragment {
 
         View station_query = (View) rootView.findViewById(R.id.station_query);
         View status_query = (View) rootView.findViewById(R.id.status_query);
-        Spinner start_station_spinner = (Spinner) rootView.findViewById(R.id.start_station_spinner);
-        Spinner stop_station_spinner = (Spinner) rootView.findViewById(R.id.stop_station_spinner);
+        final Spinner start_station_spinner = (Spinner) rootView.findViewById(R.id.start_station_spinner);
+        final Spinner stop_station_spinner = (Spinner) rootView.findViewById(R.id.stop_station_spinner);
         Spinner routes_spinner = (Spinner) rootView.findViewById(R.id.routes_spinner);
         ViewGroup.LayoutParams params = station_query.getLayoutParams();
         params.height = 0;
@@ -119,17 +118,8 @@ public class MainActivityFragment extends Fragment {
             njt_routes[i] = Utils.capitalize(njt_routes[i]);
         }
         ArrayAdapter<CharSequence> njt_adaptor = new ArrayAdapter<CharSequence>(rootView.getContext(), android.R.layout.simple_spinner_item,  njt_routes);
-        String sql_stations = "select * from stops where stop_id in (select  distinct stop_id from stop_times where trip_id in ( select distinct trip_id from trips where route_id  = {route_id} ) );";
-
-        String sql_route = "select * from routes where route_long_name like '%{route_name}%';".replace("{route_name}", "Northeast Corridor");
-        System.out.println("SQL:" + sql_route);
-        String route_id[]  = SQLHelper.get_values(dbHelper.getReadableDatabase(),sql_route, "route_id");
-        sql_stations = sql_stations.replace("{route_id}", "" + route_id[0] );
-        System.out.println("SQL:" + sql_stations );
-        String startStations[] = SQLHelper.get_values( dbHelper.getReadableDatabase(), sql_stations, "stop_name");
-        for (int i = 0; i < startStations.length; i++) {
-            startStations[i] = Utils.capitalize(startStations[i]);
-        }
+        final String route_name = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "route_name", "Northeast Corridor");
+        String startStations[] = SQLHelper.getRouteStations( dbHelper.getReadableDatabase(), route_name );
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(rootView.getContext(), android.R.layout.simple_spinner_item,  startStations);
 
         njt_adaptor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -140,16 +130,35 @@ public class MainActivityFragment extends Fragment {
         routes_spinner.setAdapter(njt_adaptor);
 
         //routes_spinner
-        String route_name = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "route_name", "Northeast Corridor");
+
         int spinnerPosition = njt_adaptor.getPosition(route_name);
         routes_spinner.setSelection(spinnerPosition);
         System.out.println("Spinner count:"+spinnerPosition);
         routes_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String route = parent.getSelectedItem().toString();
-                Toast.makeText(rootView.getContext(), "Selected :" + route , Toast.LENGTH_LONG).show();
+                String route_name = parent.getSelectedItem().toString();
+                //Toast.makeText(rootView.getContext(), "Selected :" + route_name , Toast.LENGTH_LONG).show();
                 // need to update adaptor value .. and refresh
+                String startStations[] = SQLHelper.getRouteStations( dbHelper.getReadableDatabase(), route_name );
+                ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(rootView.getContext(), android.R.layout.simple_spinner_item,  startStations);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                start_station_spinner.setAdapter(adapter);
+                stop_station_spinner.setAdapter(adapter);
+
+                start_station_spinner.invalidate();
+                stop_station_spinner.invalidate();
+                adapter.notifyDataSetChanged();
+
+                String start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", startStations[0] );
+                String stop  = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "stop_station", startStations[1] );
+
+                int spinnerPosition = adapter.getPosition(Utils.capitalize(start));
+                stop_station_spinner.setSelection(spinnerPosition);
+                spinnerPosition = adapter.getPosition(Utils.capitalize(stop));
+                start_station_spinner.setSelection(spinnerPosition);
+
             }
 
             @Override
@@ -158,8 +167,8 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
-        String start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", "NEW BRUNSWICK");
-        String stop  = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "stop_station", "NEW YORK PENN STATION");
+        String start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", startStations[0] );
+        String stop  = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "stop_station", startStations[1] );
 
         SQLHelper.update_user_pref( dbHelper.getWritableDatabase(), "start_station", start, new Date());
         SQLHelper.update_user_pref( dbHelper.getWritableDatabase(), "stop_station", stop, new Date());
@@ -189,7 +198,7 @@ public class MainActivityFragment extends Fragment {
                                 Date now = new Date();
                                 String status_code = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "status_code", "NY");
                                 if( status_result.isEmpty() || (( now.getTime() - date.getTime()) > 20000)) {
-                                    new DownloadFilesTask(rootView, new IDownloadComple() {
+                                    new DownloadFilesTask(rootView, "Swipe " + myPage, new IDownloadComple() {
                                         @Override
                                         public Context getContext() {
                                             return MainActivityFragment.this.getContext();
@@ -224,8 +233,8 @@ public class MainActivityFragment extends Fragment {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Spinner st = (Spinner)view.getRootView().findViewById(R.id.start_station_spinner);
-                    Spinner sp = (Spinner)view.getRootView().findViewById(R.id.stop_station_spinner);
+                    Spinner st = (Spinner)rootView.findViewById(R.id.start_station_spinner);
+                    Spinner sp = (Spinner)rootView.findViewById(R.id.stop_station_spinner);
                     String start = st.getSelectedItem().toString();
                     String stop = sp.getSelectedItem().toString();
 
@@ -248,7 +257,7 @@ public class MainActivityFragment extends Fragment {
                         return;
 
                     }
-
+                    SQLHelper.update_user_pref( dbHelper.getWritableDatabase(), "route_name", route_name, new Date() );
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "start_station", start, new Date());
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "stop_station", stop, new Date());
                     updateRoutes(rootView, start, stop, index-1, routes, false);
@@ -316,7 +325,7 @@ public class MainActivityFragment extends Fragment {
                     String code = stationcodes.get(start);
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "status_code", code, new Date());
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "status_station", start, new Date());
-                    new DownloadFilesTask(rootView, new IDownloadComple() {
+                    new DownloadFilesTask(rootView, " Button " + myPage, new IDownloadComple() {
                         @Override
                         public Context getContext() {
                             return rootView.getContext();
@@ -340,7 +349,7 @@ public class MainActivityFragment extends Fragment {
             status.updateRoutes(rootView, status_result);
             try {
                 String status_code = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "status_code", "NY");
-                new DownloadFilesTask(rootView, new IDownloadComple() {
+                new DownloadFilesTask(rootView, " init " + myPage, new IDownloadComple() {
                     @Override
                     public Context getContext() {
                         return this.getContext();
@@ -653,10 +662,6 @@ public class MainActivityFragment extends Fragment {
                 }
             }
             TextView th2  = addTextView(getContext(), tl2, msg, 5, 0);
-            //addTextView(this, tl2, "" , 5, 5);
-            //tl2.setOnClickListener( new TableRowListener(th, block_id + " "+ route_name + " " + departture_time));
-
-            //new RouteTouchListener(tl2, block_id + " "+ route_name + " " + departture_time));
             boolean initstate = true;
             if ( fav.contains("" + block_id )) {
                 initstate=false;
@@ -810,7 +815,7 @@ public class MainActivityFragment extends Fragment {
             //Code for the viewPager to change view
             //Code for the viewPager to change viewsc
             rootView.postInvalidate();
-            System.out.println("timer expired.");
+            //System.out.println("timer expired.");
             rootView.post(new Runnable() {
                 @Override
                 public void run() {
@@ -832,11 +837,13 @@ public class MainActivityFragment extends Fragment {
         }
 
         if (( now.getTime() - lastime.getTime()) > 20000) {
-
             if (!start.isEmpty()) {
                 String code = stationcodes.get(Utils.capitalize(start));
-                if(code !=null & !code.isEmpty()) {
-                    new DownloadFilesTask(rootView, new IDownloadComple() {
+                if( code == null && start.endsWith("Station")) {
+                    code = stationcodes.get(Utils.capitalize(start).replace(" Station", ""));
+                }
+                if(code !=null && !code.isEmpty()) {
+                    new DownloadFilesTask(rootView, " Refresh " + myPage +  " now:" + Utils.getLocaDateTime(), new IDownloadComple() {
                         @Override
                         public Context getContext() {
                             return rootView.getContext();
@@ -872,7 +879,19 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-       OnPageVisible(true);
+       OnPageVisible(false);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        OnPageVisible(false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        OnPageVisible(true);
     }
 
     public void OnPageVisible(boolean visible ) {
@@ -880,20 +899,23 @@ public class MainActivityFragment extends Fragment {
             //Toast.makeText(getContext(),(String)"setMenuVisible "+ visible + " " + myPage, Toast.LENGTH_SHORT).show();
             if (visible && rootView != null) {
                 refresh();
+                if (timer != null) {
+                    timer.cancel();
+                    //Toast.makeText(rootView.getContext(), "Timer 2 canceled ", Toast.LENGTH_LONG).show();
+                }
                 timer = new Timer();
                 // time to next minute
                 int seconds = Calendar.getInstance().get(Calendar.HOUR);
-                int inital_delay = (60 - seconds)%10 + 1;
+                int inital_delay = (60 - seconds) % 10 + 1;
                 inital_delay = inital_delay * 1000;
                 timer.schedule(new UpdateTimeTask(rootView), inital_delay, 10000);
             }
-
-            if ( !visible) {
-                if ( timer != null ) {
-                    timer.cancel();
-                    Toast.makeText(rootView.getContext(), "Timer canceled ", Toast.LENGTH_LONG).show();
-                    timer = null;
-                }
+        }
+        if ( !visible) {
+            if ( timer != null ) {
+                timer.cancel();
+                // Toast.makeText(rootView.getContext(), "Timer canceled ", Toast.LENGTH_LONG).show();
+                timer = null;
             }
         }
     }

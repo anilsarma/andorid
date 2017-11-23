@@ -31,10 +31,12 @@ public class DownloadFilesTask extends AsyncTask<String, Integer, Long> {
 
     IDownloadComple parent;
     View view;
-    public DownloadFilesTask(View view, IDownloadComple parent)
+    String msg;
+    public DownloadFilesTask(View view, String msg, IDownloadComple parent)
     {
         this.parent = parent;
         this.view = view;
+        this.msg = msg;
     }
     ArrayList<HashMap<String, Object>> result= new ArrayList<>();
     protected Long doInBackground(String... codes) {
@@ -48,7 +50,7 @@ public class DownloadFilesTask extends AsyncTask<String, Integer, Long> {
             Node node = (Node) table;
             List<Node> child = node.childNodes().get(1).childNodes();
             // discard the frist 3
-            System.out.println("child ===================== Size:" + child.size());
+            //System.out.println("child ===================== Size:" + child.size());
             for (int i = 3; i < child.size(); i++) {
                 Node tr = child.get(i);
                 List<Node> td = tr.childNodes();
@@ -97,7 +99,7 @@ public class DownloadFilesTask extends AsyncTask<String, Integer, Long> {
         if( status == -1 ){
             // should really let the UI handle this.
             if ( parent.getContext()!= null ) {
-                Toast.makeText(parent.getContext(), "Connection timed out for status", Toast.LENGTH_LONG).show();
+                Toast.makeText(parent.getContext(), "Connection timed out for status " + this.msg, Toast.LENGTH_LONG).show();
                 ;
             }
         }

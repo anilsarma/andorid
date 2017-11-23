@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by asarma on 11/2/2017.
@@ -248,5 +250,25 @@ System.out.println("output " + date + " stop:" + start_stop_id + " end:"+ stop_s
 
         Cursor curser = db.rawQuery(sql, null);
         return curser;
+    }
+
+
+    static public String[] getRouteStations(SQLiteDatabase db, String route_name)
+    {
+        String sql_stations = "select * from stops where stop_id in (select  distinct stop_id from stop_times where trip_id in ( select distinct trip_id from trips where route_id  = {route_id} ) );";
+
+        String sql_route = "select * from routes where route_long_name like '%{route_name}%';".replace("{route_name}", route_name);
+        System.out.println("SQL:" + sql_route);
+        String route_id[]  = SQLHelper.get_values(db,sql_route, "route_id");
+        sql_stations = sql_stations.replace("{route_id}", "" + route_id[0] );
+        System.out.println("SQL:" + sql_stations );
+        String startStations[] = SQLHelper.get_values( db, sql_stations, "stop_name");
+        Set<String> u = new TreeSet<>();
+
+        for (int i = 0; i < startStations.length; i++) {
+            u.add(Utils.capitalize(startStations[i]));
+        }
+        startStations = u.toArray(new String[0]);
+        return startStations;
     }
 }
