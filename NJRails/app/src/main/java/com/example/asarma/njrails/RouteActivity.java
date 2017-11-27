@@ -32,8 +32,10 @@ public class RouteActivity extends FragmentActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         dbHelper = new SQLHelper(this);
-
         super.onCreate(savedInstanceState);
+
+
+
         SQLiteDatabase db= dbHelper.getWritableDatabase();
 
         try {

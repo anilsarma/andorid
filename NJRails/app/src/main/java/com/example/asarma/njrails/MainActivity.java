@@ -47,23 +47,28 @@ public class MainActivity extends FragmentActivity {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
 
+//
+//        try {
+//            GoogleDriveTest.main();
+//            GoogleSignInClient googleSignInClient = buildGoogleSignInClient();;
+//            startActivityForResult(googleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+//
+//            GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
+//            if ( signInAccount != null ) {
+//                initializeDriveClient(signInAccount);
+//            }
+//            //mDriveClient = Drive.getDriveClient(this, GoogleSignIn.getLastSignedInAccount(this));
+//            //mDriveResourceClient = Drive.getDriveResourceClient(this, GoogleSignIn.getLastSignedInAccount(this));
+//
+//        }  catch (Exception e) {
+//            e.printStackTrace();
+//        }
+    }
 
-        try {
-            GoogleDriveTest.main();
-            GoogleSignInClient googleSignInClient = buildGoogleSignInClient();;
-            startActivityForResult(googleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
-
-            GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
-            if ( signInAccount != null ) {
-                initializeDriveClient(signInAccount);
-            }
-            //mDriveClient = Drive.getDriveClient(this, GoogleSignIn.getLastSignedInAccount(this));
-            //mDriveResourceClient = Drive.getDriveResourceClient(this, GoogleSignIn.getLastSignedInAccount(this));
-
-
-        }  catch (Exception e) {
-            e.printStackTrace();
-        }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        new DownloadGitHubFile(getApplicationContext(), "trips.txt").execute("");
     }
 
     private GoogleSignInClient buildGoogleSignInClient() {
