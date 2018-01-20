@@ -352,7 +352,7 @@ public class MainActivityFragment extends Fragment {
                 new DownloadFilesTask(rootView, " init " + myPage, new IDownloadComple() {
                     @Override
                     public Context getContext() {
-                        return this.getContext();
+                        return MainActivityFragment.this.getContext();
                     }
 
                     @Override
