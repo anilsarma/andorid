@@ -166,35 +166,20 @@ public class MainActivity extends FragmentActivity {
                     }
                     Toast.makeText(MainActivity.this.getApplicationContext(), "unzipped " + s, Toast.LENGTH_LONG).show();
 
-                    new AsyncTask<Integer, Integer, Long>() {
-                        protected Long doInBackground(Integer... value) {
-                            SQLiteDatabase db= dbHelper.getWritableDatabase();
-                            dbHelper.useAsset=false;
-                            Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade starting rail_data.zip", Toast.LENGTH_LONG).show();
-                            dbHelper.update_tables(db, false);
-                            Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade Complete rail_data.zip", Toast.LENGTH_LONG).show();
-                            try {
-                                tmp.writeFile(version, upgrade_version_str);
-                            }
-                            catch (IOException e) {
-                                return new Long(1);
-                            }
+                    try {
+                        tmp.writeFile(download_complete, upgrade_version_str);
 
-                            return new Long(0);
-                        }
-
-                        protected void onProgressUpdate(Integer... progress) {
-                            //setProgressPercent(progress[0]);
-                        }
-
-                        protected void onPostExecute(Long status) {
-                            if(status == 1) {
-                                Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade failed rail_data.zip", Toast.LENGTH_LONG).show();
-                            }
-
-                        }
-
-                    }.execute();
+                        SQLiteDatabase db= dbHelper.getWritableDatabase();
+                        dbHelper.useAsset=false;
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade starting rail_data.zip", Toast.LENGTH_LONG).show();
+                        dbHelper.update_tables(db, false);
+                        tmp.writeFile(version, upgrade_version_str);
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade Complete rail_data.zip", Toast.LENGTH_LONG).show();
+                    }
+                    catch (Exception e)
+                    {
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade failed rail_data.zip", Toast.LENGTH_LONG).show();
+                    }
                 }
 
             }
@@ -209,43 +194,22 @@ public class MainActivity extends FragmentActivity {
             new DownloadNJTGitHubFile(getApplicationContext(), "rail_data.zip", "rail_data.zip", new IGitHubDownloadComple() {
                 @Override
                 public void onDownloadComplete(String filename, File folder, File destination) {
+                    Toast.makeText(MainActivity.this.getApplicationContext(), "Download Complete, upgrading rail_data.zip", Toast.LENGTH_LONG).show();
                     try {
                         tmp.writeFile(download_complete, upgrade_version_str);
 
-                        new AsyncTask<Integer, Integer, Long>() {
-                            protected Long doInBackground(Integer... value) {
-                                SQLiteDatabase db= dbHelper.getWritableDatabase();
-                                dbHelper.useAsset=false;
-                                Toast.makeText(MainActivity.this.getApplicationContext(), "DB2 upgrade starting rail_data.zip", Toast.LENGTH_LONG).show();
-                                dbHelper.update_tables(db, false);
-                                Toast.makeText(MainActivity.this.getApplicationContext(), "DB2 upgrade Complete rail_data.zip", Toast.LENGTH_LONG).show();
-                                try {
-                                    tmp.writeFile(version, upgrade_version_str);
-                                }
-                                catch (IOException e) {
-                                    return new Long(1);
-                                }
-
-                                return new Long(0);
-                            }
-
-                            protected void onProgressUpdate(Integer... progress) {
-                                //setProgressPercent(progress[0]);
-                            }
-
-                            protected void onPostExecute(Long status) {
-                                if(status == 1) {
-                                    Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade failed rail_data.zip", Toast.LENGTH_LONG).show();
-                                }
-                            }
-
-                        }.execute();
-
+                        SQLiteDatabase db= dbHelper.getWritableDatabase();
+                        dbHelper.useAsset=false;
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "DB2 upgrade starting rail_data.zip", Toast.LENGTH_LONG).show();
+                        dbHelper.update_tables(db, false);
+                        tmp.writeFile(version, upgrade_version_str);
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "DB2 upgrade Complete rail_data.zip", Toast.LENGTH_LONG).show();
                     }
                     catch (Exception e)
                     {
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade failed rail_data.zip", Toast.LENGTH_LONG).show();
                     }
-                    Toast.makeText(MainActivity.this.getApplicationContext(), "Download Complete rail_data.zip", Toast.LENGTH_LONG).show();
+
                 }
 
                 @Override
