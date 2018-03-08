@@ -43,13 +43,13 @@ public class RouteActivity extends FragmentActivity {
                 Toast.makeText(this.getBaseContext(),(String)"updating Database Tables",
                         Toast.LENGTH_SHORT).show();
                 RailHelper.create_tables(db);
-                dbHelper.update_tables(db);
+                dbHelper.update_tables(db, false);
             }
         }catch (Exception e) {
             Toast.makeText(this.getBaseContext(),(String)"Creating Database Tables",
                     Toast.LENGTH_SHORT).show();
             RailHelper.create_tables(db);
-            dbHelper.update_tables(db);
+            dbHelper.update_tables(db, false);
         }
 
         setContentView(R.layout.route_layout);
@@ -57,7 +57,7 @@ public class RouteActivity extends FragmentActivity {
 
           //  SQLiteDatabase db= dbHelper.getWritableDatabase();
             RailHelper.create_tables(db);
-            dbHelper.update_tables(db);
+            dbHelper.update_tables(db, false);
         }
 
         Calendar cal = Calendar.getInstance();

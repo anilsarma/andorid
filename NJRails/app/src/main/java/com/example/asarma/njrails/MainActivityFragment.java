@@ -93,7 +93,7 @@ public class MainActivityFragment extends Fragment {
         }
         if( !sqlrequest ) {
             sqlrequest = true;
-            new UploadSqlDBTask(rootView, frag).execute();
+            new UploadSqlDBTask(rootView, frag, false).execute();
         }
 
         View station_query = (View) rootView.findViewById(R.id.station_query);
@@ -475,20 +475,23 @@ public class MainActivityFragment extends Fragment {
         //super.onCreate(savedInstanceState);
         SQLiteDatabase db= dbHelper.getWritableDatabase();
 
+        /* need to do the actual upgrade here */
         try {
 
             if ( SQLHelper.check_table(db, "trips")== 0 ) {
                 Toast.makeText(getContext(),(String)"updating Database Tables",
                         Toast.LENGTH_SHORT).show();
                 RailHelper.create_tables(db);
-                dbHelper.update_tables(db);
+                dbHelper.update_tables(db, false);
             }
         } catch (Exception e) {
             Toast.makeText(getContext(),(String)"Creating Database Tables",
                     Toast.LENGTH_SHORT).show();
             RailHelper.create_tables(db);
-            dbHelper.update_tables(db);
+            dbHelper.update_tables(db, false);
         }
+
+        // check file upgrade and call SQLHelper.update_tables if necessary.
     }
 
     void on_local_create(View rootView, int index, Bundle savedInstanceState) {

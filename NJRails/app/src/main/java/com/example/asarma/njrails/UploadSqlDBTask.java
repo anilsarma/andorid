@@ -22,10 +22,12 @@ public class UploadSqlDBTask extends AsyncTask<Integer, Integer, Long> {
     SQLHelper dbHelper=null;
     MainActivityFragment parent;
     View view;
-    public UploadSqlDBTask(View view, MainActivityFragment parent)
+    boolean force = false;
+    public UploadSqlDBTask(View view, MainActivityFragment parent, boolean force)
     {
         this.parent = parent;
         this.view = view;
+        this.force = force;
     }
     ArrayList<HashMap<String, Object>> result;
     protected Long doInBackground(Integer... value) {
@@ -37,13 +39,13 @@ public class UploadSqlDBTask extends AsyncTask<Integer, Integer, Long> {
                 Toast.makeText(this.view.getContext(),(String)"updating Database Tables",
                         Toast.LENGTH_SHORT).show();
                 RailHelper.create_tables(db);
-                dbHelper.update_tables(db);
+                dbHelper.update_tables(db, force);
             }
         }catch (Exception e) {
             Toast.makeText(this.view.getContext(),(String)"Creating Database Tables",
                     Toast.LENGTH_SHORT).show();
             RailHelper.create_tables(db);
-            dbHelper.update_tables(db);
+            dbHelper.update_tables(db, force);
         }
         return new Long(0);
     }

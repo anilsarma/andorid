@@ -5,17 +5,18 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -24,31 +25,43 @@ import java.util.zip.ZipInputStream;
  * Created by Anil Sarma on 11/24/2017.
  */
 //https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt
-public class DownloadGitHubFile extends AsyncTask<String, Integer, String> {
+public class DownloadNJTGitHubFile extends AsyncTask<String, Integer, String> {
     String filename;
+    String destination;
     Context context;
     //String urlbase="https://raw.githubusercontent.com/anilsarma/android/master/NJRails/app/src/main/assets/";
-    String urlbase = "https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt";
-String msg;
+    String urlbase = "https://raw.githubusercontent.com/anilsarma/misc/master/njt/";
+    //String urlbase = "https://raw.githubusercontent.com/anilsarma/android/master/NJRails/cache/";
+    String msg;
+    IGitHubDownloadComple main;
 
-    public DownloadGitHubFile(Context context, String filename) {
+    public File cacheDir( Object filename)
+    {
+        return new File(context.getCacheDir() + "/db/" + filename);
+    }
+    public DownloadNJTGitHubFile( Context context, String filename, String destination, IGitHubDownloadComple main) {
+        this.main = main;
         this.context = context;
         this.filename = filename;
+        this.destination = destination;
+        if (this.destination == null) {
+            this.destination = this.filename;
+        }
+
+
     }
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-       // mProgressDialog.show();
+        // mProgressDialog.show();
     }
     // GET THE LAST MODIFIED TIME
     public long getLastModifiedTime(String url) throws  IOException
     {
         HttpURLConnection.setFollowRedirects(false);
-        HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+        HttpURLConnection con = (HttpURLConnection) new URL(url ).openConnection();
         con.connect();
         long date = con.getLastModified();
-
-
         return date;
     }
     @Override
@@ -61,7 +74,8 @@ String msg;
 
         }
 
-        File file = new File(context.getCacheDir() + "/db/" + filename);
+        File file = new File(context.getCacheDir() + "/db/" + destination);
+        file.delete();
 
         long lastModified = 0;
         if( file.exists() ) {
@@ -71,6 +85,7 @@ String msg;
             try {
                 if (lastModified < getLastModifiedTime(urlbase +  filename)) {
                     msg = "File " + filename + " exits  " + file.exists()  + " " + lastModified + " < " + getLastModifiedTime(urlbase + filename);
+                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
                     return "";
                 }
             }
@@ -93,6 +108,7 @@ String msg;
             if(connection.getResponseCode() == 304) {
                 System.out.println(file+ " : already downloaded");
                 msg = "File " + filename + " exits  " + file.exists()  + " " + lastModified + " < " + getLastModifiedTime(urlbase + filename);
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
                 return "";
             } else {
                 // Download the content again and store the image again
@@ -129,27 +145,95 @@ String msg;
             e.printStackTrace();
         }
         try {
-            msg = "File " + urlbase + " download complete " + file.exists() + " " + lastModified + " < " + getLastModifiedTime(urlbase + filename) + " sz=" + file.length();
+            msg = "File " + urlbase + " download complete " + file.exists() + " Modified:" + lastModified + " < webmodified " + getLastModifiedTime(urlbase + filename) + " sz=" + file.length();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return null;
     }
 
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
+
+        // check the version files
+        try {
+            File file = new File(context.getCacheDir() + "/db/" + destination);
+
+//            if (filename == "version.txt") {
+//                BufferedReader br = new BufferedReader(new FileReader(file));
+//                String version = br.readLine();
+//                br.close();
+//
+//                //Toast.makeText(context, "Content of version.txt " + version, Toast.LENGTH_LONG).show();
+//            }
+            main.onDownloadComplete( filename, new File(context.getCacheDir() + "/db"), file);
+        }
+        catch( Exception e) {
+            e.printStackTrace();;
+        }
         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-       // mProgressDialog.dismiss();
+        // mProgressDialog.dismiss();
 
     }
 
     @Override
     protected void onProgressUpdate(Integer... progress) {
         super.onProgressUpdate(progress);
-       // mProgressDialog.setProgress(progress[0]);
+        // mProgressDialog.setProgress(progress[0]);
     }
 
 
+    ArrayList<File> unzipfile(File fileZip, File directory) throws IOException
+    {
+        ArrayList<File> output = new ArrayList<>();
+        byte[] buffer = new byte[1024];
+        ZipInputStream zis = new ZipInputStream(new FileInputStream(fileZip));
+        ZipEntry zipEntry = zis.getNextEntry();
+        while(zipEntry != null){
+            String fileName = zipEntry.getName();
+            File newFile = new File(directory + fileName);
+            output.add(newFile);
+            FileOutputStream fos = new FileOutputStream(newFile);
+            int len;
+            while ((len = zis.read(buffer)) > 0) {
+                fos.write(buffer, 0, len);
+            }
+            fos.close();
+            zipEntry = zis.getNextEntry();
+        }
+        zis.closeEntry();
+        zis.close();
+        return output;
+    }
+
+    public void writeFile(File output, String data) throws IOException
+    {
+        FileOutputStream ot = new FileOutputStream(output);
+        ot.write(data.getBytes());
+        ot.close();
+    }
+
+    public String readFile(File file)
+    {
+        if(!file.exists()) {
+            return "";
+        }
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String data = br.readLine();
+            br.close();
+            return data;
+        }
+        catch (IOException e) {
+            return "";
+        }
+    }
+
+    public void removeFiles(File dir)
+    {
+        for(File currentFile: dir.listFiles()){
+            currentFile.delete();
+        }
+    }
 }

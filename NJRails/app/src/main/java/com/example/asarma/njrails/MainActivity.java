@@ -1,6 +1,8 @@
 package com.example.asarma.njrails;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
@@ -8,7 +10,6 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.asarma.njrails.route.GoogleDriveTest;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -25,6 +26,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
 
 public class MainActivity extends FragmentActivity {
     protected static final int REQUEST_CODE_SIGN_IN = 0;
@@ -36,6 +42,7 @@ public class MainActivity extends FragmentActivity {
     // representing an object in the collection.
     DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
     ViewPager mViewPager;
+    SQLHelper dbHelper;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,8 +75,187 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        new DownloadGitHubFile(getApplicationContext(), "trips.txt").execute("");
+        final DownloadNJTGitHubFile github = new DownloadNJTGitHubFile(getApplicationContext(), "", "", null);
+        //new DownloadGitHubFile(getApplicationContext(), "trips.txt").execute("");
+        File version_upgrade = github.cacheDir("version_upgrade.txt");
+        long diffms = (System.currentTimeMillis() - version_upgrade.lastModified());
+
+        long hours =  0;
+        long minutes = 0;
+        long seconds = 30;
+
+        if (diffms < (( (hours *60 + minutes) *60  + seconds) *1000) ) {
+            Toast.makeText(getApplicationContext(), "Skipping check Modified time is" + diffms,Toast.LENGTH_LONG).show();
+            return;
+        }
+        Toast.makeText(MainActivity.this.getApplicationContext(), "Modified time is" + diffms,Toast.LENGTH_LONG).show();
+        new DownloadNJTGitHubFile(getApplicationContext(), "version.txt", "version_upgrade.txt", new IGitHubDownloadComple() {
+            @Override
+            public void onDownloadComplete(String filename, File folder, File destination) {
+                // download the zip file nao
+                MainActivity.this.downloadZipFile();
+                Toast.makeText(MainActivity.this.getApplicationContext(), "Download Complete",Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailed(String filename) {
+
+            }
+        }).execute("");
     }
+
+    void downloadZipFile()
+    {
+        if (dbHelper == null) {
+            dbHelper = new SQLHelper(getApplicationContext());
+        }
+        final DownloadNJTGitHubFile tmp = new DownloadNJTGitHubFile(getApplicationContext(), "", "", null);
+        final File version = tmp.cacheDir("version.txt");
+        File version_upgrade = tmp.cacheDir("version_upgrade.txt");
+        File rail_data = tmp.cacheDir("rail_data.zip");
+
+        boolean download=true;
+        final String upgrade_version_str = tmp.readFile(version_upgrade);
+        final String version_str = tmp.readFile(version);
+        try {
+            if (version_str.equals(upgrade_version_str)) {
+                download = false;
+            }
+        }
+        catch(Exception e) {
+
+        }
+
+        final File download_complete = tmp.cacheDir("download_complete.txt");
+        if (download) {
+            if (rail_data.exists()) {
+                if (download_complete.exists()) {
+                    String s = tmp.readFile(download_complete);
+                    if (s == upgrade_version_str) {
+
+                    }
+                    else {
+                        rail_data.delete();
+                    }
+                }
+            }
+            //rail_data.delete();
+        }
+        if(download) {
+            if (rail_data.exists()) {
+                rail_data.delete();
+            }
+        }
+        if (rail_data.exists()) {
+            Toast.makeText(MainActivity.this.getApplicationContext(), "no download required of rail_data.zip version:" + version_str + " remote:" + upgrade_version_str, Toast.LENGTH_LONG).show();
+
+            // download_complete
+            File destination = tmp.cacheDir("rail_data.zip");
+            File dir = tmp.cacheDir("nj_rails_cache");
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+            tmp.removeFiles(dir);
+
+            try {
+                if (download) {
+                    ArrayList<File> o = tmp.unzipfile(destination, dir);
+                    String s = "" + o.size();
+                    for (String f : dir.list()) {
+                        s += " " + f;
+                    }
+                    Toast.makeText(MainActivity.this.getApplicationContext(), "unzipped " + s, Toast.LENGTH_LONG).show();
+
+                    new AsyncTask<Integer, Integer, Long>() {
+                        protected Long doInBackground(Integer... value) {
+                            SQLiteDatabase db= dbHelper.getWritableDatabase();
+                            dbHelper.useAsset=false;
+                            Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade starting rail_data.zip", Toast.LENGTH_LONG).show();
+                            dbHelper.update_tables(db, false);
+                            Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade Complete rail_data.zip", Toast.LENGTH_LONG).show();
+                            try {
+                                tmp.writeFile(version, upgrade_version_str);
+                            }
+                            catch (IOException e) {
+                                return new Long(1);
+                            }
+
+                            return new Long(0);
+                        }
+
+                        protected void onProgressUpdate(Integer... progress) {
+                            //setProgressPercent(progress[0]);
+                        }
+
+                        protected void onPostExecute(Long status) {
+                            if(status == 1) {
+                                Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade failed rail_data.zip", Toast.LENGTH_LONG).show();
+                            }
+
+                        }
+
+                    }.execute();
+                }
+
+            }
+            catch (IOException e)
+            {
+                Toast.makeText(MainActivity.this.getApplicationContext(), "unzipped failed " + e, Toast.LENGTH_LONG).show();
+            }
+
+        }
+        else {
+            Toast.makeText(MainActivity.this.getApplicationContext(), "Starting download of rail_data.zip", Toast.LENGTH_LONG).show();
+            new DownloadNJTGitHubFile(getApplicationContext(), "rail_data.zip", "rail_data.zip", new IGitHubDownloadComple() {
+                @Override
+                public void onDownloadComplete(String filename, File folder, File destination) {
+                    try {
+                        tmp.writeFile(download_complete, upgrade_version_str);
+
+                        new AsyncTask<Integer, Integer, Long>() {
+                            protected Long doInBackground(Integer... value) {
+                                SQLiteDatabase db= dbHelper.getWritableDatabase();
+                                dbHelper.useAsset=false;
+                                Toast.makeText(MainActivity.this.getApplicationContext(), "DB2 upgrade starting rail_data.zip", Toast.LENGTH_LONG).show();
+                                dbHelper.update_tables(db, false);
+                                Toast.makeText(MainActivity.this.getApplicationContext(), "DB2 upgrade Complete rail_data.zip", Toast.LENGTH_LONG).show();
+                                try {
+                                    tmp.writeFile(version, upgrade_version_str);
+                                }
+                                catch (IOException e) {
+                                    return new Long(1);
+                                }
+
+                                return new Long(0);
+                            }
+
+                            protected void onProgressUpdate(Integer... progress) {
+                                //setProgressPercent(progress[0]);
+                            }
+
+                            protected void onPostExecute(Long status) {
+                                if(status == 1) {
+                                    Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade failed rail_data.zip", Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                        }.execute();
+
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                    Toast.makeText(MainActivity.this.getApplicationContext(), "Download Complete rail_data.zip", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onFailed(String filename) {
+
+                }
+            }).execute("");
+        }
+    }
+
 
     private GoogleSignInClient buildGoogleSignInClient() {
         Scope publicFolder = new Scope("1yc6JGDvqO9BzVa7oAfjFO53pgiTJr9me");

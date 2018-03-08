@@ -10,9 +10,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import java.util.ArrayList;
@@ -28,11 +31,24 @@ import java.util.TreeSet;
 
 class SQLHelper extends SQLiteOpenHelper {
     AssetManager amgr;
+    boolean useAsset = true;
+    Context context;
+
     SQLHelper(Context context) {
         super(context, "main.db", null, 1);
-        amgr = context.getAssets();
+        this.amgr = context.getAssets();
+        this.context = context;
     }
 
+    InputStream getFile(String filename)throws IOException
+    {
+        if (useAsset) {
+            return amgr.open(filename);
+        }
+        else {
+            return new FileInputStream(new File(context.getCacheDir() + "/db/nj_rails_cache" + filename));
+        }
+    }
     @Override
     public void onCreate(SQLiteDatabase db) {
         //db.execSQL("create table todos (_id integer primary key autoincrement, title text, priority integer)");
@@ -40,11 +56,19 @@ class SQLHelper extends SQLiteOpenHelper {
 
     }
 
-    public void update_tables(SQLiteDatabase db) {
+    public void update_tables(SQLiteDatabase db, boolean force) {
         String tables[] = {"trips", "stops", "routes", "calendar_dates", "stop_times", "shapes"};
         for (int i = 0; i < tables.length; i++) {
             System.out.println("workiing " + tables[i]);
             ArrayList<HashMap<String, Object>> df = read_csv( tables[i] + ".txt");
+            if ( force ) {
+                try {
+                    db.execSQL("delete from " + tables[i]);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             insert(db, tables[i], df);
             System.out.println("done " + tables[i]);
         }
@@ -53,7 +77,9 @@ class SQLHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
 
-    public  ArrayList<HashMap<String, Object>> read_csv(String filename )
+    // read the files from the asset directory,
+    // we need to make this either the assets or the cache directory
+    public  ArrayList<HashMap<String, Object>> read_csv(String filename)
     {
         BufferedReader br = null;
         String line = "";
@@ -61,7 +87,7 @@ class SQLHelper extends SQLiteOpenHelper {
         String cols[] = null;
         ArrayList<HashMap<String, Object>> result = new   ArrayList<HashMap<String, Object>>();
         try {
-            br = new BufferedReader(new InputStreamReader(amgr.open(filename)) );
+            br = new BufferedReader(new InputStreamReader(getFile(filename)) );
             while ((line = br.readLine()) != null) {
                 if ( line.toCharArray()[0] == 0xFEFF) { // BOM
                     line = line.substring(1);
@@ -156,7 +182,9 @@ class SQLHelper extends SQLiteOpenHelper {
             columns.add(key);
         }
         String sql = "INSERT INTO " + table_name  + "(" + cols + ") VALUES(" + values + ")";
+        //String sql_truncate = "db.execSQL("delete from "+ TABLE_NAME);
         try {
+
             SQLiteStatement pstmt = db.compileStatement(sql);
             //conn.setAutoCommit(false);
             int count = 0;
