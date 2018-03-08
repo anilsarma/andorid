@@ -172,7 +172,7 @@ public class DownloadNJTGitHubFile extends AsyncTask<String, Integer, String> {
         catch( Exception e) {
             e.printStackTrace();;
         }
-        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+        //Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
         // mProgressDialog.dismiss();
 
     }

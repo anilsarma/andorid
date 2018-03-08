@@ -94,7 +94,7 @@ public class MainActivity extends FragmentActivity {
             public void onDownloadComplete(String filename, File folder, File destination) {
                 // download the zip file nao
                 MainActivity.this.downloadZipFile();
-                Toast.makeText(MainActivity.this.getApplicationContext(), "Download Complete",Toast.LENGTH_LONG).show();
+                //Toast.makeText(MainActivity.this.getApplicationContext(), "Download Complete",Toast.LENGTH_LONG).show();
             }
 
             @Override
