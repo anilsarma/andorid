@@ -1,11 +1,15 @@
 package com.example.asarma.njrails;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.widget.Toast;
@@ -81,11 +85,13 @@ public class MainActivity extends FragmentActivity {
         long diffms = (System.currentTimeMillis() - version_upgrade.lastModified());
 
         long hours =  0;
-        long minutes = 0;
+        long minutes = 30;
         long seconds = 30;
 
         if (diffms < (( (hours *60 + minutes) *60  + seconds) *1000) ) {
             Toast.makeText(getApplicationContext(), "Skipping check Modified time is" + diffms,Toast.LENGTH_LONG).show();
+            showCustomNotification();
+
             return;
         }
         //Toast.makeText(MainActivity.this.getApplicationContext(), "Modified time is" + diffms,Toast.LENGTH_LONG).show();
@@ -102,6 +108,32 @@ public class MainActivity extends FragmentActivity {
 
             }
         }).execute("");
+    }
+    private void showCustomNotification(){
+        final int NOTIFICATION_ID = 1;
+        String ns = Context.NOTIFICATION_SERVICE;
+        final NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
+
+        int icon = R.mipmap.ic_launcher;
+        long when = System.currentTimeMillis();
+        Notification notification = new Notification(icon, getString(R.string.app_name), when);
+        notification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
+        notification.defaults |= Notification.DEFAULT_LIGHTS; // LED
+        notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
+        notification.defaults |= Notification.DEFAULT_SOUND; // Sound
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("NJRails Upgrade Required")
+                        .setTicker("Upgrade (Open to see the info).")
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setContentText("Add additional text for upgrade here");
+        // NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+
     }
 
     void downloadZipFile()
