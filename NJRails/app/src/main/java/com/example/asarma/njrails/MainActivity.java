@@ -90,7 +90,7 @@ public class MainActivity extends FragmentActivity {
 
         if (diffms < (( (hours *60 + minutes) *60  + seconds) *1000) ) {
             Toast.makeText(getApplicationContext(), "Skipping check Modified time is" + diffms,Toast.LENGTH_LONG).show();
-            showCustomNotification();
+
 
             return;
         }
@@ -160,6 +160,7 @@ public class MainActivity extends FragmentActivity {
 
         final File download_complete = tmp.cacheDir("download_complete.txt");
         if (download) {
+            showCustomNotification();
             if (rail_data.exists()) {
                 if (download_complete.exists()) {
                     String s = tmp.readFile(download_complete);
