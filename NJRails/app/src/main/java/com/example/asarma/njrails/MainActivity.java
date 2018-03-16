@@ -205,7 +205,7 @@ public class MainActivity extends FragmentActivity {
                         SQLiteDatabase db= dbHelper.getWritableDatabase();
                         dbHelper.useAsset=false;
                         Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade starting rail_data.zip", Toast.LENGTH_LONG).show();
-                        dbHelper.update_tables(db, false);
+                        dbHelper.update_tables(db, true);
                         tmp.writeFile(version, upgrade_version_str);
                         Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade Complete rail_data.zip", Toast.LENGTH_LONG).show();
                     }
