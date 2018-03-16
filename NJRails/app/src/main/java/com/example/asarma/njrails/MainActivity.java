@@ -86,7 +86,7 @@ public class MainActivity extends FragmentActivity {
 
         long hours =  0;
         long minutes = 30;
-        long seconds = 30;
+        long seconds = 5;
 
         if (diffms < (( (hours *60 + minutes) *60  + seconds) *1000) ) {
             Toast.makeText(getApplicationContext(), "Skipping check Modified time is" + diffms,Toast.LENGTH_LONG).show();
@@ -231,10 +231,19 @@ public class MainActivity extends FragmentActivity {
                     try {
                         tmp.writeFile(download_complete, upgrade_version_str);
 
+                        /*unzip the file */
+                        File dir = tmp.cacheDir("nj_rails_cache");
+                        if (!dir.exists()) {
+                            dir.mkdir();
+                        }
+
+                        ArrayList<File> o = tmp.unzipfile(destination, dir);
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "total unzipped rail_data.zip " + o.size(), Toast.LENGTH_LONG).show();
+
                         SQLiteDatabase db= dbHelper.getWritableDatabase();
                         dbHelper.useAsset=false;
                         Toast.makeText(MainActivity.this.getApplicationContext(), "DB2 upgrade starting rail_data.zip", Toast.LENGTH_LONG).show();
-                        dbHelper.update_tables(db, false);
+                        dbHelper.update_tables(db, true);
                         tmp.writeFile(version, upgrade_version_str);
                         Toast.makeText(MainActivity.this.getApplicationContext(), "DB2 upgrade Complete rail_data.zip", Toast.LENGTH_LONG).show();
                     }
