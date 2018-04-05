@@ -203,7 +203,8 @@ class SQLHelper extends SQLiteOpenHelper {
                         pstmt.bindString(i+1, (String)v);
                     }
                 }
-                pstmt.execute();
+                pstmt.executeInsert();
+                pstmt.clearBindings();
             }
             db.setTransactionSuccessful();
 
