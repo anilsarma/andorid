@@ -715,8 +715,10 @@ public class MainActivityFragment extends Fragment {
                         //Toast.makeText(getContext(), (String) "Pager scroll to " + pxdown, Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        int px = sv_selected.getHeight() * sv_index;
-                        scrollView.scrollTo(0, px);
+                        if (sv_selected !=null) {
+                            int px = sv_selected.getHeight() * sv_index;
+                            scrollView.scrollTo(0, px);
+                        }
                         //Toast.makeText(getContext(), (String) "init Pager scroll to " + px, Toast.LENGTH_SHORT).show();
                     }
                 }

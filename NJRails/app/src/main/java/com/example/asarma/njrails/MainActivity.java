@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends FragmentActivity {
+    protected  static final boolean FORCE_DOWNLOAD=false;
     protected static final int REQUEST_CODE_SIGN_IN = 0;
     protected static final int REQUEST_CODE_OPEN_ITEM = 1;
     private static final String TAG = "BaseDriveActivity";
@@ -89,10 +90,10 @@ public class MainActivity extends FragmentActivity {
         long seconds = 5;
 
         if (diffms < (( (hours *60 + minutes) *60  + seconds) *1000) ) {
-            Toast.makeText(getApplicationContext(), "Skipping check Modified time is" + diffms,Toast.LENGTH_LONG).show();
-
-
-            return;
+            if (!FORCE_DOWNLOAD) {
+                //Toast.makeText(getApplicationContext(), "Skipping check Modified time is" + diffms, Toast.LENGTH_LONG).show();
+                return;
+            }
         }
         //Toast.makeText(MainActivity.this.getApplicationContext(), "Modified time is" + diffms,Toast.LENGTH_LONG).show();
         new DownloadNJTGitHubFile(getApplicationContext(), "version.txt", "version_upgrade.txt", new IGitHubDownloadComple() {
@@ -138,6 +139,7 @@ public class MainActivity extends FragmentActivity {
 
     void downloadZipFile()
     {
+        System.out.println("in downloadZipFile");
         if (dbHelper == null) {
             dbHelper = new SQLHelper(getApplicationContext());
         }
@@ -147,6 +149,7 @@ public class MainActivity extends FragmentActivity {
         File rail_data = tmp.cacheDir("rail_data.zip");
 
         boolean download=true;
+
         final String upgrade_version_str = tmp.readFile(version_upgrade);
         final String version_str = tmp.readFile(version);
         try {
@@ -156,6 +159,9 @@ public class MainActivity extends FragmentActivity {
         }
         catch(Exception e) {
 
+        }
+        if(FORCE_DOWNLOAD) {
+            download = true;
         }
 
         final File download_complete = tmp.cacheDir("download_complete.txt");
@@ -180,7 +186,7 @@ public class MainActivity extends FragmentActivity {
             }
         }
         if (rail_data.exists()) {
-            Toast.makeText(MainActivity.this.getApplicationContext(), "no download required of rail_data.zip version:" + version_str + " remote:" + upgrade_version_str, Toast.LENGTH_LONG).show();
+            //Toast.makeText(MainActivity.this.getApplicationContext(), "no download required of rail_data.zip version:" + version_str + " remote:" + upgrade_version_str, Toast.LENGTH_LONG).show();
 
             // download_complete
             File destination = tmp.cacheDir("rail_data.zip");

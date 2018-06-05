@@ -57,7 +57,8 @@ class SQLHelper extends SQLiteOpenHelper {
     }
 
     public void update_tables(SQLiteDatabase db, boolean force) {
-        String tables[] = {"trips", "stops", "routes", "calendar_dates", "stop_times", "shapes"};
+
+        String tables[] = {"trips", "stops", "routes", "calendar_dates", "stop_times"}; // , "shapes"};
         for (int i = 0; i < tables.length; i++) {
             System.out.println("workiing " + tables[i]);
             ArrayList<HashMap<String, Object>> df = read_csv( tables[i] + ".txt");
@@ -183,6 +184,7 @@ class SQLHelper extends SQLiteOpenHelper {
         }
         String sql = "INSERT INTO " + table_name  + "(" + cols + ") VALUES(" + values + ")";
         //String sql_truncate = "db.execSQL("delete from "+ TABLE_NAME);
+        System.out.println("insert begin " + table_name);
         try {
 
             SQLiteStatement pstmt = db.compileStatement(sql);
@@ -207,8 +209,7 @@ class SQLHelper extends SQLiteOpenHelper {
                 pstmt.clearBindings();
             }
             db.setTransactionSuccessful();
-
-
+            System.out.println("insert end " + table_name);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
