@@ -614,7 +614,7 @@ public class MainActivityFragment extends Fragment {
             tl2.addView(tr2, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
             addTextView(getContext(), tl2, "" + route_name + "#" + block_id, 5, 10);
 
-            String msg = "" + time+ " minutes";
+            String msg = "" + time+ " minutes (travel time)";
             String schedule = "";
             try {
 
@@ -629,20 +629,6 @@ public class MainActivityFragment extends Fragment {
                             platform = "";
                         }
                         // check the statusl for the train
-
-                        if( false ) {
-                            for (HashMap<String, Object> value : status_result) {
-                                System.out.println("Status_result count:" + status_result.size() + " " + value.get("train").toString() + " " + block_id
-                                        + " " + value.get("track"));
-                                if (value.get("train").toString().equals(block_id)) {
-                                    platform = value.get("track").toString();
-                                    if (!platform.isEmpty()) {
-                                        platform = " track#" + platform;
-                                    }
-                                    break;
-                                }
-                            }
-                        }
                         if ( diff >=0 ) {
                             schedule= "    " + diff + " minutes " + platform;
                             if (sel_view == null) {
@@ -676,20 +662,6 @@ public class MainActivityFragment extends Fragment {
             tl2.setOnLongClickListener(new RouteLongClickListener(dbHelper, block_id, block_id + " "+ route_name + " " + departture_time, initstate));
             tl2.setOnTouchListener(new RouteTouchListener(dbHelper, this.getContext(), tl2, trip_id,  block_id, block_id + " "+ route_name + " " + departture_time, initstate));
             tl.addView(tl2, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-            //selected += 1;
-
-            Date ddtime = Utils.parseLocalTime(departture_time);
-            if ( ddtime.getTime() < now.getTime()) {
-                //selected = i;
-                //sel_view = tl2;
-            }
-
-            for ( String key:data.keySet()
-                    ) {
-                Object value = data.get(key);
-                //System.out.println("key=" + key + "=" + value);
-            }
-
         }
 
 
