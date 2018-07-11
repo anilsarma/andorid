@@ -57,7 +57,14 @@ public class MainActivity extends FragmentActivity {
         mDemoCollectionPagerAdapter =  new DemoCollectionPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
-
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if (extras != null ) {
+            Boolean value = extras.getBoolean("UPGRADE");
+            if (value!=null && value) {
+                Toast.makeText(MainActivity.this.getApplicationContext(), "Got upgrade intent " + intent, Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
@@ -70,14 +77,14 @@ public class MainActivity extends FragmentActivity {
         long hours =  0;
         long minutes = 30;
         long seconds = 5;
-
+        showCustomNotification(null, null);
         if (diffms < (( (hours *60 + minutes) *60  + seconds) *1000) ) {
             if (!FORCE_DOWNLOAD) {
                 //Toast.makeText(getApplicationContext(), "Skipping check Modified time is" + diffms, Toast.LENGTH_LONG).show();
                 return;
             }
         }
-        showCustomNotification(null, null);
+
         //Toast.makeText(MainActivity.this.getApplicationContext(), "Modified time is" + diffms,Toast.LENGTH_LONG).show();
         new DownloadNJTGitHubFile(getApplicationContext(), "version.txt", "version_upgrade.txt", new IGitHubDownloadComple() {
             @Override
@@ -116,25 +123,24 @@ public class MainActivity extends FragmentActivity {
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setContentText(msg);
         // NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        Intent intent = new Intent(this, NotificationReceiverActivity.class);
-        intent.putExtra("some_key", 12 ); //If you wan to send data also
-        PendingIntent pIntent = PendingIntent.getActivity(this, 1000, intent, 0);
+        Intent intent_upgrade = new Intent(this, MainActivity.class);
+        intent_upgrade.putExtra("UPGRADE", true ); //If you wan to send data also
+        PendingIntent pIntentUpgrade = PendingIntent.getActivity(this, 1000, intent_upgrade, 0);
+        PendingIntent pIntentIgnore = PendingIntent.getActivity(this, 1001, new Intent(this, MainActivity.class), 0);
+        mBuilder.addAction(R.mipmap.ic_launcher, "Upgrade", pIntentUpgrade)
+                .addAction(R.mipmap.ic_launcher, "Ignore", pIntentIgnore)
+                //.addAction(R.mipmap.ic_launcher, "Later", pIntent);
+        ;
+        Notification notification = mBuilder.build();
 
-        mBuilder.addAction(R.mipmap.ic_launcher, "Call", pIntent)
-                .addAction(R.mipmap.ic_launcher, "More", pIntent)
-                .addAction(R.mipmap.ic_launcher, "And more", pIntent);
+        notification.flags|= Notification.FLAG_AUTO_CANCEL;
+        //notification.defaults |= Notification.DEFAULT_SOUND;
 
-
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-
-
-
-
+        mNotificationManager.notify(NOTIFICATION_ID, notification);
     }
 
     void downloadZipFile()
     {
-
         System.out.println("in downloadZipFile");
         if (dbHelper == null) {
             dbHelper = new SQLHelper(getApplicationContext());
