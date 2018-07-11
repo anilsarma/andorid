@@ -191,7 +191,7 @@ public class MainActivityFragment extends Fragment {
                                 View view = views.get(index);
                                 Date now = new Date();
                                 String status_code = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "status_code", "NY");
-                                if( status_result.isEmpty() || (( now.getTime() - date.getTime()) > 20000)) {
+                                if( status_result.isEmpty() || (( now.getTime() - date.getTime()) > 20000)) { // 20, seconds
                                     new DownloadDepartureVisionTask(rootView, "Swipe " + myPage, new IDownloadComple() {
                                         @Override
                                         public Context getContext() {
@@ -425,15 +425,16 @@ public class MainActivityFragment extends Fragment {
         }
     }
     public void updateAdapter(View view, Long s, ArrayList<HashMap<String, Object>> result) {
-        // update thes
+        final SwipeRefreshLayout swipe = view.findViewById(R.id.swiperefresh);
         if( s != 0 ) {
             if (result.isEmpty()) {
+                if(swipe != null ) {
+                    swipe.setRefreshing(false);
+                }
                 return;
             }
         }
         status_result = result;
-        final SwipeRefreshLayout swipe = (SwipeRefreshLayout)view.findViewById(R.id.swiperefresh);
-
 
         ViewPager mViewPager = (ViewPager) view.getRootView().findViewById(R.id.pager);
         view = null;
@@ -446,8 +447,7 @@ public class MainActivityFragment extends Fragment {
             }
         }
 
-        if(view != null ) {
-
+        if(swipe != null ) {
             swipe.setRefreshing(false);
             System.out.println("set prefresing to false ins");
         }

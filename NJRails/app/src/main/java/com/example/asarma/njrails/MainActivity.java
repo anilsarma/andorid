@@ -2,6 +2,7 @@ package com.example.asarma.njrails;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -76,13 +77,13 @@ public class MainActivity extends FragmentActivity {
                 return;
             }
         }
+        showCustomNotification(null, null);
         //Toast.makeText(MainActivity.this.getApplicationContext(), "Modified time is" + diffms,Toast.LENGTH_LONG).show();
         new DownloadNJTGitHubFile(getApplicationContext(), "version.txt", "version_upgrade.txt", new IGitHubDownloadComple() {
             @Override
             public void onDownloadComplete(String filename, File folder, File destination) {
                 // download the zip file nao
                 MainActivity.this.downloadZipFile();
-                //Toast.makeText(MainActivity.this.getApplicationContext(), "Download Complete",Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -91,39 +92,54 @@ public class MainActivity extends FragmentActivity {
             }
         }).execute("");
     }
-    private void showCustomNotification(){
+    private void showCustomNotification(String from, String to){
         final int NOTIFICATION_ID = 1;
         String ns = Context.NOTIFICATION_SERVICE;
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
 
-        int icon = R.mipmap.ic_launcher;
-        long when = System.currentTimeMillis();
-        Notification notification = new Notification(icon, getString(R.string.app_name), when);
-        notification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
-        notification.defaults |= Notification.DEFAULT_LIGHTS; // LED
-        notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
-        notification.defaults |= Notification.DEFAULT_SOUND; // Sound
-
+        //int icon = R.mipmap.ic_launcher;
+        //long when = System.currentTimeMillis();
+//        Notification notification = new Notification(icon, getString(R.string.app_name), when);
+//        notification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
+//        notification.defaults |= Notification.DEFAULT_LIGHTS; // LED
+//        notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
+//        notification.defaults |= Notification.DEFAULT_SOUND; // Sound
+        String msg = "upgrade";
+        if (from != null  && to != null ) {
+            msg = "upgrade required from '" + from + "' to '" + to + "'";
+        }
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("NJRails Upgrade Required")
                         .setTicker("Upgrade (Open to see the info).")
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                        .setContentText("Add additional text for upgrade here");
+                        .setContentText(msg);
         // NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Intent intent = new Intent(this, NotificationReceiverActivity.class);
+        intent.putExtra("some_key", 12 ); //If you wan to send data also
+        PendingIntent pIntent = PendingIntent.getActivity(this, 1000, intent, 0);
+
+        mBuilder.addAction(R.mipmap.ic_launcher, "Call", pIntent)
+                .addAction(R.mipmap.ic_launcher, "More", pIntent)
+                .addAction(R.mipmap.ic_launcher, "And more", pIntent);
+
 
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+
 
 
     }
 
     void downloadZipFile()
     {
+
         System.out.println("in downloadZipFile");
         if (dbHelper == null) {
             dbHelper = new SQLHelper(getApplicationContext());
         }
+        //using this just as a ulitiy functon
         final DownloadNJTGitHubFile tmp = new DownloadNJTGitHubFile(getApplicationContext(), "", "", null);
         final File version = tmp.cacheDir("version.txt");
         File version_upgrade = tmp.cacheDir("version_upgrade.txt");
@@ -134,7 +150,7 @@ public class MainActivity extends FragmentActivity {
         final String upgrade_version_str = tmp.readFile(version_upgrade);
         final String version_str = tmp.readFile(version);
         try {
-            if (version_str.equals(upgrade_version_str)) {
+            if (!upgrade_version_str.isEmpty() && version_str.equals(upgrade_version_str)) {
                 download = false;
             }
         }
@@ -147,14 +163,11 @@ public class MainActivity extends FragmentActivity {
 
         final File download_complete = tmp.cacheDir("download_complete.txt");
         if (download) {
-            showCustomNotification();
+            showCustomNotification(upgrade_version_str, version_str);
             if (rail_data.exists()) {
                 if (download_complete.exists()) {
                     String s = tmp.readFile(download_complete);
-                    if (s == upgrade_version_str) {
-
-                    }
-                    else {
+                    if (!s.equals(upgrade_version_str)) {
                         rail_data.delete();
                     }
                 }

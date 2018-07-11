@@ -66,14 +66,12 @@ public class DownloadNJTGitHubFile extends AsyncTask<String, Integer, String> {
     }
     @Override
     protected String doInBackground(String... sUrl) {
-        //FileOutputStream outputStream = context.openFileOutput(path, Context.MODE_PRIVATE);
         File dir = new File(context.getCacheDir() + "/db/");
         try {
             dir.mkdir();
         } catch( Exception e ) {
 
         }
-
         File file = new File(context.getCacheDir() + "/db/" + destination);
         file.delete();
 
@@ -97,7 +95,6 @@ public class DownloadNJTGitHubFile extends AsyncTask<String, Integer, String> {
         try {
             URL url = new URL(urlbase + filename);
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-
             // this will be useful so that you can show a typical 0-100% progress bar
             if(lastModified != 0) {
                 connection.setIfModifiedSince(lastModified);
@@ -113,7 +110,6 @@ public class DownloadNJTGitHubFile extends AsyncTask<String, Integer, String> {
             } else {
                 // Download the content again and store the image again
             }
-
 
             // download the file
             InputStream input = new BufferedInputStream(url.openStream());
@@ -144,6 +140,7 @@ public class DownloadNJTGitHubFile extends AsyncTask<String, Integer, String> {
         {
             e.printStackTrace();
         }
+
         try {
             msg = "File " + urlbase + " download complete " + file.exists() + " Modified:" + lastModified + " < webmodified " + getLastModifiedTime(urlbase + filename) + " sz=" + file.length();
         } catch (Exception e) {
@@ -159,14 +156,6 @@ public class DownloadNJTGitHubFile extends AsyncTask<String, Integer, String> {
         // check the version files
         try {
             File file = new File(context.getCacheDir() + "/db/" + destination);
-
-//            if (filename == "version.txt") {
-//                BufferedReader br = new BufferedReader(new FileReader(file));
-//                String version = br.readLine();
-//                br.close();
-//
-//                //Toast.makeText(context, "Content of version.txt " + version, Toast.LENGTH_LONG).show();
-//            }
             main.onDownloadComplete( filename, new File(context.getCacheDir() + "/db"), file);
         }
         catch( Exception e) {
@@ -180,7 +169,6 @@ public class DownloadNJTGitHubFile extends AsyncTask<String, Integer, String> {
     @Override
     protected void onProgressUpdate(Integer... progress) {
         super.onProgressUpdate(progress);
-        // mProgressDialog.setProgress(progress[0]);
     }
 
 
