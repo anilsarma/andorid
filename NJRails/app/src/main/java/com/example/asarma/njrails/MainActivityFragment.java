@@ -550,8 +550,7 @@ public class MainActivityFragment extends Fragment {
 
         route_details.setText(Utils.capitalize(start) + "-->" + Utils.capitalize(stop));
         route_details.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-        // route_header.setTextColor(Color.BLUE);
-        //setContentView(route_header);
+      
         TableLayout tl = (TableLayout)rootView.findViewById(R.id.routes);
         tl.removeAllViews();
         int selected = 0;
@@ -669,12 +668,12 @@ public class MainActivityFragment extends Fragment {
         final int sv_index = selected;
         final TableLayout sv_selected = sel_view;
         //final NestedScrollView v =(NestedScrollView) rootView.getRootView().findViewById(R.id.route_scroll);
-        scrollView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        }, 0);
+//        scrollView.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        }, 0);
 
         ViewTreeObserver vto = scrollView.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
