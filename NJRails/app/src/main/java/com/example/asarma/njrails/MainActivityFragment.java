@@ -1,12 +1,8 @@
 package com.example.asarma.njrails;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -34,11 +30,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeSet;
 
 public class MainActivityFragment extends Fragment {
     static int STATUS_PAGE=0;
@@ -198,7 +192,7 @@ public class MainActivityFragment extends Fragment {
                                 Date now = new Date();
                                 String status_code = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "status_code", "NY");
                                 if( status_result.isEmpty() || (( now.getTime() - date.getTime()) > 20000)) {
-                                    new DownloadFilesTask(rootView, "Swipe " + myPage, new IDownloadComple() {
+                                    new DownloadDepartureVisionTask(rootView, "Swipe " + myPage, new IDownloadComple() {
                                         @Override
                                         public Context getContext() {
                                             return MainActivityFragment.this.getContext();
@@ -325,7 +319,7 @@ public class MainActivityFragment extends Fragment {
                     String code = stationcodes.get(start);
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "status_code", code, new Date());
                     SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "status_station", start, new Date());
-                    new DownloadFilesTask(rootView, " Button " + myPage, new IDownloadComple() {
+                    new DownloadDepartureVisionTask(rootView, " Button " + myPage, new IDownloadComple() {
                         @Override
                         public Context getContext() {
                             return rootView.getContext();
@@ -349,7 +343,7 @@ public class MainActivityFragment extends Fragment {
             status.updateRoutes(rootView, status_result);
             try {
                 String status_code = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "status_code", "NY");
-                new DownloadFilesTask(rootView, " init " + myPage, new IDownloadComple() {
+                new DownloadDepartureVisionTask(rootView, " init " + myPage, new IDownloadComple() {
                     @Override
                     public Context getContext() {
                         return MainActivityFragment.this.getContext();
@@ -428,13 +422,10 @@ public class MainActivityFragment extends Fragment {
             if ( !ss.isEmpty()) {
                 status_details.put(train, ss);
             }
-
-
         }
     }
     public void updateAdapter(View view, Long s, ArrayList<HashMap<String, Object>> result) {
         // update thes
-
         if( s != 0 ) {
             if (result.isEmpty()) {
                 return;
@@ -550,7 +541,7 @@ public class MainActivityFragment extends Fragment {
 
         route_details.setText(Utils.capitalize(start) + "-->" + Utils.capitalize(stop));
         route_details.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-      
+
         TableLayout tl = (TableLayout)rootView.findViewById(R.id.routes);
         tl.removeAllViews();
         int selected = 0;
@@ -582,41 +573,40 @@ public class MainActivityFragment extends Fragment {
             } catch (Exception e) {
 
             }
-
-            TableLayout tl2 = new TableLayout(getContext());
+            // this route layout is created on the fly for the Route Table
+            TableLayout tableLayout_route = new TableLayout(getContext());
             TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 5, 0, 5);
 
 
-            tl2.setLayoutParams(params);
+            tableLayout_route.setLayoutParams(params);
 
             // 1. make the first row of the status contains time
-            TableRow tr = new TableRow(getContext());
-            tr.setBackgroundColor(Color.LTGRAY);
+            TableRow tr_route_header = new TableRow(getContext());
+            tr_route_header.setBackgroundColor(Color.LTGRAY);
             TableRow.LayoutParams params0 = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params0.setMargins(5, 5,5,5);
 
-            tr.setLayoutParams(params0);
-            TextView tv = new TextView(getContext());
-            tv.setText( " " + Utils.formatToLocalTime(Utils.parseLocalTime(departture_time)) + " - " + Utils.formatToLocalTime(Utils.parseLocalTime(destination_time)));
-            tv.setTextSize(Utils.pxFromDp(6, getContext()));
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 6*multiplier);
-            tr.addView(tv);
+            tr_route_header.setLayoutParams(params0);
+            TextView tv_route_header = new TextView(getContext());
+            tv_route_header.setText( " " + Utils.formatToLocalTime(Utils.parseLocalTime(departture_time)) + " - " + Utils.formatToLocalTime(Utils.parseLocalTime(destination_time)));
+            tv_route_header.setTextSize(Utils.pxFromDp(6, getContext()));
+            tv_route_header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 6*multiplier);
+            tr_route_header.addView(tv_route_header);
 
             // next row of the talbe. (Route name) e.g. Northeast Corridor #3818
-            TableRow tr2 = new TableRow(getContext());
+            TableRow tr_route_name = new TableRow(getContext());
             TableRow.LayoutParams params2 = new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params2.setMargins(0, 20, 0, 20);
-            tr2.setLayoutParams(params2);
+            tr_route_name.setLayoutParams(params2);
 
-            tl2.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-            tl2.addView(tr2, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-            addTextView(getContext(), tl2, "" + route_name + "#" + block_id, 5, 10);
+            tableLayout_route.addView(tr_route_header, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+            tableLayout_route.addView(tr_route_name, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+            addTextView(getContext(), tableLayout_route, "" + route_name + "#" + block_id, 5, 10);
 
-            String msg = "" + time+ " minutes (travel time)";
+            String msg_train_to_time = "" + time+ " minutes (travel time)";
             String schedule = "";
             try {
-
                 if ( days == 0 ) {
                     DateFormat dateTimeFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                     Date st_time = dateTimeFormat.parse(Utils.formatToLocalDate(now) + " "  + departture_time);
@@ -631,7 +621,7 @@ public class MainActivityFragment extends Fragment {
                         if ( diff >=0 ) {
                             schedule= "    " + diff + " minutes " + platform;
                             if (sel_view == null) {
-                                sel_view = tl2;
+                                sel_view = tableLayout_route;
                                 selected = i;
                             }
                         }
@@ -643,37 +633,31 @@ public class MainActivityFragment extends Fragment {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            TextView th0 = addTextView(getContext(), tl2, "", 5, 5); // just a blank line
-            TextView th1 = addTextView(getContext(), tl2, schedule, 5, 0);
+            TextView tv_blank_line = addTextView(getContext(), tableLayout_route, "", 5, 5); // just a blank line
+            TextView tv_schedule = addTextView(getContext(), tableLayout_route, schedule, 5, 0);
 
             if ( !schedule.isEmpty()) {
-                th1.setBackgroundColor(Color.GREEN);
+                tv_schedule.setBackgroundColor(Color.GREEN);
                 if (schedule.contains("ago")) {
-                    th1.setBackgroundColor(Color.RED);
+                    tv_schedule.setBackgroundColor(Color.RED);
                 }
             }
-            TextView th2  = addTextView(getContext(), tl2, msg, 5, 0);
-            boolean initstate = true;
+            //TextView tv_train_to_time  =
+            addTextView(getContext(), tableLayout_route, msg_train_to_time, 5, 0);
+            boolean init_state = true;
             if ( fav.contains("" + block_id )) {
-                initstate=false;
-                tl2.setBackgroundColor(Color.parseColor("#18FFFF"));
+                init_state=false;
+                tableLayout_route.setBackgroundColor(Color.parseColor("#18FFFF"));
             }
-            tl2.setOnLongClickListener(new RouteLongClickListener(dbHelper, block_id, block_id + " "+ route_name + " " + departture_time, initstate));
-            tl2.setOnTouchListener(new RouteTouchListener(dbHelper, this.getContext(), tl2, trip_id,  block_id, block_id + " "+ route_name + " " + departture_time, initstate));
-            tl.addView(tl2, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+            tableLayout_route.setOnLongClickListener(new RouteLongClickListener(dbHelper, block_id, block_id + " "+ route_name + " " + departture_time, init_state));
+            tableLayout_route.setOnTouchListener(new RouteTouchListener(dbHelper, this.getContext(), tableLayout_route, trip_id,  block_id, block_id + " "+ route_name + " " + departture_time, init_state));
+            tl.addView(tableLayout_route, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
         }
 
 
-        final int pxdown = location;//==0?selected:location ;//* 200; selected
+        final int px_down = location;//==0?selected:location ;//* 200; selected
         final int sv_index = selected;
         final TableLayout sv_selected = sel_view;
-        //final NestedScrollView v =(NestedScrollView) rootView.getRootView().findViewById(R.id.route_scroll);
-//        scrollView.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        }, 0);
 
         ViewTreeObserver vto = scrollView.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -683,7 +667,7 @@ public class MainActivityFragment extends Fragment {
 
                 if(!done)  {
                     if(refresh) {
-                        scrollView.scrollTo(0, pxdown);
+                        scrollView.scrollTo(0, px_down);
                         //Toast.makeText(getContext(), (String) "Pager scroll to " + pxdown, Toast.LENGTH_SHORT).show();
                     }
                     else {
@@ -701,90 +685,6 @@ public class MainActivityFragment extends Fragment {
         });
     }
 
-    void buildTable(View rootView)
-    {
-        TableLayout tl = (TableLayout)rootView.findViewById(R.id.menu);
-/* Create a new row to be added. */
-        TableRow tr = new TableRow(getContext());
-        tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-/* Create a Button to be the row-content. */
-
-        TextView tv = new TextView(getContext());
-        tv.setText("Some text");
-        tr.addView(tv);
-        tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-
-        Button b = new Button(getContext());
-        b.setText("Dynamic Button");
-        b.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-/* Add Button to row. */
-        tr.addView(b);
-        tv.setOnClickListener( new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                TableLayout tl = (TableLayout)v.getRootView().findViewById(R.id.menu);
-/* Create a new row to be added. */
-                TableRow tr = new TableRow(v.getContext());
-                tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-/* Create a Button to be the row-content. */
-
-                TextView tv = new TextView(v.getContext());
-                tv.setText("Some text");
-                tr.addView(tv);
-                tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-
-                Button b = new Button(v.getContext());
-                b.setText("Dynamic Button");
-                b.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-/* Add Button to row. */
-                tr.addView(b);
-                b.setOnClickListener( new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
-/* Add row to TableLayout. */
-//tr.setBackgroundResource(R.drawable.sf_gradient_03);
-                tl.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-            }
-        });
-/* Add row to TableLayout. */
-//tr.setBackgroundResource(R.drawable.sf_gradient_03);
-        tl.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-
-    }
-
-    public void showDialog(final String phone) throws Exception
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("Ring: " + phone);
-
-        builder.setPositiveButton("Ring", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                Intent callIntent = new Intent(Intent.ACTION_DIAL);// (Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:" + phone));
-                //startActivity(callIntent);
-                dialog.dismiss();
-            }
-        });
-
-        builder.setNegativeButton("Avbryt", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                dialog.dismiss();
-            }
-        });
-
-        builder.show();
-    }
     class UpdateTimeTask extends TimerTask {
         View rootView;
         UpdateTimeTask(View rootView) {
@@ -822,7 +722,7 @@ public class MainActivityFragment extends Fragment {
                     code = stationcodes.get(Utils.capitalize(start).replace(" Station", ""));
                 }
                 if(code !=null && !code.isEmpty()) {
-                    new DownloadFilesTask(rootView, " Refresh " + myPage +  " now:" + Utils.getLocaDateTime(), new IDownloadComple() {
+                    new DownloadDepartureVisionTask(rootView, " Refresh " + myPage +  " now:" + Utils.getLocaDateTime(), new IDownloadComple() {
                         @Override
                         public Context getContext() {
                             return rootView.getContext();

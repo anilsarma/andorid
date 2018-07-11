@@ -11,6 +11,6 @@ import java.util.HashMap;
  */
 
 public interface IDownloadComple {
-    public Context getContext();
-    public void updateAdapter(View view, Long s, ArrayList<HashMap<String, Object>> result);
+    Context getContext();
+    void updateAdapter(View view, Long s, ArrayList<HashMap<String, Object>> result);
 }

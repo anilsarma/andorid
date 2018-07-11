@@ -63,7 +63,6 @@ public class MainActivity extends FragmentActivity {
     protected void onStart() {
         super.onStart();
         final DownloadNJTGitHubFile github = new DownloadNJTGitHubFile(getApplicationContext(), "", "", null);
-        //new DownloadGitHubFile(getApplicationContext(), "trips.txt").execute("");
         File version_upgrade = github.cacheDir("version_upgrade.txt");
         long diffms = (System.currentTimeMillis() - version_upgrade.lastModified());
 
