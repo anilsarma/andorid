@@ -139,6 +139,7 @@ public class MainActivity extends FragmentActivity {
         mNotificationManager.notify(NOTIFICATION_ID, notification);
     }
 
+    // called multiple times ...
     void downloadZipFile()
     {
         System.out.println("in downloadZipFile");
@@ -146,15 +147,15 @@ public class MainActivity extends FragmentActivity {
             dbHelper = new SQLHelper(getApplicationContext());
         }
         //using this just as a ulitiy functon
-        final DownloadNJTGitHubFile tmp = new DownloadNJTGitHubFile(getApplicationContext(), "", "", null);
-        final File version = tmp.cacheDir("version.txt");
-        File version_upgrade = tmp.cacheDir("version_upgrade.txt");
-        File rail_data = tmp.cacheDir("rail_data.zip");
+        final DownloadNJTGitHubFile utilsNJGitHub = new DownloadNJTGitHubFile(getApplicationContext(), "", "", null);
+        final File version = utilsNJGitHub.cacheDir("version.txt");
+        File version_upgrade = utilsNJGitHub.cacheDir("version_upgrade.txt");
+        File rail_data = utilsNJGitHub.cacheDir("rail_data.zip");
 
         boolean download=true;
 
-        final String upgrade_version_str = tmp.readFile(version_upgrade);
-        final String version_str = tmp.readFile(version);
+        final String upgrade_version_str = utilsNJGitHub.readFile(version_upgrade);
+        final String version_str = utilsNJGitHub.readFile(version);
         try {
             if (!upgrade_version_str.isEmpty() && version_str.equals(upgrade_version_str)) {
                 download = false;
@@ -167,38 +168,44 @@ public class MainActivity extends FragmentActivity {
             download = true;
         }
 
-        final File download_complete = tmp.cacheDir("download_complete.txt");
+        final File download_complete = utilsNJGitHub.cacheDir("download_complete.txt");
         if (download) {
             showCustomNotification(upgrade_version_str, version_str);
-            if (rail_data.exists()) {
-                if (download_complete.exists()) {
-                    String s = tmp.readFile(download_complete);
-                    if (!s.equals(upgrade_version_str)) {
-                        rail_data.delete();
-                    }
-                }
-            }
-            //rail_data.delete();
-        }
-        if(download) {
             if (rail_data.exists()) {
                 rail_data.delete();
             }
         }
+
+        // check if the rail_data in archive is good.
+        if (rail_data.exists()) {
+            if (download_complete.exists()) {
+                String s = utilsNJGitHub.readFile(download_complete);
+                if (!s.equals(upgrade_version_str)) {
+                    rail_data.delete();
+                    download = true;
+                }
+            }
+            else {
+                // download did not complete
+                rail_data.delete();
+                download = true;
+            }
+        }
+
+        // if the rail data file exists, mean that we have successfuly downloaded the rail data file.
         if (rail_data.exists()) {
             //Toast.makeText(MainActivity.this.getApplicationContext(), "no download required of rail_data.zip version:" + version_str + " remote:" + upgrade_version_str, Toast.LENGTH_LONG).show();
-
             // download_complete
-            File destination = tmp.cacheDir("rail_data.zip");
-            File dir = tmp.cacheDir("nj_rails_cache");
+            File destination = utilsNJGitHub.cacheDir("rail_data.zip");
+            File dir = utilsNJGitHub.cacheDir("nj_rails_cache");
             if (!dir.exists()) {
                 dir.mkdir();
             }
-            tmp.removeFiles(dir);
+            utilsNJGitHub.removeFiles(dir);
 
             try {
                 if (download) {
-                    ArrayList<File> o = tmp.unzipfile(destination, dir);
+                    ArrayList<File> o = utilsNJGitHub.unzipfile(destination, dir);
                     String s = "" + o.size();
                     for (String f : dir.list()) {
                         s += " " + f;
@@ -206,13 +213,13 @@ public class MainActivity extends FragmentActivity {
                     Toast.makeText(MainActivity.this.getApplicationContext(), "unzipped " + s, Toast.LENGTH_LONG).show();
 
                     try {
-                        tmp.writeFile(download_complete, upgrade_version_str);
+                        utilsNJGitHub.writeFile(download_complete, upgrade_version_str);
 
                         SQLiteDatabase db= dbHelper.getWritableDatabase();
                         dbHelper.useAsset=false;
                         Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade starting rail_data.zip", Toast.LENGTH_LONG).show();
                         dbHelper.update_tables(db, true);
-                        tmp.writeFile(version, upgrade_version_str);
+                        utilsNJGitHub.writeFile(version, upgrade_version_str);
                         Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade Complete rail_data.zip", Toast.LENGTH_LONG).show();
                     }
                     catch (Exception e)
@@ -226,7 +233,6 @@ public class MainActivity extends FragmentActivity {
             {
                 Toast.makeText(MainActivity.this.getApplicationContext(), "unzipped failed " + e, Toast.LENGTH_LONG).show();
             }
-
         }
         else {
             Toast.makeText(MainActivity.this.getApplicationContext(), "Starting download of rail_data.zip", Toast.LENGTH_LONG).show();
@@ -235,31 +241,29 @@ public class MainActivity extends FragmentActivity {
                 public void onDownloadComplete(String filename, File folder, File destination) {
                     Toast.makeText(MainActivity.this.getApplicationContext(), "Download Complete, upgrading rail_data.zip", Toast.LENGTH_LONG).show();
                     try {
-                        tmp.writeFile(download_complete, upgrade_version_str);
+                        utilsNJGitHub.writeFile(download_complete, upgrade_version_str);
 
                         /*unzip the file */
-                        File dir = tmp.cacheDir("nj_rails_cache");
+                        File dir = utilsNJGitHub.cacheDir("nj_rails_cache");
                         if (!dir.exists()) {
                             dir.mkdir();
                         }
 
-                        ArrayList<File> o = tmp.unzipfile(destination, dir);
+                        ArrayList<File> o = utilsNJGitHub.unzipfile(destination, dir);
                         Toast.makeText(MainActivity.this.getApplicationContext(), "total unzipped rail_data.zip " + o.size(), Toast.LENGTH_LONG).show();
 
                         SQLiteDatabase db= dbHelper.getWritableDatabase();
                         dbHelper.useAsset=false;
                         Toast.makeText(MainActivity.this.getApplicationContext(), "DB2 upgrade starting rail_data.zip", Toast.LENGTH_LONG).show();
                         dbHelper.update_tables(db, true);
-                        tmp.writeFile(version, upgrade_version_str);
+                        utilsNJGitHub.writeFile(version, upgrade_version_str);
                         Toast.makeText(MainActivity.this.getApplicationContext(), "DB2 upgrade Complete rail_data.zip", Toast.LENGTH_LONG).show();
                     }
                     catch (Exception e)
                     {
                         Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade failed rail_data.zip", Toast.LENGTH_LONG).show();
                     }
-
                 }
-
                 @Override
                 public void onFailed(String filename) {
 
