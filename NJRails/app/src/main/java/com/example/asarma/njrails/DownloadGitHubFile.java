@@ -51,10 +51,11 @@ String msg;
 
         return date;
     }
+
     @Override
     protected String doInBackground(String... sUrl) {
         //FileOutputStream outputStream = context.openFileOutput(path, Context.MODE_PRIVATE);
-        File dir = new File(context.getCacheDir() + "/db/");
+        File dir = new File(context.getCacheDir() + "/db" + "/");
         try {
             dir.mkdir();
         } catch( Exception e ) {

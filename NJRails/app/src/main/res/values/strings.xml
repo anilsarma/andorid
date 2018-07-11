@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NJRails</string>
+    <string name="app_name">NJTSchedule</string>
     <string-array name="planets_array">
         <item>Mercury</item>
         <item>Venus</item>

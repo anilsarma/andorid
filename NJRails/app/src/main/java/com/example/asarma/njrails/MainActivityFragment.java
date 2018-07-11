@@ -65,7 +65,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
         setupDB();
-        // do this in the background
+        // do this in the background TODO
         if (stationcodes.size()==0) {
             ArrayList<HashMap<String, Object>> r = dbHelper.read_csv("station_codes.txt");
             //System.out.print(r);
@@ -561,6 +561,7 @@ public class MainActivityFragment extends Fragment {
         final NestedScrollView scrollView =(NestedScrollView) rootView.getRootView().findViewById(R.id.route_scroll);
         int location = scrollView.getScrollY();
         Date now = new Date();
+
         for(int i=0;i< routes.size();i ++) {
             HashMap<String, Object> data = routes.get(i);
             // departure_time, destnaton arrival time block_id, route_long namem duration
@@ -584,15 +585,16 @@ public class MainActivityFragment extends Fragment {
             }
 
             TableLayout tl2 = new TableLayout(getContext());
-            TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+            TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 5, 0, 5);
 
 
             tl2.setLayoutParams(params);
 
+            // 1. make the first row of the status contains time
             TableRow tr = new TableRow(getContext());
             tr.setBackgroundColor(Color.LTGRAY);
-            TableRow.LayoutParams params0 = new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+            TableRow.LayoutParams params0 = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params0.setMargins(5, 5,5,5);
 
             tr.setLayoutParams(params0);
@@ -602,17 +604,14 @@ public class MainActivityFragment extends Fragment {
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 6*multiplier);
             tr.addView(tv);
 
+            // next row of the talbe. (Route name) e.g. Northeast Corridor #3818
             TableRow tr2 = new TableRow(getContext());
             TableRow.LayoutParams params2 = new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params2.setMargins(0, 20, 0, 20);
             tr2.setLayoutParams(params2);
 
-            // tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-
             tl2.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
             tl2.addView(tr2, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-            //tl2.addView(tr3, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-            //addTextView(this, tl2, "" + block_id + " " + departture_time + " " + destination_time, 6, 10);
             addTextView(getContext(), tl2, "" + route_name + "#" + block_id, 5, 10);
 
             String msg = "" + time+ " minutes";
@@ -646,6 +645,10 @@ public class MainActivityFragment extends Fragment {
                         }
                         if ( diff >=0 ) {
                             schedule= "    " + diff + " minutes " + platform;
+                            if (sel_view == null) {
+                                sel_view = tl2;
+                                selected = i;
+                            }
                         }
                         if ( diff < 0 ) {
                             schedule= "    " + Math.abs(diff) + " minutes ago " + platform;
@@ -677,12 +680,8 @@ public class MainActivityFragment extends Fragment {
 
             Date ddtime = Utils.parseLocalTime(departture_time);
             if ( ddtime.getTime() < now.getTime()) {
-                int sz = tl2.getBottom() - tl2.getTop();
-                if ( sz <= 0 ) {
-                    sz = 70;
-                }
-                selected = i;
-                sel_view = tl2;
+                //selected = i;
+                //sel_view = tl2;
             }
 
             for ( String key:data.keySet()
@@ -692,6 +691,8 @@ public class MainActivityFragment extends Fragment {
             }
 
         }
+
+
         final int pxdown = location;//==0?selected:location ;//* 200; selected
         final int sv_index = selected;
         final TableLayout sv_selected = sel_view;
@@ -716,10 +717,12 @@ public class MainActivityFragment extends Fragment {
                     }
                     else {
                         if (sv_selected !=null) {
-                            int px = sv_selected.getHeight() * sv_index;
+                            sv_selected.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                            //int px = sv_selected.getHeight() * sv_index;
+                            int px = sv_selected.getMeasuredHeight() * sv_index;
                             scrollView.scrollTo(0, px);
+                            //Toast.makeText(getContext(), (String) "init Pager scroll to " + sv_index + " ht:" + sv_selected.getMeasuredHeight(), Toast.LENGTH_SHORT).show();
                         }
-                        //Toast.makeText(getContext(), (String) "init Pager scroll to " + px, Toast.LENGTH_SHORT).show();
                     }
                 }
                 done= true;

@@ -6,146 +6,152 @@
     android:layout_height="match_parent"
     tools:context="com.example.asarma.njrails.RouteActivity">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/swiperefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <RelativeLayout  android:layout_width="fill_parent" android:layout_height="wrap_content"
-        android:padding="0dp">
-        <TextView
-            android:id="@+id/route_header"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:gravity="center"
-            android:padding="0dp"
-            android:background="#01579B"
-            android:textColor="#FFFFFF"
-            android:textSize="20px"
-            android:text="Train Details" />
-        <TextView
-            android:id="@+id/route_details"
-            android:layout_below="@+id/route_header"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:gravity="center"
-            android:padding="0dp"
-            android:background="#80D8FF"
-            android:textColor="#000000"
-            android:textSize="20px"
-            android:text="Pull down to refresh" />
-        <LinearLayout
-            android:id="@+id/station_query"
-            android:layout_below="@+id/route_details"
-            android:background="#90CAF9"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="0dp">
 
-            <Spinner
-                android:id="@+id/routes_spinner"
-                android:visibility="visible"
+            <TextView
+                android:id="@+id/route_header"
                 android:layout_width="match_parent"
-                android:background="#E0E0E0"
-                android:layout_height="wrap_content" />
-            <Spinner
-                android:id="@+id/start_station_spinner"
-                android:visibility="visible"
+                android:layout_height="50dp"
+                android:background="#01579B"
+                android:gravity="center"
+                android:padding="0dp"
+                android:text="Train Details"
+                android:textColor="#FFFFFF"
+                android:textSize="20px" />
 
+            <TextView
+                android:id="@+id/route_details"
                 android:layout_width="match_parent"
-                android:textSize="90px"
-                android:background="#00838F"
-                android:layout_height="wrap_content" />
-            <Spinner
-                android:id="@+id/stop_station_spinner"
-                android:visibility="visible"
+                android:layout_height="50dp"
+                android:layout_below="@+id/route_header"
+                android:background="#80D8FF"
+                android:gravity="center"
+                android:padding="0dp"
+                android:text="Pull down to refresh"
+                android:textColor="#000000"
+                android:textSize="20px" />
+
+            <LinearLayout
+                android:id="@+id/station_query"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/route_details"
+                android:background="#90CAF9"
+                android:orientation="vertical">
+
+                <Spinner
+                    android:id="@+id/routes_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#E0E0E0"
+                    android:visibility="visible" />
+
+                <Spinner
+                    android:id="@+id/start_station_spinner"
+                    android:layout_width="match_parent"
+
+                    android:layout_height="wrap_content"
+                    android:background="#00838F"
+                    android:textSize="90px"
+                    android:visibility="visible" />
+
+                <Spinner
+                    android:id="@+id/stop_station_spinner"
+                    android:layout_width="match_parent"
+
+                    android:layout_height="match_parent"
+                    android:height="200px"
+                    android:background="#E0E0E0"
+                    android:textSize="40sp"
+
+                    android:visibility="visible" />
+
+                <Button
+                    android:id="@+id/station_query_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Submit" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/status_query"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/station_query"
+                android:height="0px"
+                android:background="#90CAF9"
+                android:orientation="vertical"
+                android:visibility="invisible">
+
+                <Spinner
+                    android:id="@+id/station_status_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#E0E0E0"
+                    android:visibility="visible" />
+
+                <Button
+                    android:id="@+id/status_query_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Submit" />
+            </LinearLayout>
+
+
+            <!--LinearLayout
+            https://material.io/guidelines/style/color.html#color-color-palette
 
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#E0E0E0"
-                android:textSize="40sp"
-
-                android:height="200px"
-                />
-            <Button
-                android:id="@+id/station_query_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Submit"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/status_query"
-            android:layout_below="@+id/station_query"
-            android:background="#90CAF9"
-            android:orientation="vertical"
-            android:height="0px"
-            android:visibility="invisible"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Spinner
-                android:id="@+id/station_status_spinner"
-                android:visibility="visible"
-                android:layout_width="match_parent"
-                android:background="#E0E0E0"
-                android:layout_height="wrap_content" />
-
-            <Button
-                android:id="@+id/status_query_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Submit"/>
-        </LinearLayout>
-
-
-    <!--LinearLayout
-    https://material.io/guidelines/style/color.html#color-color-palette
-
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:showDividers="middle"
-        android:divider="?android:dividerHorizontal"
-        android:orientation="vertical">
-        <TextView
-            android:id="@+id/route_header"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="right"
-            android:padding="3dip"
-            android:text="Train Details" />
-
-
-    </LinearLayout-->
-
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/route_scroll"
-        android:layout_below="@+id/status_query"
-        android:padding="5dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="100dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:showDividers="middle"
-            android:divider="?android:dividerHorizontal"
-            android:orientation="vertical">
-
-            <TableLayout
-                android:id="@+id/routes"
-                android:layout_width="match_parent"
                 android:showDividers="middle"
                 android:divider="?android:dividerHorizontal"
-                android:layout_height="wrap_content">
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/route_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="Train Details" />
 
-            </TableLayout>
-        </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
-    </RelativeLayout>
+
+            </LinearLayout-->
+
+            <android.support.v4.widget.NestedScrollView
+                android:id="@+id/route_scroll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/status_query"
+                android:padding="5dp"
+                tools:layout_editor_absoluteX="16dp"
+                tools:layout_editor_absoluteY="100dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="?android:dividerHorizontal"
+                    android:orientation="vertical"
+                    android:showDividers="middle">
+
+                    <TableLayout
+                        android:id="@+id/routes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="?android:dividerHorizontal"
+                        android:showDividers="middle">
+
+                    </TableLayout>
+                </LinearLayout>
+            </android.support.v4.widget.NestedScrollView>
+        </RelativeLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
 </android.support.constraint.ConstraintLayout>
