@@ -521,7 +521,7 @@ public class MainActivityFragment extends Fragment {
         Calendar cal = Calendar.getInstance();
         TimeZone tz = cal.getTimeZone();
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss EEEE");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm EEEE"); //"yyyy/MM/dd HH:mm:ss
         Date date = Utils.adddays(new Date(), days );
 
         dateFormat.setTimeZone(tz);
