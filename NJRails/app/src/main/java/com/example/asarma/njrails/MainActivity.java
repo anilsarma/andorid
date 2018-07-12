@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
@@ -34,7 +33,6 @@ import com.google.android.gms.tasks.Task;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends FragmentActivity {
@@ -71,13 +69,13 @@ public class MainActivity extends FragmentActivity {
     protected void onStart() {
         super.onStart();
         final DownloadNJTGitHubFile github = new DownloadNJTGitHubFile(getApplicationContext(), "", "", null);
-        File version_upgrade = github.cacheDir("version_upgrade.txt");
+        File version_upgrade = github.getCacheDir("version_upgrade.txt");
         long diffms = (System.currentTimeMillis() - version_upgrade.lastModified());
 
         long hours =  0;
         long minutes = 30;
         long seconds = 5;
-        showCustomNotification(null, null);
+        //showCustomNotification(null, null);
         if (diffms < (( (hours *60 + minutes) *60  + seconds) *1000) ) {
             if (!FORCE_DOWNLOAD) {
                 //Toast.makeText(getApplicationContext(), "Skipping check Modified time is" + diffms, Toast.LENGTH_LONG).show();
@@ -117,7 +115,7 @@ public class MainActivity extends FragmentActivity {
         }
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.mipmap.app_njs_icon)
                         .setContentTitle("NJRails Upgrade Required")
                         .setTicker("Upgrade (Open to see the info).")
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -148,29 +146,31 @@ public class MainActivity extends FragmentActivity {
         }
         //using this just as a ulitiy functon
         final DownloadNJTGitHubFile utilsNJGitHub = new DownloadNJTGitHubFile(getApplicationContext(), "", "", null);
-        final File version = utilsNJGitHub.cacheDir("version.txt");
-        File version_upgrade = utilsNJGitHub.cacheDir("version_upgrade.txt");
-        File rail_data = utilsNJGitHub.cacheDir("rail_data.zip");
+        final File version = utilsNJGitHub.getCacheDir("version.txt");
+        File version_upgrade = utilsNJGitHub.getCacheDir("version_upgrade.txt");
+        File rail_data = utilsNJGitHub.getCacheDir("rail_data.zip");
 
         boolean download=true;
 
         final String upgrade_version_str = utilsNJGitHub.readFile(version_upgrade);
         final String version_str = utilsNJGitHub.readFile(version);
         try {
-            if (!upgrade_version_str.isEmpty() && version_str.equals(upgrade_version_str)) {
+            if (version_str.equals(upgrade_version_str)) {
+                download = false;
+            }
+            if(upgrade_version_str.isEmpty()) {
                 download = false;
             }
         }
         catch(Exception e) {
-
         }
         if(FORCE_DOWNLOAD) {
             download = true;
         }
 
-        final File download_complete = utilsNJGitHub.cacheDir("download_complete.txt");
+        final File download_complete = utilsNJGitHub.getCacheDir("download_complete.txt");
         if (download) {
-            showCustomNotification(upgrade_version_str, version_str);
+            showCustomNotification(version_str, upgrade_version_str);
             if (rail_data.exists()) {
                 rail_data.delete();
             }
@@ -196,8 +196,8 @@ public class MainActivity extends FragmentActivity {
         if (rail_data.exists()) {
             //Toast.makeText(MainActivity.this.getApplicationContext(), "no download required of rail_data.zip version:" + version_str + " remote:" + upgrade_version_str, Toast.LENGTH_LONG).show();
             // download_complete
-            File destination = utilsNJGitHub.cacheDir("rail_data.zip");
-            File dir = utilsNJGitHub.cacheDir("nj_rails_cache");
+            File destination = utilsNJGitHub.getCacheDir("rail_data.zip");
+            File dir = utilsNJGitHub.getCacheDir("nj_rails_cache");
             if (!dir.exists()) {
                 dir.mkdir();
             }
@@ -244,7 +244,7 @@ public class MainActivity extends FragmentActivity {
                         utilsNJGitHub.writeFile(download_complete, upgrade_version_str);
 
                         /*unzip the file */
-                        File dir = utilsNJGitHub.cacheDir("nj_rails_cache");
+                        File dir = utilsNJGitHub.getCacheDir("nj_rails_cache");
                         if (!dir.exists()) {
                             dir.mkdir();
                         }

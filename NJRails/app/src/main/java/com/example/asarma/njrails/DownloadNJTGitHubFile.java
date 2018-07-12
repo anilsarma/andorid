@@ -35,10 +35,21 @@ public class DownloadNJTGitHubFile extends AsyncTask<String, Integer, String> {
     String msg;
     IGitHubDownloadComple main;
 
-    public File cacheDir( Object filename)
+    public File getCacheDir(Object filename)
     {
         return new File(context.getCacheDir() + "/db/" + filename);
     }
+
+    public File getDir( Object filename)
+    {
+        return new File(context.getDir("db",  context.MODE_PRIVATE|context.MODE_APPEND) + "/db/" + filename);
+    }
+
+    public FileOutputStream openFileOutput( String filename) throws  FileNotFoundException
+    {
+        return context.openFileOutput(filename,  context.MODE_PRIVATE|context.MODE_APPEND);
+    }
+
     public DownloadNJTGitHubFile( Context context, String filename, String destination, IGitHubDownloadComple main) {
         this.main = main;
         this.context = context;
