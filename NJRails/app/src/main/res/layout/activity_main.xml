@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.asarma.njrails.RouteActivity">
+    tools:context="com.smartdeviceny.njts.RouteActivity">
 
 
     <ScrollView
@@ -34,24 +34,24 @@
 
                             <TextView
                                 android:padding="3dip"
-                                android:text="djdjdjdj" />
+                                android:text="Header" />
 
                             <TextView
                                 android:gravity="right"
                                 android:padding="3dip"
-                                android:text="" />
+                                android:text="First Line" />
                         </TableRow>
 
                         <TableRow>
 
                             <TextView
                                 android:padding="3dip"
-                                android:text="dd" />
+                                android:text="Second Line" />
 
                             <TextView
                                 android:gravity="right"
                                 android:padding="3dip"
-                                android:text="d" />
+                                android:text="Second Line Status" />
                         </TableRow>
                     </TableLayout>
                 </TableRow>

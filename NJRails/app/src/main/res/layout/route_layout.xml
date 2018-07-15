@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.asarma.njrails.RouteActivity">
+    tools:context="com.smartdeviceny.njts.RouteActivity">
 
     <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/swiperefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -67,10 +67,10 @@
                     android:id="@+id/stop_station_spinner"
                     android:layout_width="match_parent"
 
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:height="200px"
                     android:background="#E0E0E0"
-                    android:textSize="40sp"
+                    android:textSize="200sp"
 
                     android:visibility="visible" />
 
@@ -129,7 +129,7 @@
             <android.support.v4.widget.NestedScrollView
                 android:id="@+id/route_scroll"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/status_query"
                 android:padding="5dp"
                 tools:layout_editor_absoluteX="16dp"
@@ -137,7 +137,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:divider="?android:dividerHorizontal"
                     android:orientation="vertical"
                     android:showDividers="middle">

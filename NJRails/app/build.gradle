@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     //buildToolsVersion '27.0.1'
     //project.archivesBaseName = "NJTSchedule";
     defaultConfig {
-        applicationId "com.example.asarma.njrails"
+        applicationId "com.smartdeviceny.njts"
         minSdkVersion 24
         targetSdkVersion 25
         versionCode 1

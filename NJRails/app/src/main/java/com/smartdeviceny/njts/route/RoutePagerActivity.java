@@ -1,0 +1,38 @@
+package com.smartdeviceny.njts.route;
+
+
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
+
+import com.smartdeviceny.njts.MainActivityFragment;
+import com.smartdeviceny.njts.ParcelResult;
+import com.smartdeviceny.njts.R;
+
+public class RoutePagerActivity extends FragmentActivity {
+
+    // When requested, this adapter returns a DemoObjectFragment,
+    // representing an object in the collection.
+    RouteCollectionPagerAdapter mDemoCollectionPagerAdapter;
+    ViewPager mViewPager;
+
+    public void onCreate(Bundle savedInstanceState) {
+        ParcelResult obj = this.getIntent().getParcelableExtra("data");
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.route_pager);
+        // ViewPager and its adapters use support library
+        // fragments, so use getSupportFragmentManager.
+        mDemoCollectionPagerAdapter =  new RouteCollectionPagerAdapter(getSupportFragmentManager(), obj);
+        mViewPager = (ViewPager) findViewById(R.id.route_pager);
+        mViewPager.setAdapter(mDemoCollectionPagerAdapter);
+        mViewPager.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mViewPager.setCurrentItem(MainActivityFragment.FIRST_PAGE);
+               // Toast.makeText(mViewPager.getContext(), "Current Act"+ mViewPager.getCurrentItem(), Toast.LENGTH_LONG).show();
+            }
+        }, 5000);
+    }
+
+
+}
