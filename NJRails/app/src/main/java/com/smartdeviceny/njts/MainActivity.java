@@ -40,7 +40,7 @@ public class MainActivity extends FragmentActivity {
     protected  static final boolean FORCE_DOWNLOAD=false;
     protected static final int REQUEST_CODE_SIGN_IN = 0;
     protected static final int REQUEST_CODE_OPEN_ITEM = 1;
-    private static final String TAG = "BaseDriveActivity";
+    private static final String TAG = "MainActivity";
     DriveClient mDriveClient;
     DriveResourceClient mDriveResourceClient;
     // When requested, this adapter returns a DemoObjectFragment,
@@ -52,20 +52,69 @@ public class MainActivity extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_pager);
-
+        if (dbHelper == null) {
+            dbHelper = new SQLHelper(getApplicationContext());
+        }
+        SQLiteDatabase db= dbHelper.getWritableDatabase();
+        boolean dbNotReady = false;
+        try {
+            if (SQLHelper.check_table(db, "trips") == 0) {
+                dbNotReady = true;
+            }
+        } catch (Exception e) {
+            dbNotReady=true;
+        }
         mDemoCollectionPagerAdapter =  new DemoCollectionPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager =  findViewById(R.id.pager);
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-        if (extras != null ) {
-            Boolean value = extras.getBoolean("UPGRADE");
-            if (value!=null && value) {
-                Toast.makeText(MainActivity.this.getApplicationContext(), "Got upgrade intent " + intent, Toast.LENGTH_LONG).show();
+        if (dbNotReady) {
+            mDemoCollectionPagerAdapter.setCount(1);
+            mDemoCollectionPagerAdapter.notifyDataSetChanged();
+        }
+
+
+
+
+//        Intent intent = getIntent();
+//        Bundle extras = intent.getExtras();
+//        if (extras != null ) {
+//            Boolean value = extras.getBoolean("UPGRADE");
+//            if (value!=null && value) {
+//                //Toast.makeText(MainActivity.this.getApplicationContext(), "Got upgrade intent " + intent, Toast.LENGTH_LONG).show();
+//            }
+//        }
+    }
+
+    void checkDB() {
+        if (dbHelper == null) {
+            dbHelper = new SQLHelper(getApplicationContext());
+        }
+        SQLiteDatabase db= dbHelper.getWritableDatabase();
+        RailHelper.create_tables(db);
+        System.out.println("Tables" + SQLHelper.check_table(db, "trips"));
+        if ( SQLHelper.check_table(db, "trips")<100 ) {
+            try {
+
+                new TaskUpgradeDB(getApplicationContext(), new ITaskUpgradeComplete() {
+                    @Override
+                    public void onUpgradeTaskComplete() {
+                        //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        //startActivity(intent);
+
+//                        Intent i = getBaseContext().getPackageManager()
+//                                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+//                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                        startActivity(i);
+                        mDemoCollectionPagerAdapter.setCount(5);
+                        mDemoCollectionPagerAdapter.notifyDataSetChanged();
+
+                    }
+                }).execute("");
+            } catch (Exception ee) {
+                ee.printStackTrace();
             }
         }
     }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -97,6 +146,8 @@ public class MainActivity extends FragmentActivity {
 
             }
         }).execute("");
+        //checkDB();
+
     }
 
 
@@ -115,12 +166,12 @@ public class MainActivity extends FragmentActivity {
 //        notification.defaults |= Notification.DEFAULT_SOUND; // Sound
         String msg = "upgrade";
         if (from != null  && to != null ) {
-            msg = "upgrade required from '" + from + "' to '" + to + "'";
+            msg = "schedule upgrade required from '" + from + "' to '" + to + "'";
         }
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.app_njs_icon)
-                        .setContentTitle("NJRails Upgrade Required")
+                        .setContentTitle("NJTS Schedule Upgrade Required")
                         .setTicker("Upgrade (Open to see the info).")
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setContentText(msg);
@@ -129,8 +180,9 @@ public class MainActivity extends FragmentActivity {
         intent_upgrade.putExtra("UPGRADE", true ); //If you wan to send data also
         PendingIntent pIntentUpgrade = PendingIntent.getActivity(this, 1000, intent_upgrade, 0);
         PendingIntent pIntentIgnore = PendingIntent.getActivity(this, 1001, new Intent(this, MainActivity.class), 0);
-        mBuilder.addAction(R.mipmap.ic_launcher, "Upgrade", pIntentUpgrade)
-                .addAction(R.mipmap.ic_launcher, "Ignore", pIntentIgnore)
+        // disable the actions for now.
+        //mBuilder.addAction(R.mipmap.ic_launcher, "Upgrade", pIntentUpgrade)
+        //        .addAction(R.mipmap.ic_launcher, "Ignore", pIntentIgnore)
                 //.addAction(R.mipmap.ic_launcher, "Later", pIntent);
         ;
         Notification notification = mBuilder.build();
@@ -214,21 +266,21 @@ public class MainActivity extends FragmentActivity {
                     for (String f : dir.list()) {
                         s += " " + f;
                     }
-                    Toast.makeText(MainActivity.this.getApplicationContext(), "unzipped " + s, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(MainActivity.this.getApplicationContext(), "unzipped " + s, Toast.LENGTH_LONG).show();
 
                     try {
                         utilsNJGitHub.writeFile(download_complete, upgrade_version_str);
 
                         SQLiteDatabase db= dbHelper.getWritableDatabase();
                         dbHelper.useAsset=false;
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade starting rail_data.zip", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "NJT downloading Schedule", Toast.LENGTH_LONG).show();
                         dbHelper.update_tables(db, true);
                         utilsNJGitHub.writeFile(version, upgrade_version_str);
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade Complete rail_data.zip", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "NJT Schedule upgrade complete.", Toast.LENGTH_LONG).show();
                     }
                     catch (Exception e)
                     {
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade failed rail_data.zip", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "NJT Schedule download/upgrade failed.", Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -239,7 +291,7 @@ public class MainActivity extends FragmentActivity {
             }
         }
         else {
-            Toast.makeText(MainActivity.this.getApplicationContext(), "Starting download of rail_data.zip", Toast.LENGTH_LONG).show();
+            //Toast.makeText(MainActivity.this.getApplicationContext(), "Starting download of rail_data.zip", Toast.LENGTH_LONG).show();
             new DownloadNJTGitHubFile(getApplicationContext(), "rail_data.zip", "rail_data.zip", new IGitHubDownloadComple() {
                 @Override
                 public void onDownloadComplete(String filename, File folder, File destination) {
@@ -254,18 +306,18 @@ public class MainActivity extends FragmentActivity {
                         }
 
                         ArrayList<File> o = utilsNJGitHub.unzipfile(destination, dir);
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "total unzipped rail_data.zip " + o.size(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(MainActivity.this.getApplicationContext(), "total unzipped rail_data.zip " + o.size(), Toast.LENGTH_LONG).show();
 
                         SQLiteDatabase db= dbHelper.getWritableDatabase();
                         dbHelper.useAsset=false;
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "DB2 upgrade starting rail_data.zip", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "NJTS downloading Schedule", Toast.LENGTH_LONG).show();
                         dbHelper.update_tables(db, true);
                         utilsNJGitHub.writeFile(version, upgrade_version_str);
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "DB2 upgrade Complete rail_data.zip", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "NJTS Schedule download complete.", Toast.LENGTH_LONG).show();
                     }
                     catch (Exception e)
                     {
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "DB upgrade failed rail_data.zip", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "NJTS Schedule download failed.", Toast.LENGTH_LONG).show();
                     }
                 }
                 @Override
@@ -307,7 +359,7 @@ public class MainActivity extends FragmentActivity {
                     buffer.addOnSuccessListener(new OnSuccessListener<MetadataBuffer>() {
                         @Override
                         public void onSuccess(MetadataBuffer metadata) {
-                            Toast.makeText(getApplicationContext(), "file good" + metadata.getCount() + " " , Toast.LENGTH_LONG).show();
+                            //Toast.makeText(getApplicationContext(), "file good" + metadata.getCount() + " " , Toast.LENGTH_LONG).show();
                         }
                     }) .addOnFailureListener(this, new OnFailureListener() {
                         @Override

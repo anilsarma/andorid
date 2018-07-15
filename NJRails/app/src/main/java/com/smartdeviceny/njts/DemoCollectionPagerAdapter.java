@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
  */
 
 public class DemoCollectionPagerAdapter extends FragmentStatePagerAdapter {
+    int count = 5   ;
     public DemoCollectionPagerAdapter(FragmentManager fm) {
         super(fm);
     }
@@ -26,9 +27,14 @@ public class DemoCollectionPagerAdapter extends FragmentStatePagerAdapter {
         return fragment;
     }
 
+    void setCount(int value)
+    {
+        count = value;
+    }
+
     @Override
     public int getCount() {
-        return 5;
+        return count;
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.ViewGroup;
@@ -89,6 +90,8 @@ public class RouteActivity extends FragmentActivity {
         tv.setPadding(0, padding, 0, 0);
         return  tv;
     }
+
+    // duplicate code exists in MainActivity need to combing the 2 code.
     void updateRoutes(ArrayList<HashMap<String, Object>> routes)
     {
         Calendar cal = Calendar.getInstance();
@@ -98,7 +101,7 @@ public class RouteActivity extends FragmentActivity {
         Date date = new Date();
         dateFormat.setTimeZone(tz);
         SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss");
-timeformat.setTimeZone(tz);
+        timeformat.setTimeZone(tz);
 
         TextView route_header = (TextView)findViewById(R.id.route_header);
         //route_header.setBackgroundColor(Color.BLACK);
@@ -109,6 +112,7 @@ timeformat.setTimeZone(tz);
         route_header.setTextColor(Color.BLUE);
         //setContentView(route_header);
         TableLayout tl = (TableLayout)findViewById(R.id.routes);
+
         for(int i=0;i< routes.size();i ++) {
             HashMap<String, Object> data = routes.get(i);
             // departure_time, destnaton arrival time block_id, route_long namem duration
@@ -130,17 +134,16 @@ timeformat.setTimeZone(tz);
 
             }
             TableLayout tl2 = new TableLayout(this);
+            tl2.setBackgroundResource(R.drawable.route_background);
+            tl2.setPadding(0, 0, 0, TypedValue.COMPLEX_UNIT_SP * 1);
             TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 5, 0, 5);
-
-
             tl2.setLayoutParams(params);
 
             TableRow tr = new TableRow(this);
             tr.setBackgroundColor(Color.LTGRAY);
             TableRow.LayoutParams params0 = new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params0.setMargins(5, 5,5,5);
-
             tr.setLayoutParams(params0);
             TextView tv = new TextView(this);
             tv.setText( block_id + " " + departture_time + " " + destination_time);
@@ -152,26 +155,13 @@ timeformat.setTimeZone(tz);
             params2.setMargins(0, 20, 0, 20);
             tr2.setLayoutParams(params2);
 
-           // tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-
             tl2.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
             tl2.addView(tr2, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-            //tl2.addView(tr3, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-            //addTextView(this, tl2, "" + block_id + " " + departture_time + " " + destination_time, 6, 10);
             addTextView(this, tl2, "" + route_name + "#" + block_id, 5, 10);
             TextView th = addTextView(this, tl2, "" + time+ " minutes", 5, 150);
-            //addTextView(this, tl2, "" , 5, 5);
-            //tl2.setOnClickListener( new TableRowListener(th, block_id + " "+ route_name + " " + departture_time));
-           // tl2.setOnTouchListener( new RouteTouchListener(th, block_id + " "+ route_name + " " + departture_time));
-
             tl.addView(tl2, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
 
-
-            for ( String key:data.keySet()
-                 ) {
-                Object value = data.get(key);
-                System.out.println("key=" + key + "=" + value);
-            }
+            tl2.setBackgroundResource(R.drawable.route_background);
         }
     }
 

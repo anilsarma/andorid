@@ -22,7 +22,7 @@ import java.util.TimeZone;
  * Created by asarma on 11/3/2017.
  */
 
-public class TrainStatusUpdate {
+public class DepartureVisionViewUpdate {
 
     int multiplier = 3;
     public void updateRoutes(View rootView, ArrayList<HashMap<String, Object>> routes)
@@ -68,10 +68,10 @@ public class TrainStatusUpdate {
             }
 
             TableLayout tl2 = new TableLayout(rootView.getContext());
+            tl2.setBackgroundResource(R.drawable.route_background);
+            tl2.setPadding(0, 0, 0, TypedValue.COMPLEX_UNIT_SP * 1);
             TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 5, 0, 5);
-
-
             tl2.setLayoutParams(params);
 
             TableRow tr = new TableRow(rootView.getContext());

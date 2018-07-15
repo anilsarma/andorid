@@ -28,8 +28,6 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.smartdeviceny.njts.R;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,7 +44,7 @@ public class MainActivityFragment extends Fragment {
     public static int FIRST_PAGE=1;
 
     public static final String ARG_OBJECT = "object";
-    TrainStatusUpdate status = null;
+    DepartureVisionViewUpdate status = null;
     Date date = new Date(new Date().getTime()-6000000);
     ArrayList<HashMap<String, Object>> status_result = new ArrayList<HashMap<String, Object>>();
     HashMap<Integer, View> views = new HashMap<>();
@@ -87,15 +85,18 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
         setupDB();
+        boolean dbEmpty = false;
+        if ( SQLHelper.check_table(dbHelper.getReadableDatabase(), "trips")== 0 ) {
+            dbEmpty = true;
+        }
+
         // do this in the background TODO
         if (stationcodes.size()==0) {
             ArrayList<HashMap<String, Object>> r = dbHelper.read_csv("station_codes.txt");
             //System.out.print(r);
             for (int i = 0; i < r.size(); i++) {
                 try {
-                    if (true) {
                         stationcodes.put(Utils.capitalize(r.get(i).get("station_name").toString()), r.get(i).get("station_code").toString());
-                    }
                 } catch (Exception e) {
                     // e.printStackTrace();
                 }
@@ -130,11 +131,10 @@ public class MainActivityFragment extends Fragment {
         ViewGroup.LayoutParams params0 = status_query.getLayoutParams();
         params.height = 0;
         status_query.setLayoutParams(params);
-
-        {
-            ArrayList<HashMap<String, Object>> data = SQLHelper.query(dbHelper.getReadableDatabase(), "select * from routes");
-            System.out.println(data);
-        }
+//        {
+//            ArrayList<HashMap<String, Object>> data = SQLHelper.query(dbHelper.getReadableDatabase(), "select * from routes");
+//            System.out.println(data);
+//        }
         String njt_routes[] = SQLHelper.get_values(dbHelper.getReadableDatabase(), "select * from routes", "route_long_name");
         for (int i = 0; i < njt_routes.length; i++) {
             njt_routes[i] = Utils.capitalize(njt_routes[i]);
@@ -142,6 +142,10 @@ public class MainActivityFragment extends Fragment {
         ArrayAdapter<CharSequence> njt_adaptor = new ArrayAdapter<CharSequence>(rootView.getContext(), android.R.layout.simple_spinner_item,  njt_routes);
         final String route_name = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "route_name", "Northeast Corridor");
         String startStations[] = SQLHelper.getRouteStations( dbHelper.getReadableDatabase(), route_name );
+        if (startStations.length ==0) {
+            String tmp[] = { "New York Penn Station", "New Brunswick"};
+            startStations = tmp;
+        }
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(rootView.getContext(), android.R.layout.simple_spinner_item,  startStations);
 
         njt_adaptor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -192,8 +196,10 @@ public class MainActivityFragment extends Fragment {
         String start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", startStations[0] );
         String stop  = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "stop_station", startStations[1] );
 
-        SQLHelper.update_user_pref( dbHelper.getWritableDatabase(), "start_station", start, new Date());
-        SQLHelper.update_user_pref( dbHelper.getWritableDatabase(), "stop_station", stop, new Date());
+        if (!dbEmpty) {
+            SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "start_station", start, new Date());
+            SQLHelper.update_user_pref(dbHelper.getWritableDatabase(), "stop_station", stop, new Date());
+        }
 
 
         spinnerPosition = adapter.getPosition(Utils.capitalize(start));
@@ -293,7 +299,7 @@ public class MainActivityFragment extends Fragment {
         }
         if ( index == STATUS_PAGE ) {
             if ( status == null) {
-                status = new TrainStatusUpdate();
+                status = new DepartureVisionViewUpdate();
             }
 
             TextView th =(TextView) rootView.findViewById(R.id.route_header);
@@ -458,7 +464,7 @@ public class MainActivityFragment extends Fragment {
 
                System.out.println("got status:" + departure_station + " " + departure_code);
                if (departure_station != null) {
-                   new DownloadDepartureVisionTask(rootView, " Button " + myPage, new IDownloadComple() {
+                   new DownloadDepartureVisionTask(rootView, " Station:" + departure_station + "(" + departure_code + ")", new IDownloadComple() {
                        @Override
                        public Context getContext() {
                            return rootView.getContext();
@@ -536,19 +542,54 @@ public class MainActivityFragment extends Fragment {
         SQLiteDatabase db= dbHelper.getWritableDatabase();
 
         /* need to do the actual upgrade here */
+
         try {
 
             if ( SQLHelper.check_table(db, "trips")== 0 ) {
                 Toast.makeText(getContext(),(String)"updating Database Tables",
                         Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), (String) "creating tables", Toast.LENGTH_SHORT).show();
                 RailHelper.create_tables(db);
-                dbHelper.update_tables(db, false);
+                try {
+
+                    new TaskUpgradeDB(getContext(), new ITaskUpgradeComplete() {
+                        @Override
+                        public void onUpgradeTaskComplete() {
+                                                    Intent i = getContext().getPackageManager()
+                                .getLaunchIntentForPackage( getContext().getPackageName() );
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(i);
+                        }
+                    }).execute("");
+                }
+                catch(Exception ee ) {
+                    ee.printStackTrace();
+                }
+                //dbHelper.update_tables(db, false);
+                Toast.makeText(getContext(), (String) "init complete", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             Toast.makeText(getContext(),(String)"Creating Database Tables",
                     Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), (String) "creating tables", Toast.LENGTH_SHORT).show();
             RailHelper.create_tables(db);
-            dbHelper.update_tables(db, false);
+            try {
+                final View view = rootView;
+                new TaskUpgradeDB(getContext(), new ITaskUpgradeComplete() {
+                    @Override
+                    public void onUpgradeTaskComplete() {
+                        Intent i = getContext().getPackageManager()
+                                .getLaunchIntentForPackage( getContext().getPackageName() );
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(i);
+                    }
+                }).execute("");
+            }
+            catch(Exception ee ) {
+                ee.printStackTrace();
+            }
+            //dbHelper.update_tables(db, false);
+            Toast.makeText(getContext(), (String) "database tables created", Toast.LENGTH_SHORT).show();
         }
 
         // check file upgrade and call SQLHelper.update_tables if necessary.
@@ -569,8 +610,12 @@ public class MainActivityFragment extends Fragment {
             start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", start);
             stop = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "stop_station", stop);
         }
-        routes = Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getReadableDatabase(), start, stop, Integer.parseInt(Utils.getLocaDate(index-1))));
-        updateRoutes(rootView, start, stop, index-1, routes, false);
+        try {
+            routes = Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getReadableDatabase(), start, stop, Integer.parseInt(Utils.getLocaDate(index - 1))));
+            updateRoutes(rootView, start, stop, index - 1, routes, false);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     TextView addTextView(Context context, ViewGroup parent, String text, int font_size, int padding)
@@ -646,8 +691,8 @@ public class MainActivityFragment extends Fragment {
             TableLayout tableLayout_route = new TableLayout(getContext());
             TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 5, 0, 5);
-
-
+            tableLayout_route.setBackgroundResource(R.drawable.route_background);
+            tableLayout_route.setPadding(0, 0, 0, TypedValue.COMPLEX_UNIT_SP * 1);
             tableLayout_route.setLayoutParams(params);
 
             // 1. make the first row of the status contains time

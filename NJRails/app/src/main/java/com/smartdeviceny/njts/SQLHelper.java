@@ -290,6 +290,9 @@ System.out.println("output " + date + " stop:" + start_stop_id + " end:"+ stop_s
         String sql_route = "select * from routes where route_long_name like '%{route_name}%';".replace("{route_name}", route_name);
         System.out.println("SQL:" + sql_route);
         String route_id[]  = SQLHelper.get_values(db,sql_route, "route_id");
+        if( route_id.length ==0) {
+            return  new String[]{};
+        }
         sql_stations = sql_stations.replace("{route_id}", "" + route_id[0] );
         System.out.println("SQL:" + sql_stations );
         String startStations[] = SQLHelper.get_values( db, sql_stations, "stop_name");

@@ -7,9 +7,9 @@ android {
     defaultConfig {
         applicationId "com.smartdeviceny.njts"
         minSdkVersion 24
-        targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 26
+        versionCode 3
+        versionName "1.1"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
