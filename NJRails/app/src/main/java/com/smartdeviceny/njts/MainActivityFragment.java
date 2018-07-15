@@ -294,6 +294,7 @@ public class MainActivityFragment extends Fragment {
                     params.height = 0;
                     station_query.setLayoutParams(params);
                     station_query.setVisibility(View.INVISIBLE);
+                    status_result.clear();
                 }
             });
         }
@@ -458,6 +459,7 @@ public class MainActivityFragment extends Fragment {
         System.out.println("onActivityResult "+  requestCode + " " + request_code);
         if (requestCode == request_code) {
             if (resultCode == Activity.RESULT_OK) {
+                status_result.clear();
                 String departure_station = data.getStringExtra("departure_station");
                 //String departure_code = data.getStringExtra("departure_code");
                 String departure_code = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "departure_code", "NY");

@@ -150,6 +150,12 @@ public class SettingsActivity extends Activity {
                 System.out.println("updated " +  route_name + " " + start + " "  + stop);
 
                 Toast.makeText(getApplicationContext(), (String) "Start/Stop station updated",  Toast.LENGTH_LONG).show();
+                Intent data = new Intent();
+
+                data.putExtra("start_station", start);
+                data.putExtra("stop_station", stop);
+                setResult(RESULT_OK, data);
+
                 finish();
 
             }
