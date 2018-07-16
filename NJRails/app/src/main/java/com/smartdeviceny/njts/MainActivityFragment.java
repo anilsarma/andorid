@@ -185,6 +185,7 @@ public class MainActivityFragment extends Fragment {
                 spinnerPosition = adapter.getPosition(Utils.capitalize(stop));
                 start_station_spinner.setSelection(spinnerPosition);
 
+
             }
 
             @Override
@@ -295,6 +296,7 @@ public class MainActivityFragment extends Fragment {
                     station_query.setLayoutParams(params);
                     station_query.setVisibility(View.INVISIBLE);
                     status_result.clear();
+                    status_details.clear();
                 }
             });
         }
@@ -443,6 +445,8 @@ public class MainActivityFragment extends Fragment {
 
                     int days = index-1;
                     routes = Utils.parseCursor(SQLHelper.getRoutes(dbHelper.getWritableDatabase(), stop, start, Integer.parseInt(Utils.getLocaDate(days))));
+                    status_details.clear();
+                    status_result.clear();
                     updateRoutes(rootView, stop, start, days, routes, false);
                 }
             });
@@ -459,6 +463,7 @@ public class MainActivityFragment extends Fragment {
         System.out.println("onActivityResult "+  requestCode + " " + request_code);
         if (requestCode == request_code) {
             if (resultCode == Activity.RESULT_OK) {
+                status_details.clear();
                 status_result.clear();
                 String departure_station = data.getStringExtra("departure_station");
                 //String departure_code = data.getStringExtra("departure_code");
@@ -751,9 +756,16 @@ public class MainActivityFragment extends Fragment {
             }
             TextView tv_blank_line = addTextView(getContext(), tableLayout_route, "", 5, 5); // just a blank line
             TextView tv_schedule = addTextView(getContext(), tableLayout_route, schedule, 5, 0);
-
+            int padding = Utils.pxFromSp(4, getContext());
+            int pad_updown = Utils.pxFromSp(1, getContext());
+            tv_schedule.setPadding(padding, pad_updown, pad_updown,padding );
             if ( !schedule.isEmpty()) {
-                tv_schedule.setBackgroundColor(Color.GREEN);
+                if ( isBadStatus( schedule)) {
+                    tv_schedule.setBackgroundColor(Color.RED);
+                }
+                else {
+                    tv_schedule.setBackgroundColor(Color.GREEN);
+                }
                 if (schedule.contains("ago")) {
                     tv_schedule.setBackgroundColor(Color.RED);
                 }
@@ -801,6 +813,13 @@ public class MainActivityFragment extends Fragment {
         });
     }
 
+    boolean isBadStatus(String msg)
+    {
+        if (msg.toUpperCase().contains("CANCEL")) {
+            return true;
+        }
+        return false;
+    }
     class UpdateTimeTask extends TimerTask {
         View rootView;
         UpdateTimeTask(View rootView) {
