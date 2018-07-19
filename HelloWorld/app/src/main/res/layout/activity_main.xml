@@ -5,10 +5,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.asarma.helloworld.MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
     <Button
         android:id="@+id/button_ok"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Submit" />
+        android:text="Message Service" />
+    <Button
+        android:id="@+id/button_localservice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Local Service" />
+    <Button
+        android:id="@+id/sql"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SQL" />
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

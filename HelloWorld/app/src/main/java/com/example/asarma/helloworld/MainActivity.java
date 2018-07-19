@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
@@ -24,14 +25,25 @@ import android.util.ArraySet;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.example.asarma.helloworld.utils.Utils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Set;
+import java.util.zip.ZipInputStream;
 
 public class MainActivity extends AppCompatActivity {
     DownloadManager manager;
     private long enqueue;
     public static final String PREF_FILE_NAME = "test.pref";
+    DownloadFile download = null;
+    SQLiteDelegate sql;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,20 +64,33 @@ public class MainActivity extends AppCompatActivity {
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
             request.setDescription("Some descrition");
             request.setTitle("Some title");
-            enqueue = manager.enqueue(request);
-            System.out.println("downloading service .... ");
+            //enqueue = manager.enqueue(request);
+            //System.out.println("downloading service .... ");
         }
         else {
-            System.out.println("does not have download serecicxe");
+           // System.out.println("does not have download serecicxe");
         }
+        download = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
+            @Override
+            public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
+                Log.d("download", "downloading complete " + file.getAbsolutePath() + " " + url +  " " + id );
+                return true;
+            }
 
-        //startActivity(i);
+            @Override
+            public void downloadFailed(DownloadFile d, long id, String url) {
+                Log.d("download", "downloading failed " + " " + url +  " " + id );
+            }
+        });
+        download.downloadFile("https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt", "NJS", "",
+                DownloadManager.Request.NETWORK_WIFI| DownloadManager.Request.NETWORK_MOBILE, null);
+
+                //startActivity(i);
         System.out.println("started");
         startService(new Intent(MainActivity.this, MessageService.class));
         //startService(new Intent(MainActivity.this, MainActivity.MessageService.class));
         Button buttonStartService = (Button) findViewById(R.id.button_ok);
-        buttonStartService.setOnClickListener(new View.OnClickListener() {
-
+        buttonStartService.setOnClickListener( p -> new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
@@ -76,7 +101,59 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button sqlButton = (Button)findViewById(R.id.sql);
+        sqlButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
+                if (f.exists()) {
+                    sql = new SQLiteDelegate(getApplicationContext(), "rails_db.sql", null);
+                    sql.getWritableDatabase();
+                    Toast.makeText(getApplicationContext(), "Got SQL", Toast.LENGTH_LONG).show();
+                    Log.d("SQL", "found database file and opened.");
+                }
+                else {
+                    final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
+                        @Override
+                        public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
 
+                            try {
+                                InputStream is = new FileInputStream(file);
+                                OutputStream os = new FileOutputStream(f);
+                                Log.d("SQL", "getting Inputstream");
+                                ZipInputStream zis = Utils.getFileFromZip(is);
+                                Log.d("SQL", "writing stream to disk"+ f.getAbsolutePath());
+                                Utils.writeExtractedFileToDisk(zis, os);
+                                Log.d("SQL", "extracted zip file " + f.getAbsolutePath() );
+                            } catch(IOException e) {
+                                Log.d("SQL", "failed reading zip file " + e);
+                                e.printStackTrace();
+                            }
+                            return false;
+                        }
+
+                        @Override
+                        public void downloadFailed(DownloadFile d,long id, String url) {
+                            Log.d("SQL", "download of SQL file failed " + url);
+                        }
+                    });
+                    d.downloadFile("https://github.com/anilsarma/misc/raw/master/njt/rail_data.zip", "", "",
+                            DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "application/zip");
+                }
+            }
+        });
+
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(download != null ) {
+            Log.d("main", "cleaning up download .... ");
+            download.cleanup();
+            download = null;
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -167,15 +244,22 @@ public class MainActivity extends AppCompatActivity {
 
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            mService = new Messenger(service);
-            //textStatus.setText("Attached.");
-            try {
-                Message msg = Message.obtain(null, Config.MSG_REGISTER_CLIENT);
-                msg.replyTo = mMessenger;
-                mService.send(msg);
-            }
-            catch (RemoteException e) {
-                // In this case the service has crashed before we could even do anything with it
+            Log.d("main activity", "called method on remote binder "  + ((RemoteBinder)service).getService().getValue());
+            boolean usemessanger = false;
+            if ( usemessanger ) {
+                mService = new Messenger(service);
+                //textStatus.setText("Attached.");
+                try {
+                    Message msg = Message.obtain(null, Config.MSG_REGISTER_CLIENT);
+                    msg.replyTo = mMessenger;
+                    mService.send(msg);
+
+                    //RemoteBinder remote = (RemoteBinder)service;
+
+                    Log.d("main activity", "called method on remote binder " + service);
+                } catch (RemoteException e) {
+                    // In this case the service has crashed before we could even do anything with it
+                }
             }
         }
 
@@ -189,7 +273,6 @@ public class MainActivity extends AppCompatActivity {
     void doBindService() {
         bindService(new Intent(this, MessageService.class), mConnection, Context.BIND_AUTO_CREATE);
         mIsBound = true;
-        //textStatus.setText("Binding.");
     }
 
     void doUnbindService() {
@@ -223,6 +306,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 catch (RemoteException e) {
                 }
+               // mService.getBinder()
             }
         }
         else {

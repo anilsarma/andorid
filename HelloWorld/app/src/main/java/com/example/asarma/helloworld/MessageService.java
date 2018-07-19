@@ -23,6 +23,7 @@ import java.util.Set;
 
 public class MessageService extends Service {
     class IncomingHandler extends Handler { // Handler of incoming messages from clients.
+
         @Override
         public void handleMessage(Message msg) {
             Log.d("msg_service", "Got Message " + msg.what);
@@ -52,7 +53,10 @@ public class MessageService extends Service {
     {
 
     }
-
+    public String getValue()
+    {
+        return "FROM Binder";
+    }
     @Override
     public void onCreate() {
         super.onCreate();
@@ -60,7 +64,9 @@ public class MessageService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return mMessenger.getBinder();
+
+       //return mMessenger.getBinder();
+       return new RemoteBinder(this);
     }
 
     @Override
