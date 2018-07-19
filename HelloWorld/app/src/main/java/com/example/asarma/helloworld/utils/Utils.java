@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -255,7 +258,35 @@ public class Utils {
         return null;
     }
 
+    public static ZipInputStream getFileFromZip(InputStream zipFileStream, String name) throws IOException {
+        ZipInputStream zis = new ZipInputStream(zipFileStream);
+        ZipEntry ze;
+        while ((ze = zis.getNextEntry()) != null) {
+            Log.w(TAG, "extracting file: '" + ze.getName() + "'...");
+            if(ze.getName().toUpperCase().equals(name.toUpperCase())) {
+                return zis;
+            }
+        }
+        return null;
+    }
+
     public static String convertStreamToString(InputStream is) {
         return new Scanner(is).useDelimiter("\\A").next();
+    }
+
+    static public String getFileContent(File file)
+    {
+        if(!file.exists()) {
+            return "";
+        }
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String data = br.readLine();
+            br.close();
+            return data;
+        }
+        catch (IOException e) {
+            return "";
+        }
     }
 }

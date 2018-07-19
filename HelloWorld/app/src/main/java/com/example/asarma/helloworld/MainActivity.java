@@ -1,23 +1,19 @@
 package com.example.asarma.helloworld;
 
 import android.app.DownloadManager;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,6 +23,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.asarma.helloworld.utils.SQLiteLocalDatabase;
+import com.example.asarma.helloworld.utils.SqlUtils;
 import com.example.asarma.helloworld.utils.Utils;
 
 import java.io.File;
@@ -35,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.Set;
 import java.util.zip.ZipInputStream;
 
@@ -43,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private long enqueue;
     public static final String PREF_FILE_NAME = "test.pref";
     DownloadFile download = null;
-    SQLiteDelegate sql;
+    SQLiteLocalDatabase sql;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         registerReceiver(mMessageReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
+        //f.delete();
 
          manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         if(manager !=null) {
@@ -107,27 +108,72 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
                 if (f.exists()) {
-                    sql = new SQLiteDelegate(getApplicationContext(), "rails_db.sql", null);
+                    sql = new SQLiteLocalDatabase(getApplicationContext(), "rails_db.sql", null);
                     sql.getWritableDatabase();
                     Toast.makeText(getApplicationContext(), "Got SQL", Toast.LENGTH_LONG).show();
-                    Log.d("SQL", "found database file and opened.");
+                    Log.d("SQL", "found database file and opened." + sql);
+                    String njt_routes[] = SqlUtils.get_values(sql.getReadableDatabase(), "select * from routes", "route_long_name");
+                    for (int i = 0; i < njt_routes.length; i++) {
+                        njt_routes[i] = Utils.capitalize(njt_routes[i]);
+                        Log.d("SQL", "route " + njt_routes[i]);
+                    }
                 }
-                else {
+                // download it any way.
+                 {
                     final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
                         @Override
                         public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
-
+                            File tmpFilename=null;
+                            File tmpVersionFilename=null;
                             try {
+                                tmpFilename = File.createTempFile(f.getName(), ".sql.tmp", f.getParentFile());
+                                tmpVersionFilename = File.createTempFile("version", ".txt.tmp", f.getParentFile());
                                 InputStream is = new FileInputStream(file);
                                 OutputStream os = new FileOutputStream(f);
                                 Log.d("SQL", "getting Inputstream");
-                                ZipInputStream zis = Utils.getFileFromZip(is);
+                                ZipInputStream zis = Utils.getFileFromZip(is, "rail_data.db");
+                                OutputStream zos = new FileOutputStream(tmpFilename);
                                 Log.d("SQL", "writing stream to disk"+ f.getAbsolutePath());
-                                Utils.writeExtractedFileToDisk(zis, os);
+                                Utils.writeExtractedFileToDisk(zis, zos);
+
+                                ZipInputStream zis_version = Utils.getFileFromZip(is, "rail_data.db");
+                                OutputStream zos_version = new FileOutputStream(tmpVersionFilename);
+                                Log.d("SQL", "writing stream to disk"+ tmpVersionFilename.getAbsolutePath());
+                                Utils.writeExtractedFileToDisk(zis_version, zos_version);
+                                String version_str = Utils.getFileContent(tmpVersionFilename);
+
+                                if(f.exists()) {
+                                    if(sql != null) {
+                                        boolean closeDB = true;
+                                        if ( SqlUtils.check_if_user_pref_exists(sql.getWritableDatabase())) {
+                                            String db_ver = SqlUtils.get_user_pref_value( sql.getWritableDatabase(),"version", "");
+                                            if (db_ver.equals(version_str)) {
+                                                Log.d("SQL", "no upgrade required, version  matches " + version_str);
+                                                closeDB = false;
+                                            }
+                                        }
+                                        if(closeDB) {
+                                            sql.close();
+                                            sql = null;
+                                        }
+                                    }
+                                    if(sql == null ) {
+                                        tmpFilename.renameTo(f);
+                                        sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
+                                        SqlUtils.create_user_pref_table(sql.getWritableDatabase());
+                                        SqlUtils.update_user_pref( sql.getWritableDatabase(),"version", version_str, new Date());
+                                    }
+                                }
+
                                 Log.d("SQL", "extracted zip file " + f.getAbsolutePath() );
                             } catch(IOException e) {
                                 Log.d("SQL", "failed reading zip file " + e);
                                 e.printStackTrace();
+                            }
+                            finally {
+                                if(tmpFilename != null ) {
+                                    try {tmpFilename.delete();} catch (Exception e){}
+                                }
                             }
                             return false;
                         }
@@ -137,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("SQL", "download of SQL file failed " + url);
                         }
                     });
-                    d.downloadFile("https://github.com/anilsarma/misc/raw/master/njt/rail_data.zip", "", "",
+                    d.downloadFile("https://github.com/anilsarma/misc/raw/master/njt/rail_data_db.zip", "", "",
                             DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "application/zip");
                 }
             }
