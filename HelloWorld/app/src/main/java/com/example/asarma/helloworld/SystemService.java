@@ -154,7 +154,7 @@ public class SystemService extends Service {
                                     sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
                                     SqlUtils.create_user_pref_table(sql.getWritableDatabase());
                                     SqlUtils.update_user_pref( sql.getWritableDatabase(),"version", version_str, new Date());
-                                    sendDatabaseReady();
+
                                 }
                             } else {
                                 Log.d("SQL", "renamed filed " + tmpFilename.getAbsolutePath() + " to " + f.getAbsolutePath());
@@ -164,7 +164,7 @@ public class SystemService extends Service {
                                 sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
                                 SqlUtils.create_user_pref_table(sql.getWritableDatabase());
                                 SqlUtils.update_user_pref( sql.getWritableDatabase(),"version", version_str, new Date());
-                                sendDatabaseReady();
+
                             }
 
                             Log.d("SQL", "extracted zip file " + f.getAbsolutePath() );
@@ -178,6 +178,9 @@ public class SystemService extends Service {
                             }
                             if(tmpVersionFilename != null ) {
                                 try {tmpVersionFilename.delete();} catch (Exception e){}
+                            }
+                            if(sql!=null) {
+                                sendDatabaseReady();
                             }
                         }
                         return false;
@@ -218,7 +221,7 @@ public class SystemService extends Service {
         //intent.putExtra("message", "This is my message!");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         Log.d("SVC", "sending database ready");
-        Toast.makeText(this.getApplicationContext(),"System Database ready", Toast.LENGTH_LONG).show();
+        Toast.makeText(this.getApplicationContext(),"System Database ready sending", Toast.LENGTH_LONG).show();
     }
 
     // SQL related messages similar to the uil

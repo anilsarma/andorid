@@ -50,6 +50,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         doBindService();
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("custom-event-name");
+        filter.addAction("database-ready");
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
+
+
         config.set("SOME_FLAG", "Heloo There");
         Set<String> values = new ArraySet<>();
         values.add("ITEM1");
@@ -128,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
             download.cleanup();
             download = null;
         }
+        doUnbindService();
         super.onDestroy();
     }
 
@@ -136,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.print("Local::onPause");
         // Unregister since the activity is paused.
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
-        doUnbindService();
+
         super.onPause();
     }
 
@@ -146,13 +153,7 @@ public class MainActivity extends AppCompatActivity {
         // Register to receive messages.
         // We are registering an observer (mMessageReceiver) to receive Intents
         // with actions named "custom-event-name".
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("custom-event-name");
-        filter.addAction("database-ready");
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
 
-
-        doBindService();
         super.onResume();
     }
 
