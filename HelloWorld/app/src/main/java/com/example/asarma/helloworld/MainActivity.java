@@ -112,10 +112,16 @@ public class MainActivity extends AppCompatActivity {
                     sql.getWritableDatabase();
                     Toast.makeText(getApplicationContext(), "Got SQL", Toast.LENGTH_LONG).show();
                     Log.d("SQL", "found database file and opened." + sql);
-                    String njt_routes[] = SqlUtils.get_values(sql.getReadableDatabase(), "select * from routes", "route_long_name");
-                    for (int i = 0; i < njt_routes.length; i++) {
-                        njt_routes[i] = Utils.capitalize(njt_routes[i]);
-                        Log.d("SQL", "route " + njt_routes[i]);
+                    try {
+                        String njt_routes[] = SqlUtils.get_values(sql.getReadableDatabase(), "select * from routes", "route_long_name");
+                        for (int i = 0; i < njt_routes.length; i++) {
+                            njt_routes[i] = Utils.capitalize(njt_routes[i]);
+                            Log.d("SQL", "route " + njt_routes[i]);
+                        }
+                    } catch(Exception e) {
+                        Log.d("SQL", "get routes failed need to download");
+                        sql.close();
+                        sql = null;
                     }
                 }
                 // download it any way.
