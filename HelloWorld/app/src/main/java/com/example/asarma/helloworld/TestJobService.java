@@ -50,7 +50,7 @@ public class TestJobService extends JobService {
 			SystemService systemService = ((RemoteBinder)service).getService();
 			systemService.checkForUpdate();
             job.jobFinished(params, true);
-
+            unbindService(mConnection);
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
