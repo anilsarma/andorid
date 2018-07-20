@@ -106,7 +106,7 @@ public class SystemService extends Service {
             sql = UtilsDBVerCheck.getSQLDatabase(getApplicationContext(), f);
             if (UtilsDBVerCheck.matchDBVersion( sql, version_str) ) {
                 checkingVersion = false;
-                Log.d("DBSVC", "system schedule db is upto date " + version_str);
+                Log.d("DBSVC", "system schedule db is uptodate " + version_str);
                 return;
             }
             final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
