@@ -244,6 +244,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     void doBindService() {
+
         if (!mIsBound) {
             Log.d("SVCON", "SystemService binding.");
             bindService(new Intent(this, SystemService.class), mConnection, Context.BIND_AUTO_CREATE);

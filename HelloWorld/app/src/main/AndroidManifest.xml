@@ -23,9 +23,28 @@
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".TestJobService"
+            android:label="Word service"
+            android:permission="android.permission.BIND_JOB_SERVICE" >
+
+        </service>
+
         <service android:enabled="true" android:name=".MessageService" />
         <service android:enabled="true" android:name=".SystemService" />
         <receiver android:name=".MainActivity$LocalBcstReceiver" android:enabled="true"/>
+        <receiver android:name=".SystemService$LocalbroadcastReceiver" android:enabled="true"/>
+
+        <receiver android:name="PowerStartServiceReceiver"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

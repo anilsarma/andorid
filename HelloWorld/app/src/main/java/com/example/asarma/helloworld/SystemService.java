@@ -1,44 +1,33 @@
 package com.example.asarma.helloworld;
 
 import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Binder;
-import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.example.asarma.helloworld.utils.SQLiteLocalDatabase;
 import com.example.asarma.helloworld.utils.SqlUtils;
 import com.example.asarma.helloworld.utils.Utils;
-import com.google.gson.Gson;
-
-import org.json.JSONArray;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Set;
-import java.util.zip.ZipInputStream;
 
 public class SystemService extends Service {
 
     boolean           checkingVersion;
     DownloadFile      downloader;
     SQLiteLocalDatabase sql;
+    BroadcastReceiver receiver = new LocalbroadcastReceiver(this);
 
 
     DownloadFile.Callback callback = new DownloadFile.Callback() {
@@ -63,9 +52,9 @@ public class SystemService extends Service {
         downloader = new DownloadFile(this.getApplicationContext(),  callback);
         super.onCreate();
         setupDb();
-        if(isDatabaseReady()) {
-            sendDatabaseReady();
-        }
+        sendDatabaseReady();
+        checkForUpdate();
+
     }
 
     @Override
@@ -83,120 +72,99 @@ public class SystemService extends Service {
         _checkRemoteDBUpdate();
         return true;
     }
+
     void _checkRemoteDBUpdate() {
-
-        // check if we have a valid db file, if we don't get it directly not using the download manager.
-        // non blocking run a thread in the back.
-        // check the version file check if it matches.
-
-            File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
-            if (f.exists()) {
-                sql = new SQLiteLocalDatabase(getApplicationContext(), "rails_db.sql", null);
-                sql.getWritableDatabase();
-                Toast.makeText(getApplicationContext(), "Got SQL", Toast.LENGTH_LONG).show();
-                Log.d("SQL", "found database file and opened." + sql);
-                try {
-                    String njt_routes[] = SqlUtils.get_values(sql.getReadableDatabase(), "select * from routes", "route_long_name");
-                    for (int i = 0; i < njt_routes.length; i++) {
-                        njt_routes[i] = Utils.capitalize(njt_routes[i]);
-                        Log.d("SQL", "route " + njt_routes[i]);
-                    }
-                } catch(Exception e) {
-                    Log.d("SQL", "get routes failed need to download");
-                    sql.close();
-                    f.delete();
-                    sql = null;
-                }
-            }
-            // download it any way.
-            {
-                final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
-                    @Override
-                    public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
-                        checkingVersion=false;
-                        File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
-                        File tmpFilename=null;
-                        File tmpVersionFilename=null;
-                        try {
-                            tmpFilename = File.createTempFile(f.getName(), ".sql.tmp", f.getParentFile());
-                            tmpVersionFilename = File.createTempFile("version", ".txt.tmp", f.getParentFile());
-                            Log.d("SQL", "getting Inputstream");
-                            ZipInputStream zis = Utils.getFileFromZip(new FileInputStream(file), "rail_data.db");
-                            Log.d("SQL", "writing stream to disk "+ tmpFilename.getAbsolutePath());
-                            Utils.writeExtractedFileToDisk(zis, new FileOutputStream(tmpFilename));
-
-                            ZipInputStream zis_version = Utils.getFileFromZip(new FileInputStream(file), "version.txt");
-                            Log.d("SQL", "writing stream to disk"+ tmpVersionFilename.getAbsolutePath());
-                            Utils.writeExtractedFileToDisk(zis_version, new FileOutputStream(tmpVersionFilename));
-                            String version_str = Utils.getFileContent(tmpVersionFilename);
-
-                            if(f.exists()) {
-                                if(sql != null) {
-                                    boolean closeDB = true;
-                                    if ( SqlUtils.check_if_user_pref_exists(sql.getWritableDatabase())) {
-                                        String db_ver = SqlUtils.get_user_pref_value( sql.getWritableDatabase(),"version", "");
-                                        if (db_ver.equals(version_str)) {
-                                            Log.d("SQL", "no upgrade required, version  matches " + version_str);
-                                            closeDB = false;
-                                        }
-                                    }
-                                    if(closeDB) {
-                                        sql.close();
-                                        sql = null;
-                                    }
-                                }
-                                if(sql == null ) {
-                                    f.delete();
-                                    Log.d("SQL", "renamed filed " + tmpFilename.getAbsolutePath() + " to " + f.getAbsolutePath());
-                                    tmpFilename.renameTo(f);
-                                    f = new File(f.getAbsolutePath());
-                                    tmpFilename = null;
-                                    sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
-                                    SqlUtils.create_user_pref_table(sql.getWritableDatabase());
-                                    SqlUtils.update_user_pref( sql.getWritableDatabase(),"version", version_str, new Date());
-
-                                }
-                            } else {
-                                Log.d("SQL", "renamed filed " + tmpFilename.getAbsolutePath() + " to " + f.getAbsolutePath());
-                                tmpFilename.renameTo(f);
-                                f = new File(f.getAbsolutePath());
-                                tmpFilename = null;
-                                sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
-                                SqlUtils.create_user_pref_table(sql.getWritableDatabase());
-                                SqlUtils.update_user_pref( sql.getWritableDatabase(),"version", version_str, new Date());
-
-                            }
-
-                            Log.d("SQL", "extracted zip file " + f.getAbsolutePath() );
-                        } catch(IOException e) {
-                            Log.d("SQL", "failed reading zip file " + e);
-                            e.printStackTrace();
-                        }
-                        finally {
-                            if(tmpFilename != null ) {
-                                try {tmpFilename.delete();} catch (Exception e){}
-                            }
-                            if(tmpVersionFilename != null ) {
-                                try {tmpVersionFilename.delete();} catch (Exception e){}
-                            }
-                            if(sql!=null) {
-                                sendDatabaseReady();
-                            }
-                        }
-                        return false;
-                    }
-
-                    @Override
-                    public void downloadFailed(DownloadFile d,long id, String url) {
-                        Log.d("SQL", "download of SQL file failed " + url);
-                        checkingVersion=false;
-                    }
-                });
-                d.downloadFile("https://github.com/anilsarma/misc/raw/master/njt/rail_data_db.zip", "rail_data_db.zip", "NJ Transit Schedules",
-                        DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "application/zip");
-                checkingVersion=true;
-            }
+        Log.d("SVC", "checking Schedule status");
+        File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
+        sql = UtilsDBVerCheck.getSQLDatabase(getApplicationContext(), f);
+        checkingVersion=true;
+        if( sql == null) {
+            _checkRemoteDBZipUpdate(""); // download it anyway we dont have a valid database.
+            return;
         }
+        final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
+            @Override
+            public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
+                String version_str = Utils.getFileContent(file);
+                _checkRemoteDBZipUpdate(version_str);
+                return false;
+            }
+
+            @Override
+            public void downloadFailed(DownloadFile d,long id, String url) {
+                Log.d("SQL", "download of SQL file failed " + url);
+                checkingVersion=false;  // could not get a version string, we will do it later.
+            }
+        });
+        d.downloadFile("https://github.com/anilsarma/misc/raw/master/njt/version.txt", "version.txt", "NJ Transit Schedules Version",
+                DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, null);
+    }
+
+    // never call this directly shold be called via _checkRemoteDBUpdate
+    private void _checkRemoteDBZipUpdate(String version_str) {
+            File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
+            sql = UtilsDBVerCheck.getSQLDatabase(getApplicationContext(), f);
+            if (UtilsDBVerCheck.matchDBVersion( sql, version_str) ) {
+                checkingVersion = false;
+                Log.d("DBSVC", "system schedule db is upto date " + version_str);
+                return;
+            }
+            final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
+                @Override
+                public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
+                    checkingVersion=false;
+                    File dbFilePath = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
+                    File tmpFilename=null;
+                    File tmpVersionFilename=null;
+                    try {
+                        tmpFilename = UtilsDBVerCheck.createTempFile(file, dbFilePath.getParentFile(), "rail_data.db");
+                        tmpVersionFilename = UtilsDBVerCheck.createTempFile(file, dbFilePath.getParentFile(), "version.txt");
+                        String version_str = Utils.getFileContent(tmpVersionFilename);
+
+                        if(!tmpFilename.exists()) {// extracted file does not exit some thing is wong
+                            return true; // remove the downloaded files.
+                        }
+                        if (UtilsDBVerCheck.matchDBVersion( sql, version_str) ) {
+                            return true;
+                        }
+                        if(sql != null ) {
+                            sql.close();
+                            sql = null;
+                            dbFilePath.delete();
+                            Log.d("SQL", "renamed filed " + tmpFilename.getAbsolutePath() + " to " + dbFilePath.getAbsolutePath());
+                        }
+
+                        Log.d("SQL", "renamed filed " + tmpFilename.getAbsolutePath() + " to " + dbFilePath.getAbsolutePath());
+                        tmpFilename.renameTo(dbFilePath); tmpFilename = null;
+                        //dbFilePath = new File(dbFilePath.getAbsolutePath());
+
+                        sql = new SQLiteLocalDatabase(getApplicationContext(), dbFilePath.getName(), null);
+                        SqlUtils.create_user_pref_table(sql.getWritableDatabase());
+                        SqlUtils.update_user_pref( sql.getWritableDatabase(),"version", version_str, new Date());
+
+                        // let the user know we have upgraded.
+                        notify_user_of_upgrade(version_str);
+                    }
+                    finally {
+                        Utils.delete(tmpFilename);
+                        Utils.delete(tmpVersionFilename);
+                        sendDatabaseReady();
+                    }
+                    return false;
+                }
+
+                @Override
+                public void downloadFailed(DownloadFile d,long id, String url) {
+                    Log.d("SQL", "download of SQL file failed " + url);
+                    checkingVersion=false;
+                }
+            });
+
+            d.downloadFile("https://github.com/anilsarma/misc/raw/master/njt/rail_data_db.zip", "rail_data_db.zip", "NJ Transit Schedules",
+                    DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "application/zip");
+            checkingVersion=true;
+        }
+
     @Override
     public IBinder onBind(Intent intent) {
        return new RemoteBinder(this);
@@ -207,21 +175,12 @@ public class SystemService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void sendMessage() {
-        Log.d("sender", "Broadcasting message");
-        Intent intent = new Intent("custom-event-name");
-        // You can also include some extra data.
-        intent.putExtra("message", "This is my message!");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
     private void sendDatabaseReady() {
-        Log.d("sender", "Broadcasting message");
-        Intent intent = new Intent("database-ready");
-        // You can also include some extra data.
-        //intent.putExtra("message", "This is my message!");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        Log.d("SVC", "sending database ready");
-        Toast.makeText(this.getApplicationContext(),"System Database ready sending", Toast.LENGTH_LONG).show();
+        if( isDatabaseReady() ) {
+            Intent intent = new Intent("database-ready");
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            Log.d("SVC", "sending database ready");
+        }
     }
 
     // SQL related messages similar to the uil
@@ -241,8 +200,49 @@ public class SystemService extends Service {
     private void setupDb() {
         if(sql == null ) {
             File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
-            sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
+            if(f.exists()) {
+                sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
+            }
         }
     }
+    private void notify_user_of_upgrade(String new_version) {
+        final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        //int icon = R.mipmap.ic_launcher;
+        //long when = System.currentTimeMillis();
+//        Notification notification = new Notification(icon, getString(R.string.app_name), when);
+//        notification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
+//        notification.defaults |= Notification.DEFAULT_LIGHTS; // LED
+//        notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
+//        notification.defaults |= Notification.DEFAULT_SOUND; // Sound
+        String msg = "NJT Schedule upgraded to version " + new_version;
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("NJTS Schedule Upgraded")
+                        .setTicker("NT Transit Schedule.")
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setContentText(msg);
 
+        Notification notification = mBuilder.build();
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        //notification.defaults |= Notification.DEFAULT_SOUND;
+
+        Log.d("SVC", "database schedule upgraded " + msg );
+        mNotificationManager.notify(1, notification);
+    }
+
+    public class LocalbroadcastReceiver extends BroadcastReceiver {
+        SystemService service;
+        public LocalbroadcastReceiver(){}
+
+        public LocalbroadcastReceiver(SystemService service) {
+            this.service = service;
+        }
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(service !=null ) {
+                service.checkForUpdate();
+            }
+        }
+    }
 }

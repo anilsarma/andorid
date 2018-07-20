@@ -1,7 +1,11 @@
 package com.example.asarma.helloworld.utils;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TableRow;
@@ -288,6 +292,62 @@ public class Utils {
         }
         catch (IOException e) {
             return "";
+        }
+    }
+
+    public static void scheduleJob(Context context, @NonNull Class<?> cls) {
+        ComponentName serviceComponent = new ComponentName(context, cls);
+        JobInfo.Builder builder = new JobInfo.Builder(0, serviceComponent);
+        builder.setMinimumLatency(10 * 1000); // wait at least
+        builder.setOverrideDeadline(30 * 1000); // maximum delay
+        //builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED); // require unmetered network
+        //builder.setRequiresDeviceIdle(true); // device should be idle
+        //builder.setRequiresCharging(true); // we don't care if the device is charging or not
+        JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
+        jobScheduler.schedule(builder.build());
+    }
+
+    static public String getExtension(File name) {
+        String extension = "";
+        String fileName = name.getName();
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i+1);
+        }
+        return extension;
+    }
+
+    static public String getBasename(File name) {
+        String extension = "";
+        String fileName = name.getName();
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(0, i-1);
+        }
+        return extension;
+    }
+
+    static public String getExtension(String fileName) {
+        String extension = "";
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i+1);
+        }
+        return extension;
+    }
+
+    static public String getBasename(String fileName) {
+        String extension = "";
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(0, i-1);
+        }
+        return extension;
+    }
+
+    static public void delete(File file) {
+        if(file != null ) {
+            try {file.delete();} catch (Exception e){}
         }
     }
 }
