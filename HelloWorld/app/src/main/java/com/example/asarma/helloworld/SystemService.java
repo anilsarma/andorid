@@ -62,6 +62,7 @@ public class SystemService extends Service {
     public void onCreate() {
         downloader = new DownloadFile(this.getApplicationContext(),  callback);
         super.onCreate();
+        setupDb();
         if(isDatabaseReady()) {
             sendDatabaseReady();
         }
@@ -83,6 +84,11 @@ public class SystemService extends Service {
         return true;
     }
     void _checkRemoteDBUpdate() {
+
+        // check if we have a valid db file, if we don't get it directly not using the download manager.
+        // non blocking run a thread in the back.
+        // check the version file check if it matches.
+
             File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
             if (f.exists()) {
                 sql = new SQLiteLocalDatabase(getApplicationContext(), "rails_db.sql", null);
@@ -142,13 +148,22 @@ public class SystemService extends Service {
                                     f.delete();
                                     Log.d("SQL", "renamed filed " + tmpFilename.getAbsolutePath() + " to " + f.getAbsolutePath());
                                     tmpFilename.renameTo(f);
-                                    f = tmpFilename;
+                                    f = new File(f.getAbsolutePath());
                                     tmpFilename = null;
                                     sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
                                     SqlUtils.create_user_pref_table(sql.getWritableDatabase());
                                     SqlUtils.update_user_pref( sql.getWritableDatabase(),"version", version_str, new Date());
                                     sendDatabaseReady();
                                 }
+                            } else {
+                                Log.d("SQL", "renamed filed " + tmpFilename.getAbsolutePath() + " to " + f.getAbsolutePath());
+                                tmpFilename.renameTo(f);
+                                f = new File(f.getAbsolutePath());
+                                tmpFilename = null;
+                                sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
+                                SqlUtils.create_user_pref_table(sql.getWritableDatabase());
+                                SqlUtils.update_user_pref( sql.getWritableDatabase(),"version", version_str, new Date());
+                                sendDatabaseReady();
                             }
 
                             Log.d("SQL", "extracted zip file " + f.getAbsolutePath() );
@@ -174,6 +189,7 @@ public class SystemService extends Service {
                 });
                 d.downloadFile("https://github.com/anilsarma/misc/raw/master/njt/rail_data_db.zip", "rail_data_db.zip", "NJ Transit Schedules",
                         DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "application/zip");
+                checkingVersion=true;
             }
         }
     @Override
@@ -197,8 +213,10 @@ public class SystemService extends Service {
         Log.d("sender", "Broadcasting message");
         Intent intent = new Intent("database-ready");
         // You can also include some extra data.
-        intent.putExtra("message", "This is my message!");
+        //intent.putExtra("message", "This is my message!");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        Log.d("SVC", "sending database ready");
+        Toast.makeText(this.getApplicationContext(),"System Database ready", Toast.LENGTH_LONG).show();
     }
 
     // SQL related messages similar to the uil
@@ -213,6 +231,13 @@ public class SystemService extends Service {
             }
         }
         return  false;
+    }
+
+    private void setupDb() {
+        if(sql == null ) {
+            File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
+            sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
+        }
     }
 
 }

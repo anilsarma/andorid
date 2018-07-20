@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         config.set("SET",values);
         setContentView(R.layout.activity_main);
 
-        registerReceiver(mMessageReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        //registerReceiver(mMessageReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
         //f.delete();
 
@@ -173,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
             } else if (intent.getAction().equals("database-ready" )) {
                 Log.d("receiver", "Database is ready we can do all the good stuff");
             }
+
+            Log.d("receiver", "got omething not sure what " + intent.getAction());
         }
 
         public void handle_download_complete(Context context, Intent intent) {
