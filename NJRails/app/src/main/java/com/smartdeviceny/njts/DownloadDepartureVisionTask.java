@@ -95,7 +95,7 @@ public class DownloadDepartureVisionTask extends AsyncTask<String, Integer, Long
         if( status == -1 ){
             // should really let the UI handle this.
             if ( parent.getContext()!= null ) {
-                Toast.makeText(parent.getContext(), "Failed retrieving live train status "  + this.msg, Toast.LENGTH_LONG).show();
+                Toast.makeText(parent.getContext(), "Failed retrieving live train status ", Toast.LENGTH_LONG).show();
                 ;
             }
         }

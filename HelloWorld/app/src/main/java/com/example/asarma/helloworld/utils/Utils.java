@@ -262,8 +262,9 @@ public class Utils {
         ZipInputStream zis = new ZipInputStream(zipFileStream);
         ZipEntry ze;
         while ((ze = zis.getNextEntry()) != null) {
-            Log.w(TAG, "extracting file: '" + ze.getName() + "'...");
+            Log.w(TAG, "Zip entry  '" + ze.getName() + "'...");
             if(ze.getName().toUpperCase().equals(name.toUpperCase())) {
+                Log.w(TAG, "Found matching file: '" + name + "'...");
                 return zis;
             }
         }

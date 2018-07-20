@@ -153,7 +153,6 @@ public class MainActivity extends FragmentActivity {
 
 
     private void showCustomNotification(String from, String to){
-        final int NOTIFICATION_ID = 1;
         String ns = Context.NOTIFICATION_SERVICE;
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
 
@@ -190,7 +189,7 @@ public class MainActivity extends FragmentActivity {
         notification.flags|= Notification.FLAG_AUTO_CANCEL;
         //notification.defaults |= Notification.DEFAULT_SOUND;
 
-        mNotificationManager.notify(NOTIFICATION_ID, notification);
+        mNotificationManager.notify(R.integer.NOTIFICATION_ROUTE_STATUS, notification);
     }
 
     // called multiple times ...

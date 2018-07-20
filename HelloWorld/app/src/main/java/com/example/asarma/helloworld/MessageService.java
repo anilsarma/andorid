@@ -66,7 +66,7 @@ public class MessageService extends Service {
     public IBinder onBind(Intent intent) {
 
        //return mMessenger.getBinder();
-       return new RemoteBinder(this);
+       return null;//new RemoteBinder(this);
     }
 
     @Override

@@ -3,12 +3,12 @@ package com.example.asarma.helloworld;
 import android.os.Binder;
 
 public class RemoteBinder extends Binder {
-    MessageService service;
+    SystemService service;
 
-    public RemoteBinder(MessageService serivce){
+    public RemoteBinder(SystemService serivce){
         this.service = serivce;
     }
-    public MessageService getService() {
+    public SystemService getService() {
         return service;
     }
 

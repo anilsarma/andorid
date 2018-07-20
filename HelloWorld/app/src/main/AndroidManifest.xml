@@ -24,6 +24,7 @@
             </intent-filter>
         </activity>
         <service android:enabled="true" android:name=".MessageService" />
+        <service android:enabled="true" android:name=".SystemService" />
         <receiver android:name=".MainActivity$LocalBcstReceiver" android:enabled="true"/>
     </application>
     <uses-permission android:name="android.permission.INTERNET" />

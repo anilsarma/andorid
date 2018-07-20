@@ -1,12 +1,16 @@
 package com.smartdeviceny.njts;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -672,7 +676,9 @@ public class MainActivityFragment extends Fragment {
         final NestedScrollView scrollView =(NestedScrollView) rootView.getRootView().findViewById(R.id.route_scroll);
         int location = scrollView.getScrollY();
         Date now = new Date();
+        //Date lastNotificationTime = timeformat.parse(departture_time);
 
+        boolean notification = false;
         for(int i=0;i< routes.size();i ++) {
             HashMap<String, Object> data = routes.get(i);
             // departure_time, destnaton arrival time block_id, route_long namem duration
@@ -748,6 +754,28 @@ public class MainActivityFragment extends Fragment {
                         }
                         if ( diff < 0 ) {
                             schedule= "    " + Math.abs(diff) + " minutes ago " + platform;
+                        }
+                        if (diff > 0 ) { // &&  fav.contains("" + block_id )) {
+                            if(!notification) {
+                                NotificationCompat.Builder mBuilder =
+                                        new NotificationCompat.Builder(getContext().getApplicationContext())
+                                                .setSmallIcon(R.mipmap.app_njs_icon)
+                                                .setTicker("Upgrade (Open to see the info).")
+                                                .setContentTitle("Train " + block_id + " Track# " + platform  )
+                                                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                                                .setContentText( Utils.formatToLocalTime(Utils.parseLocalTime(departture_time)) + " departure in " +  Math.abs(diff) + "(mins)" );
+                                // NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                                Notification notify = mBuilder.build();
+
+                                notify.flags|= Notification.FLAG_AUTO_CANCEL;
+                                //notify.defaults |= Notification.DEFAULT_VIBRATE;
+                                final NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                                mNotificationManager.notify(R.integer.NOTIFICATION_ROUTE_STATUS, notify);
+
+                                //Toast.makeText(getContext(), (String) "sent notification ", Toast.LENGTH_SHORT).show();
+                                notification = true;
+                            }
                         }
                     }
                 }

@@ -43,11 +43,13 @@ public class MainActivity extends AppCompatActivity {
     public static final String PREF_FILE_NAME = "test.pref";
     DownloadFile download = null;
     SQLiteLocalDatabase sql;
-
+    SystemService systemService=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Config config = new Config(getApplicationContext());
         super.onCreate(savedInstanceState);
+        doBindService();
+
         config.set("SOME_FLAG", "Heloo There");
         Set<String> values = new ArraySet<>();
         values.add("ITEM1");
@@ -83,12 +85,14 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("download", "downloading failed " + " " + url +  " " + id );
             }
         });
-        download.downloadFile("https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt", "NJS", "",
+        download.downloadFile("https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt", "version.txt", "NJT Schedule version",
                 DownloadManager.Request.NETWORK_WIFI| DownloadManager.Request.NETWORK_MOBILE, null);
 
                 //startActivity(i);
         System.out.println("started");
         startService(new Intent(MainActivity.this, MessageService.class));
+        startService(new Intent(MainActivity.this, SystemService.class));
+
         //startService(new Intent(MainActivity.this, MainActivity.MessageService.class));
         Button buttonStartService = (Button) findViewById(R.id.button_ok);
         buttonStartService.setOnClickListener( p -> new View.OnClickListener() {
@@ -106,91 +110,10 @@ public class MainActivity extends AppCompatActivity {
         sqlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
-                if (f.exists()) {
-                    sql = new SQLiteLocalDatabase(getApplicationContext(), "rails_db.sql", null);
-                    sql.getWritableDatabase();
-                    Toast.makeText(getApplicationContext(), "Got SQL", Toast.LENGTH_LONG).show();
-                    Log.d("SQL", "found database file and opened." + sql);
-                    try {
-                        String njt_routes[] = SqlUtils.get_values(sql.getReadableDatabase(), "select * from routes", "route_long_name");
-                        for (int i = 0; i < njt_routes.length; i++) {
-                            njt_routes[i] = Utils.capitalize(njt_routes[i]);
-                            Log.d("SQL", "route " + njt_routes[i]);
-                        }
-                    } catch(Exception e) {
-                        Log.d("SQL", "get routes failed need to download");
-                        sql.close();
-                        sql = null;
-                    }
-                }
-                // download it any way.
-                 {
-                    final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
-                        @Override
-                        public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
-                            File tmpFilename=null;
-                            File tmpVersionFilename=null;
-                            try {
-                                tmpFilename = File.createTempFile(f.getName(), ".sql.tmp", f.getParentFile());
-                                tmpVersionFilename = File.createTempFile("version", ".txt.tmp", f.getParentFile());
-                                InputStream is = new FileInputStream(file);
-                                OutputStream os = new FileOutputStream(f);
-                                Log.d("SQL", "getting Inputstream");
-                                ZipInputStream zis = Utils.getFileFromZip(is, "rail_data.db");
-                                OutputStream zos = new FileOutputStream(tmpFilename);
-                                Log.d("SQL", "writing stream to disk"+ f.getAbsolutePath());
-                                Utils.writeExtractedFileToDisk(zis, zos);
-
-                                ZipInputStream zis_version = Utils.getFileFromZip(is, "rail_data.db");
-                                OutputStream zos_version = new FileOutputStream(tmpVersionFilename);
-                                Log.d("SQL", "writing stream to disk"+ tmpVersionFilename.getAbsolutePath());
-                                Utils.writeExtractedFileToDisk(zis_version, zos_version);
-                                String version_str = Utils.getFileContent(tmpVersionFilename);
-
-                                if(f.exists()) {
-                                    if(sql != null) {
-                                        boolean closeDB = true;
-                                        if ( SqlUtils.check_if_user_pref_exists(sql.getWritableDatabase())) {
-                                            String db_ver = SqlUtils.get_user_pref_value( sql.getWritableDatabase(),"version", "");
-                                            if (db_ver.equals(version_str)) {
-                                                Log.d("SQL", "no upgrade required, version  matches " + version_str);
-                                                closeDB = false;
-                                            }
-                                        }
-                                        if(closeDB) {
-                                            sql.close();
-                                            sql = null;
-                                        }
-                                    }
-                                    if(sql == null ) {
-                                        tmpFilename.renameTo(f);
-                                        sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
-                                        SqlUtils.create_user_pref_table(sql.getWritableDatabase());
-                                        SqlUtils.update_user_pref( sql.getWritableDatabase(),"version", version_str, new Date());
-                                    }
-                                }
-
-                                Log.d("SQL", "extracted zip file " + f.getAbsolutePath() );
-                            } catch(IOException e) {
-                                Log.d("SQL", "failed reading zip file " + e);
-                                e.printStackTrace();
-                            }
-                            finally {
-                                if(tmpFilename != null ) {
-                                    try {tmpFilename.delete();} catch (Exception e){}
-                                }
-                            }
-                            return false;
-                        }
-
-                        @Override
-                        public void downloadFailed(DownloadFile d,long id, String url) {
-                            Log.d("SQL", "download of SQL file failed " + url);
-                        }
-                    });
-                    d.downloadFile("https://github.com/anilsarma/misc/raw/master/njt/rail_data_db.zip", "", "",
-                            DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "application/zip");
+                if (systemService!= null ) {
+                    systemService.checkForUpdate();
+                } else {
+                    Log.d("BTNDNLD", "system service not init " + systemService );
                 }
             }
         });
@@ -223,8 +146,12 @@ public class MainActivity extends AppCompatActivity {
         // Register to receive messages.
         // We are registering an observer (mMessageReceiver) to receive Intents
         // with actions named "custom-event-name".
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter("custom-event-name"));
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("custom-event-name");
+        filter.addAction("database-ready");
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
+
+
         doBindService();
         super.onResume();
     }
@@ -233,15 +160,19 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
-            System.out.print("BroadcastReceiver::onReceive");
-            String action = intent.getAction();
-            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
-                Log.d("download complete", "compleete ... ");
-                handle_download_complete(context, intent);
+            if (intent.getAction().equals("custom-event-name")) {
+                System.out.print("BroadcastReceiver::onReceive");
+                String action = intent.getAction();
+                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
+                    Log.d("download complete", "compleete ... ");
+                    handle_download_complete(context, intent);
+                }
+                // Get extra data included in the Intent
+                String message = intent.getStringExtra("message");
+                Log.d("receiver", "~~~~~~~~~~~~ Got message: " + message);
+            } else if (intent.getAction().equals("database-ready" )) {
+                Log.d("receiver", "Database is ready we can do all the good stuff");
             }
-            // Get extra data included in the Intent
-            String message = intent.getStringExtra("message");
-            Log.d("receiver", "~~~~~~~~~~~~ Got message: " + message);
         }
 
         public void handle_download_complete(Context context, Intent intent) {
@@ -273,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver mMessageReceiver = new LocalBcstReceiver();
 
     boolean mIsBound = false;
-    Messenger mService;
+
 
     final Messenger mMessenger = new Messenger(new IncomingHandler());
     class IncomingHandler extends Handler {
@@ -296,51 +227,31 @@ public class MainActivity extends AppCompatActivity {
 
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d("main activity", "called method on remote binder "  + ((RemoteBinder)service).getService().getValue());
-            boolean usemessanger = false;
-            if ( usemessanger ) {
-                mService = new Messenger(service);
-                //textStatus.setText("Attached.");
-                try {
-                    Message msg = Message.obtain(null, Config.MSG_REGISTER_CLIENT);
-                    msg.replyTo = mMessenger;
-                    mService.send(msg);
+            systemService = ((RemoteBinder)service).getService();
+            Log.d("SVCON", "SystemService connected, called method on remote binder "  + ((RemoteBinder)service).getService());
 
-                    //RemoteBinder remote = (RemoteBinder)service;
-
-                    Log.d("main activity", "called method on remote binder " + service);
-                } catch (RemoteException e) {
-                    // In this case the service has crashed before we could even do anything with it
-                }
-            }
         }
 
         public void onServiceDisconnected(ComponentName className) {
             // This is called when the connection with the service has been unexpectedly disconnected - process crashed.
-            mService = null;
+            systemService = null;
+            Log.d("SVCON", "SystemService disconnected");
             //textStatus.setText("Disconnected.");
         }
     };
 
     void doBindService() {
-        bindService(new Intent(this, MessageService.class), mConnection, Context.BIND_AUTO_CREATE);
-        mIsBound = true;
+        if (!mIsBound) {
+            Log.d("SVCON", "SystemService binding.");
+            bindService(new Intent(this, SystemService.class), mConnection, Context.BIND_AUTO_CREATE);
+            mIsBound = true;
+        }
     }
 
     void doUnbindService() {
         if (mIsBound) {
+            Log.d("SVCON", "SystemService doUnbindService.");
             // If we have received the service, and hence registered with it, then now is the time to unregister.
-            if (mService != null) {
-                try {
-                    Message msg = Message.obtain(null, Config.MSG_UNREGISTER_CLIENT);
-                    msg.replyTo = mMessenger;
-                    mService.send(msg);
-                }
-                catch (RemoteException e) {
-                    // There is nothing special we need to do if the service has crashed.
-                }
-            }
-            // Detach our existing connection.
             unbindService(mConnection);
             mIsBound = false;
             //textStatus.setText("Unbinding.");
@@ -348,22 +259,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendMessageToService(int intvaluetosend) {
-        if (mIsBound) {
-            if (mService != null) {
-                try {
-                    Message msg = Message.obtain(null, Config.MSG_SET_INT_VALUE, intvaluetosend, 0);
-                    msg.replyTo = mMessenger;
-                    Log.d("send", "message sent");
-                    mService.send(msg);
-                }
-                catch (RemoteException e) {
-                }
-               // mService.getBinder()
-            }
-        }
-        else {
-            System.out.println("Service not bound ... ");
-        }
+//        if (mIsBound) {
+//            if (systemService != null) {
+//                try {
+//                    Message msg = Message.obtain(null, Config.MSG_SET_INT_VALUE, intvaluetosend, 0);
+//                    msg.replyTo = mMessenger;
+//                    Log.d("send", "message sent");
+//                    //systemService mService.send(msg);
+//                }
+//                catch (RemoteException e) {
+//                }
+//               // mService.getBinder()
+//            }
+//        }
+//        else {
+//            System.out.println("Service not bound ... ");
+//        }
     }
 
 }

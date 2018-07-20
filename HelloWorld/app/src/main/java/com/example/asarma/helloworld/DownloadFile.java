@@ -48,6 +48,8 @@ public class DownloadFile {
         request.setDescription(description);
 
         request.setAllowedNetworkTypes(request_flags);
+        request.setRequiresDeviceIdle(false);
+        request.setRequiresCharging(false);
         request.setTitle(title);
         request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, "download.txt");
         long id = manager.enqueue(request);
@@ -84,6 +86,7 @@ public class DownloadFile {
             for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
                 int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 int ID = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_ID));
+                Log.d("DNLD", "checking entry " + status + " " + ID );
                 switch (status) {
                     case DownloadManager.STATUS_SUCCESSFUL:
                         File mFile = new File(Uri.parse(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))).getPath());
@@ -104,8 +107,19 @@ public class DownloadFile {
                         }
                         requestid.remove(new Long(ID));
                         break;
+                    case DownloadManager.STATUS_PAUSED: {
+                            String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
+                            Log.d("DNLD", "Paused ID " + ID + " url:" + url);
+                        }
+                        break;
+                    case DownloadManager.STATUS_PENDING: {
+                            String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
+                            Log.d("DNLD", "Pending ID " + ID + " url:" + url);
+                        }
+                        break;
                 }
             } // for loop
+            Log.d("DNLD", "loop done");
         }
     } // Receiver
 
