@@ -113,6 +113,7 @@ public class SystemService extends Service {
                 final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
                     @Override
                     public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
+                        checkingVersion=false;
                         File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
                         File tmpFilename=null;
                         File tmpVersionFilename=null;
@@ -185,6 +186,7 @@ public class SystemService extends Service {
                     @Override
                     public void downloadFailed(DownloadFile d,long id, String url) {
                         Log.d("SQL", "download of SQL file failed " + url);
+                        checkingVersion=false;
                     }
                 });
                 d.downloadFile("https://github.com/anilsarma/misc/raw/master/njt/rail_data_db.zip", "rail_data_db.zip", "NJ Transit Schedules",
