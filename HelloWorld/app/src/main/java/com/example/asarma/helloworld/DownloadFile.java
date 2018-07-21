@@ -51,7 +51,8 @@ public class DownloadFile {
         request.setRequiresDeviceIdle(false);
         request.setRequiresCharging(false);
         request.setTitle(title);
-        request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, "download.txt");
+
+        request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, title);
         long id = manager.enqueue(request);
         this.requestid.add(id);
         Log.d("download", "downloadFile scheduling .. " + id );

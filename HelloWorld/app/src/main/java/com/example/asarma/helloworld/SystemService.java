@@ -70,9 +70,11 @@ public class SystemService extends Service {
             return false; // already running.
         }
         _checkRemoteDBUpdate();
-        return true;
+        return checkingVersion;
     }
-
+    boolean isUpdateRunning() {
+        return checkingVersion;
+    }
     void _checkRemoteDBUpdate() {
         Log.d("SVC", "checking Schedule status");
         File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
@@ -87,7 +89,8 @@ public class SystemService extends Service {
             public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
                 String version_str = Utils.getFileContent(file);
                 _checkRemoteDBZipUpdate(version_str);
-                return false;
+                file.delete();
+                return true;
             }
 
             @Override
@@ -107,6 +110,7 @@ public class SystemService extends Service {
             if (UtilsDBVerCheck.matchDBVersion( sql, version_str) ) {
                 checkingVersion = false;
                 Log.d("DBSVC", "system schedule db is uptodate " + version_str);
+                sendCheckcomplete();
                 return;
             }
             final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
@@ -148,7 +152,9 @@ public class SystemService extends Service {
                     finally {
                         Utils.delete(tmpFilename);
                         Utils.delete(tmpVersionFilename);
+                        sendCheckcomplete();
                         sendDatabaseReady();
+
                     }
                     return false;
                 }
@@ -157,6 +163,7 @@ public class SystemService extends Service {
                 public void downloadFailed(DownloadFile d,long id, String url) {
                     Log.d("SQL", "download of SQL file failed " + url);
                     checkingVersion=false;
+                    sendCheckcomplete();
                 }
             });
 
@@ -181,6 +188,13 @@ public class SystemService extends Service {
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
             Log.d("SVC", "sending database ready");
         }
+    }
+
+    private void sendCheckcomplete() {
+        Intent intent = new Intent("database-check-complete");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        Log.d("SVC", "sending database-check-complete");
+
     }
 
     // SQL related messages similar to the uil
