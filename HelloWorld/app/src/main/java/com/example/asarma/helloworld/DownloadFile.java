@@ -43,7 +43,7 @@ public class DownloadFile {
         //String url = "https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt";
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         if (mimetype==null) {
-            request.setMimeType("text/plain");//application/x-compressed
+            //request.setMimeType("text/plain");//application/x-compressed
         }
         request.setDescription(description);
 
@@ -51,7 +51,16 @@ public class DownloadFile {
         request.setRequiresDeviceIdle(false);
         request.setRequiresCharging(false);
         request.setTitle(title);
-        request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, "download.txt");
+        request.addRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36");
+
+        request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, title);
+        long id = manager.enqueue(request);
+        this.requestid.add(id);
+        Log.d("download", "downloadFile scheduling .. " + id  + " " + url + " as " + title);
+        return id;
+    }
+
+    long downloadFile(DownloadManager.Request request ) {
         long id = manager.enqueue(request);
         this.requestid.add(id);
         Log.d("download", "downloadFile scheduling .. " + id );
@@ -86,37 +95,35 @@ public class DownloadFile {
             for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
                 int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 int ID = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_ID));
-                Log.d("DNLD", "checking entry " + status + " " + ID );
-                switch (status) {
-                    case DownloadManager.STATUS_SUCCESSFUL:
-                        File mFile = new File(Uri.parse(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))).getPath());
-                        boolean removeFile = true;
-                        if (DownloadFile.this.callback != null) {
-                            String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
-                            removeFile = DownloadFile.this.callback.downloadComplete(DownloadFile.this, ID, url, mFile);
-                        }
-                        if (removeFile) {
-                            mFile.delete();
-                        }
-                        requestid.remove(new Long(ID));
-                        break;
-                    case DownloadManager.STATUS_FAILED:
-                        if (DownloadFile.this.callback != null) {
-                            String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
-                            DownloadFile.this.callback.downloadFailed(DownloadFile.this, ID, url);
-                        }
-                        requestid.remove(new Long(ID));
-                        break;
-                    case DownloadManager.STATUS_PAUSED: {
-                            String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
-                            Log.d("DNLD", "Paused ID " + ID + " url:" + url);
-                        }
-                        break;
-                    case DownloadManager.STATUS_PENDING: {
-                            String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
-                            Log.d("DNLD", "Pending ID " + ID + " url:" + url);
-                        }
-                        break;
+                Log.d("DNLD", "checking entry " + status + " " + ID);
+
+                if ((status & DownloadManager.STATUS_SUCCESSFUL) == DownloadManager.STATUS_SUCCESSFUL) {
+                    File mFile = new File(Uri.parse(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))).getPath());
+                    boolean removeFile = true;
+                    if (DownloadFile.this.callback != null) {
+                        String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
+                        removeFile = DownloadFile.this.callback.downloadComplete(DownloadFile.this, ID, url, mFile);
+                    }
+                    if (removeFile) {
+                        mFile.delete();
+                    }
+                    requestid.remove(new Long(ID));
+                }
+                if ((status & DownloadManager.STATUS_FAILED) == DownloadManager.STATUS_FAILED) {
+                    if (DownloadFile.this.callback != null) {
+                        String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
+                        DownloadFile.this.callback.downloadFailed(DownloadFile.this, ID, url);
+                    }
+                    requestid.remove(new Long(ID));
+                }
+                if ((status & DownloadManager.STATUS_PAUSED) == DownloadManager.STATUS_PAUSED) {
+                    String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
+                    Log.d("DNLD", "Paused ID " + ID + " url:" + url);
+                }
+
+                if ((status & DownloadManager.STATUS_PENDING) == DownloadManager.STATUS_PENDING) {
+                    String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
+                    Log.d("DNLD", "Pending ID " + ID + " url:" + url);
                 }
             } // for loop
             Log.d("DNLD", "loop done");

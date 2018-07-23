@@ -3,7 +3,6 @@ package com.example.asarma.helloworld;
 import android.app.DownloadManager;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,14 +12,22 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.asarma.helloworld.utils.SQLiteLocalDatabase;
 import com.example.asarma.helloworld.utils.SqlUtils;
 import com.example.asarma.helloworld.utils.Utils;
 
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 public class SystemService extends Service {
 
@@ -70,9 +77,11 @@ public class SystemService extends Service {
             return false; // already running.
         }
         _checkRemoteDBUpdate();
-        return true;
+        return checkingVersion;
     }
-
+    boolean isUpdateRunning() {
+        return checkingVersion;
+    }
     void _checkRemoteDBUpdate() {
         Log.d("SVC", "checking Schedule status");
         File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
@@ -87,7 +96,8 @@ public class SystemService extends Service {
             public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
                 String version_str = Utils.getFileContent(file);
                 _checkRemoteDBZipUpdate(version_str);
-                return false;
+                file.delete();
+                return true;
             }
 
             @Override
@@ -107,6 +117,7 @@ public class SystemService extends Service {
             if (UtilsDBVerCheck.matchDBVersion( sql, version_str) ) {
                 checkingVersion = false;
                 Log.d("DBSVC", "system schedule db is uptodate " + version_str);
+                sendCheckcomplete();
                 return;
             }
             final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
@@ -148,7 +159,9 @@ public class SystemService extends Service {
                     finally {
                         Utils.delete(tmpFilename);
                         Utils.delete(tmpVersionFilename);
+                        sendCheckcomplete();
                         sendDatabaseReady();
+
                     }
                     return false;
                 }
@@ -157,6 +170,7 @@ public class SystemService extends Service {
                 public void downloadFailed(DownloadFile d,long id, String url) {
                     Log.d("SQL", "download of SQL file failed " + url);
                     checkingVersion=false;
+                    sendCheckcomplete();
                 }
             });
 
@@ -183,6 +197,18 @@ public class SystemService extends Service {
         }
     }
 
+    private void sendCheckcomplete() {
+        Intent intent = new Intent("database-check-complete");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        Log.d("SVC", "sending database-check-complete");
+
+    }
+    private void sendDepartVisionUpdated() {
+        Intent intent = new Intent("departure-vision-updated");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        Log.d("SVC", "sending departure-vision-updated");
+
+    }
     // SQL related messages similar to the uil
     public boolean isDatabaseReady() {
         if(sql == null ) {
@@ -229,6 +255,89 @@ public class SystemService extends Service {
 
         Log.d("SVC", "database schedule upgraded " + msg );
         mNotificationManager.notify(1, notification);
+    }
+    HashMap<Integer, ArrayList<String>> departureVisionSubscriptions = new HashMap<Integer, ArrayList<String>>();
+    public void subscribeDepartureVision(int uniqueid, ArrayList<String> departureVisionSubscriptionStations) {
+        // update the subscriptions
+        departureVisionSubscriptions.put(uniqueid, departureVisionSubscriptionStations);
+    }
+
+    ArrayList<HashMap<String, Object>> parseDepartureVision(String station, Document doc) {
+        Log.d("DV", "parsing Departure vision Doc");
+        ArrayList<HashMap<String, Object>> result =  new ArrayList<HashMap<String, Object>>();
+        try {
+            Element table = doc.getElementById("GridView1");
+            Node node = table;
+            List<Node> child = node.childNodes().get(1).childNodes();
+            // discard the frist 3
+            //Log.d("DV", "child ===================== Size:" + child.size());
+            for (int i = 3; i < child.size(); i++) {
+                Node tr = child.get(i);
+                List<Node> td = tr.childNodes();
+                //Log.d("DV", "childNodes(td) ===================== Size:" + td.size());
+
+                if (td.size()< 4 ) {
+                    continue;
+                }
+                HashMap<String, Object> data = new HashMap<>();
+                String time = ((Element)td.get(1)).html().toString();
+                String to =  ((Element)td.get(3)).html().toString();
+                String track = ((Element)td.get(5)).html().toString();
+                String line = ((Element)td.get(7)).html().toString();
+                String train = ((Element)td.get(9)).html().toString();
+                String status =  ((Element)td.get(11)).html().toString();;
+                data.put("time", time);
+                data.put("to", to);
+                data.put("track", track);
+                data.put("line", line);
+                data.put("status", status);
+                data.put("train", train);
+                data.put("station", station);
+                Log.d("DV", "details time:" + time +  " to:" + to + " track:" + track + " line:" + line + " status:" + status + " train:" + train + " station:" + station );
+                result.add(data);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //Log.d("DV", "result=" + result.size());
+        return result;
+    }
+    HashMap<String, ArrayList<HashMap<String, Object>>> status = new HashMap<>();
+    public void getDepartureVision(String station) {
+        // check if we have a recent download, less than 1 minute old
+        final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
+            @Override
+            public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
+                try {
+                    //Log.d("DV", "File Content\n" + Utils.getEntireFileContent(file));
+                    Document doc = Jsoup.parse(file, null, "http://dv.njtransit.com");
+                    ArrayList<HashMap<String, Object>> result = parseDepartureVision(station, doc);
+                    status.put("NY", result);
+                    sendDepartVisionUpdated();
+                    // send this off on an intent.
+                } catch(Exception e) {
+                    Log.d("SOUP", "Failed to parse soup " + e.getMessage());
+                }
+                file.delete();
+                return true;
+            }
+
+            @Override
+            public void downloadFailed(DownloadFile d,long id, String url) {
+                Log.d("SQL", "download of SQL file failed " + url);
+                checkingVersion=false;  // could not get a version string, we will do it later.
+            }
+        });
+
+        d.downloadFile("http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+ station, "njts_departure_vision_" + station.toLowerCase() + ".html",
+                "NJ Transit DepartureVision",
+                DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "text/html");
+
+    }
+
+    public HashMap<String, ArrayList<HashMap<String, Object>>> getCachedDepartureVisionStatus() {
+        return  status;
     }
 
     public class LocalbroadcastReceiver extends BroadcastReceiver {

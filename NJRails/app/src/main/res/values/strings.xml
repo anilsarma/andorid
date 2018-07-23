@@ -15,4 +15,7 @@
     <string name="upgrade">Upgrade</string>
     <string name="version">Version</string>
     <string name="google_maps_key">AIzaSyBoIzv1e-aA-XI5EGj-TNgkjlL-HbEY39c</string>
+    <string name="default_start_station">New York</string>
+    <string name="default_stop_station">New Brunswick</string>
+    <string name="default_route_name">Northeast Corridor</string>
 </resources>

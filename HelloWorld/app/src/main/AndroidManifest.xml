@@ -23,6 +23,13 @@
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".NJMapActivity"/>
+        <activity android:name=".activities.DepartureVisionActivity"
+            android:label="Departure Vision"
+            android:parentActivityName=".MainActivity" >
+
+        </activity>
+
         <service
             android:name=".TestJobService"
             android:label="Word service"

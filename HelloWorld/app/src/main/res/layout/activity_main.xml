@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.asarma.helloworld.MainActivity">
     <LinearLayout
+        android:id="@+id/activity_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:divider="?android:dividerHorizontal"
+
         >
     <Button
         android:id="@+id/button_ok"
@@ -16,15 +20,22 @@
         android:layout_height="wrap_content"
         android:text="Message Service" />
     <Button
-        android:id="@+id/button_localservice"
+        android:id="@+id/button_departurevision"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Local Service" />
+        android:text="Departure Vision" />
     <Button
-        android:id="@+id/sql"
+        android:id="@+id/check_for_updates"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="SQL" />
+        android:text="Check for Updates" />
+
+
+
+
+
+
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -1,49 +1,47 @@
 package com.example.asarma.helloworld;
 
-import android.app.DownloadManager;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.net.Uri;
+import android.content.res.Resources;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.ArraySet;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.asarma.helloworld.activities.DepartureVisionActivity;
 import com.example.asarma.helloworld.utils.SQLiteLocalDatabase;
-import com.example.asarma.helloworld.utils.SqlUtils;
-import com.example.asarma.helloworld.utils.Utils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.Set;
-import java.util.zip.ZipInputStream;
 
 public class MainActivity extends AppCompatActivity {
-    DownloadManager manager;
+    //DownloadManager manager;
     private long enqueue;
     public static final String PREF_FILE_NAME = "test.pref";
     DownloadFile download = null;
     SQLiteLocalDatabase sql;
     SystemService systemService=null;
+    ProgressDialog progressDialog =null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Config config = new Config(getApplicationContext());
@@ -53,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction("custom-event-name");
         filter.addAction("database-ready");
+        filter.addAction("database-check-complete");
+        filter.addAction("departure-vision-update");
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
 
 
@@ -63,38 +63,59 @@ public class MainActivity extends AppCompatActivity {
         config.set("SET",values);
         setContentView(R.layout.activity_main);
 
+        LinearLayout parent = (LinearLayout)this.findViewById(R.id.activity_main);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View route = inflater.inflate(R.layout.route_layout_template, null);
+        parent.addView(route);
+
+        View route2 = inflater.inflate(R.layout.route_layout_template, null);
+        TextView track_number = route2.findViewById(R.id.track_number);
+        TextView train_live_header = route2.findViewById(R.id.train_live_header);
+        TextView train_live_details = route2.findViewById(R.id.train_live_details);
+        Button detail_button = route2.findViewById(R.id.detail_button);
+
+        detail_button.setOnClickListener(new View.OnClickListener() {
+                                             @Override
+                                             public void onClick(View v) {
+                                                 Toast.makeText(getApplicationContext(), "A new window will show with details", Toast.LENGTH_LONG).show();
+
+                                                 Intent i = new Intent(getApplicationContext(), NJMapActivity.class);
+                                                 startActivity(i);
+
+                                             }
+                                         });
+        route2.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LinearLayout ll = (LinearLayout) v;
+                Resources resources = getApplicationContext().getResources();
+                if ( ll.isSelected()) {
+                    int resid = resources.getIdentifier("route_background", "drawable", getApplicationContext().getPackageName());
+                    ll.setBackgroundResource(resid);
+                    ll.setSelected(false);
+                } else {
+                    int resid = resources.getIdentifier("route_background_selected", "drawable", getApplicationContext().getPackageName());
+                    ll.setBackgroundResource(resid);
+                    ll.setSelected(true);
+                }
+                return false;
+            }
+        });
+
+        track_number.setText("12");
+        train_live_header.setVisibility(View.VISIBLE);
+        train_live_details.setText("Track 12, status good");
+        Resources resources = getApplicationContext().getResources();
+        int resourceId = resources.getIdentifier("card_text_border_red", "drawable",getApplicationContext().getPackageName());
+        track_number.setBackground(resources.getDrawable(resourceId));
+
+        parent.addView(route2);
+
         //registerReceiver(mMessageReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
         //f.delete();
 
-         manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        if(manager !=null) {
-            String url = "https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt";
-            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-            request.setDescription("Some descrition");
-            request.setTitle("Some title");
-            //enqueue = manager.enqueue(request);
-            //System.out.println("downloading service .... ");
-        }
-        else {
-           // System.out.println("does not have download serecicxe");
-        }
-        download = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
-            @Override
-            public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
-                Log.d("download", "downloading complete " + file.getAbsolutePath() + " " + url +  " " + id );
-                return true;
-            }
 
-            @Override
-            public void downloadFailed(DownloadFile d, long id, String url) {
-                Log.d("download", "downloading failed " + " " + url +  " " + id );
-            }
-        });
-        download.downloadFile("https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt", "version.txt", "NJT Schedule version",
-                DownloadManager.Request.NETWORK_WIFI| DownloadManager.Request.NETWORK_MOBILE, null);
-
-                //startActivity(i);
         System.out.println("started");
         startService(new Intent(MainActivity.this, MessageService.class));
         startService(new Intent(MainActivity.this, SystemService.class));
@@ -112,19 +133,35 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button sqlButton = (Button)findViewById(R.id.sql);
+        Button sqlButton = (Button)findViewById(R.id.check_for_updates);
         sqlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (systemService!= null ) {
                     systemService.checkForUpdate();
+                    if ( progressDialog != null && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                    }
+                    if( systemService.isUpdateRunning()) {
+                        showUpdateProgressDialog(v.getContext());
+                    }
                 } else {
                     Log.d("BTNDNLD", "system service not init " + systemService );
                 }
             }
         });
 
-
+        Button button_departurevision = (Button)findViewById(R.id.button_departurevision);
+        button_departurevision.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(systemService!=null) {
+                    systemService.getDepartureVision("NY");
+                }
+                Intent i = new Intent(getApplicationContext(), DepartureVisionActivity.class);
+                startActivity(i);
+            }
+        });
     }
 
     @Override
@@ -135,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
             download = null;
         }
         doUnbindService();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onDestroy();
     }
 
@@ -142,63 +180,54 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         System.out.print("Local::onPause");
         // Unregister since the activity is paused.
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
-
+        //LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+//        if(progressDialog !=null) {
+//            progressDialog.
+//        }
         super.onPause();
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.context_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     protected void onResume() {
         System.out.print("Local::onResume");
-        // Register to receive messages.
-        // We are registering an observer (mMessageReceiver) to receive Intents
-        // with actions named "custom-event-name".
 
+        if(progressDialog !=null && progressDialog.isShowing()) {
+            if(systemService != null && !systemService.isUpdateRunning()) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+        }
         super.onResume();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     public class LocalBcstReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
-            if (intent.getAction().equals("custom-event-name")) {
-                System.out.print("BroadcastReceiver::onReceive");
-                String action = intent.getAction();
-                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
-                    Log.d("download complete", "compleete ... ");
-                    handle_download_complete(context, intent);
-                }
-                // Get extra data included in the Intent
-                String message = intent.getStringExtra("message");
-                Log.d("receiver", "~~~~~~~~~~~~ Got message: " + message);
-            } else if (intent.getAction().equals("database-ready" )) {
+            Log.d("MAIN", "onReceive " + intent.getAction());
+            if (intent.getAction().equals("database-ready" )) {
                 Log.d("receiver", "Database is ready we can do all the good stuff");
-            }
-
-            Log.d("receiver", "got omething not sure what " + intent.getAction());
-        }
-
-        public void handle_download_complete(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
-                long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
-                DownloadManager.Query query = new DownloadManager.Query();
-                query.setFilterById(enqueue);
-                Cursor c = manager.query(query);
-                if (c.moveToFirst()) {
-                    int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
-                    if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
-                        String uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI ))
-                                + " " + c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-
-
-                        String downloadFileLocalUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-                        File mFile = new File(Uri.parse(downloadFileLocalUri).getPath());
-
-                        System.out.println("~~~~~~~~~~~ COmplete" + uriString + " File " + mFile.getAbsolutePath());
-                        mFile.delete();
-                    }
+                if(progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
                 }
+            } else if (intent.getAction().equals("database-check-complete" )) {
+                Log.d("receiver", "database-check-complete");
+                if(progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            } else {
+                Log.d("receiver", "got omething not sure what " + intent.getAction());
             }
         }
     }
@@ -227,12 +256,35 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+    void showUpdateProgressDialog(Context context) {
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setMessage("Checking for NJ Transit schedule updates");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+    }
+    boolean departureVisionSubscription = false;
+    ArrayList<String> departureVisionSubscriptionStations = new ArrayList<>();
+    void subscribeDepartureVision(String station)
+    {
+        departureVisionSubscription = true;
+        if( !departureVisionSubscriptionStations.contains(station)) {
+            departureVisionSubscriptionStations.add(station);
+        }
+        updateSubscriptions();
+    }
+    void updateSubscriptions() {
+        if( departureVisionSubscription) {
+            if(systemService!=null ) {
+                systemService.subscribeDepartureVision(1, departureVisionSubscriptionStations);
+            }
+        }
+    }
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             systemService = ((RemoteBinder)service).getService();
             Log.d("SVCON", "SystemService connected, called method on remote binder "  + ((RemoteBinder)service).getService());
-
+            // we just reconnected  check the progressdialog
+            updateSubscriptions();
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -244,7 +296,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
     void doBindService() {
-
         if (!mIsBound) {
             Log.d("SVCON", "SystemService binding.");
             bindService(new Intent(this, SystemService.class), mConnection, Context.BIND_AUTO_CREATE);
