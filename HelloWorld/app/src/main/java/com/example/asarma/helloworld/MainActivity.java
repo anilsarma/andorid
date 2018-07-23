@@ -1,6 +1,5 @@
 package com.example.asarma.helloworld;
 
-import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -8,8 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.net.Uri;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -19,12 +17,20 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.ArraySet;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.asarma.helloworld.activities.DepartureVisionActivity;
 import com.example.asarma.helloworld.utils.SQLiteLocalDatabase;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction("custom-event-name");
         filter.addAction("database-ready");
         filter.addAction("database-check-complete");
+        filter.addAction("departure-vision-update");
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
 
 
@@ -55,6 +62,54 @@ public class MainActivity extends AppCompatActivity {
         values.add("ITEM2");
         config.set("SET",values);
         setContentView(R.layout.activity_main);
+
+        LinearLayout parent = (LinearLayout)this.findViewById(R.id.activity_main);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View route = inflater.inflate(R.layout.route_layout_template, null);
+        parent.addView(route);
+
+        View route2 = inflater.inflate(R.layout.route_layout_template, null);
+        TextView track_number = route2.findViewById(R.id.track_number);
+        TextView train_live_header = route2.findViewById(R.id.train_live_header);
+        TextView train_live_details = route2.findViewById(R.id.train_live_details);
+        Button detail_button = route2.findViewById(R.id.detail_button);
+
+        detail_button.setOnClickListener(new View.OnClickListener() {
+                                             @Override
+                                             public void onClick(View v) {
+                                                 Toast.makeText(getApplicationContext(), "A new window will show with details", Toast.LENGTH_LONG).show();
+
+                                                 Intent i = new Intent(getApplicationContext(), NJMapActivity.class);
+                                                 startActivity(i);
+
+                                             }
+                                         });
+        route2.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LinearLayout ll = (LinearLayout) v;
+                Resources resources = getApplicationContext().getResources();
+                if ( ll.isSelected()) {
+                    int resid = resources.getIdentifier("route_background", "drawable", getApplicationContext().getPackageName());
+                    ll.setBackgroundResource(resid);
+                    ll.setSelected(false);
+                } else {
+                    int resid = resources.getIdentifier("route_background_selected", "drawable", getApplicationContext().getPackageName());
+                    ll.setBackgroundResource(resid);
+                    ll.setSelected(true);
+                }
+                return false;
+            }
+        });
+
+        track_number.setText("12");
+        train_live_header.setVisibility(View.VISIBLE);
+        train_live_details.setText("Track 12, status good");
+        Resources resources = getApplicationContext().getResources();
+        int resourceId = resources.getIdentifier("card_text_border_red", "drawable",getApplicationContext().getPackageName());
+        track_number.setBackground(resources.getDrawable(resourceId));
+
+        parent.addView(route2);
 
         //registerReceiver(mMessageReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
@@ -96,7 +151,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        Button button_departurevision = (Button)findViewById(R.id.button_departurevision);
+        button_departurevision.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(systemService!=null) {
+                    systemService.getDepartureVision("NY");
+                }
+                Intent i = new Intent(getApplicationContext(), DepartureVisionActivity.class);
+                startActivity(i);
+            }
+        });
     }
 
     @Override
@@ -120,6 +185,12 @@ public class MainActivity extends AppCompatActivity {
 //            progressDialog.
 //        }
         super.onPause();
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.context_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -191,12 +262,29 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
     }
+    boolean departureVisionSubscription = false;
+    ArrayList<String> departureVisionSubscriptionStations = new ArrayList<>();
+    void subscribeDepartureVision(String station)
+    {
+        departureVisionSubscription = true;
+        if( !departureVisionSubscriptionStations.contains(station)) {
+            departureVisionSubscriptionStations.add(station);
+        }
+        updateSubscriptions();
+    }
+    void updateSubscriptions() {
+        if( departureVisionSubscription) {
+            if(systemService!=null ) {
+                systemService.subscribeDepartureVision(1, departureVisionSubscriptionStations);
+            }
+        }
+    }
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             systemService = ((RemoteBinder)service).getService();
             Log.d("SVCON", "SystemService connected, called method on remote binder "  + ((RemoteBinder)service).getService());
             // we just reconnected  check the progressdialog
-
+            updateSubscriptions();
         }
 
         public void onServiceDisconnected(ComponentName className) {

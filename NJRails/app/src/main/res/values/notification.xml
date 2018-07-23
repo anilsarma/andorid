@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="NOTIFICATION_UPGRADE_REQUIRED">1</integer>
+    <integer name="NOTIFICATION_ROUTE_STATUS">2</integer>
+
+</resources>

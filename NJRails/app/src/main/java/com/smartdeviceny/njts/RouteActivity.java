@@ -136,13 +136,13 @@ public class RouteActivity extends FragmentActivity {
             TableLayout tl2 = new TableLayout(this);
             tl2.setBackgroundResource(R.drawable.route_background);
             tl2.setPadding(0, 0, 0, TypedValue.COMPLEX_UNIT_SP * 1);
-            TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+            TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 5, 0, 5);
             tl2.setLayoutParams(params);
 
             TableRow tr = new TableRow(this);
             tr.setBackgroundColor(Color.LTGRAY);
-            TableRow.LayoutParams params0 = new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+            TableRow.LayoutParams params0 = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params0.setMargins(5, 5,5,5);
             tr.setLayoutParams(params0);
             TextView tv = new TextView(this);
@@ -151,7 +151,7 @@ public class RouteActivity extends FragmentActivity {
             tr.addView(tv);
 
             TableRow tr2 = new TableRow(this);
-            TableRow.LayoutParams params2 = new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+            TableRow.LayoutParams params2 = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             params2.setMargins(0, 20, 0, 20);
             tr2.setLayoutParams(params2);
 

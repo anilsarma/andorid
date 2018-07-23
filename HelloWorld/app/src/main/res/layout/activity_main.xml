@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.asarma.helloworld.MainActivity">
     <LinearLayout
+        android:id="@+id/activity_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:divider="?android:dividerHorizontal"
+
         >
     <Button
         android:id="@+id/button_ok"
@@ -16,98 +20,22 @@
         android:layout_height="wrap_content"
         android:text="Message Service" />
     <Button
-        android:id="@+id/button_localservice"
+        android:id="@+id/button_departurevision"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Local Service" />
+        android:text="Departure Vision" />
     <Button
         android:id="@+id/check_for_updates"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Check for Updates" />
 
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/route_background"
-            >
-            <TableRow >
-                <TextView
-
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:padding="10sp"
-                    android:layout_column="1"
-                    android:textColor="#80FFFFFF"
-                    android:textSize="40sp"
-                    android:text="Train #" />
-
-                <TextClock
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textClock"
-                    android:layout_column="2" />
-            </TableRow>
-            <TableRow>
-                <TextView
-                    android:text="Route"
-                    android:textSize="20sp"
-                    android:textColor="#80FFFFFF"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_column="1" />
-
-                <EditText
-                    android:width="400sp"
-                    android:textColor="#80FFFFFF"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </TableRow>
 
 
-        </TableLayout>
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/route_background"
-            >
-            <TableRow >
-                <TextView
-
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:padding="10sp"
-                    android:layout_column="1"
-                    android:textColor="#80FFFFFF"
-                    android:textSize="40sp"
-                    android:text="Train #" />
-
-                <TextClock
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    
-                    android:layout_column="2" />
-            </TableRow>
-            <TableRow>
-                <TextView
-                    android:text="Route"
-                    android:textSize="20sp"
-                    android:textColor="#80FFFFFF"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_column="1" />
-
-                <EditText
-                    android:width="400sp"
-                    android:textColor="#80FFFFFF"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </TableRow>
 
 
-        </TableLayout>
+
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

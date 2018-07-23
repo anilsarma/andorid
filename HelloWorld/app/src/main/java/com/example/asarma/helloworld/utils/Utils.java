@@ -294,6 +294,25 @@ public class Utils {
             return "";
         }
     }
+    static public String getEntireFileContent(File file)
+    {
+        if(!file.exists()) {
+            return "";
+        }
+        StringBuffer str = new StringBuffer();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+           String line = "";
+            while ((line = br.readLine()) != null) {
+                str.append(line + "\n");
+            }
+
+        }
+        catch (IOException e) {
+
+        }
+        return str.toString();
+    }
 
     public static void scheduleJob(Context context, @NonNull Class<?> cls) {
         ComponentName serviceComponent = new ComponentName(context, cls);

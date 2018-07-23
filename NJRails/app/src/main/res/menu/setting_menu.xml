@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <item android:id="@+id/file"
+        android:title="Settings" >
+
+        <item android:id="@+id/settings"
+            android:title="@string/settings" />
+
+        <item android:id="@+id/upgrade"
+            android:title="@string/upgrade" />
+
+        <item android:id="@+id/version"
+            android:title="@string/version" />
+
+        <title android:id="@+id/title"
+            android:title="title" />
+
+
+    </item>
+</menu>

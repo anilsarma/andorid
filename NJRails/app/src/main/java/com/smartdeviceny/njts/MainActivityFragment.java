@@ -181,6 +181,11 @@ public class MainActivityFragment extends Fragment {
                 stop_station_spinner.invalidate();
                 adapter.notifyDataSetChanged();
 
+                if(startStations.length<2) {
+                    Toast.makeText(getContext(), "No Direct route found between stations", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 String start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", startStations[0] );
                 String stop  = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "stop_station", startStations[1] );
 
@@ -773,7 +778,7 @@ public class MainActivityFragment extends Fragment {
                                 final NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
                                 mNotificationManager.notify(R.integer.NOTIFICATION_ROUTE_STATUS, notify);
 
-                                //Toast.makeText(getContext(), (String) "sent notification ", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), (String) "sent notification ", Toast.LENGTH_SHORT).show();
                                 notification = true;
                             }
                         }

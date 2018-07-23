@@ -35,16 +35,19 @@ public class SettingsActivity extends Activity {
         final Spinner start_station_spinner = findViewById(R.id.start_station_spinner);
         final Spinner stop_station_spinner = findViewById(R.id.stop_station_spinner);
 
-        String route_name = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "route_name", "Northeast Corridor");
+        String route_name = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "route_name", getResources().getString(R.string.default_route_name));
         String startStations[] = SQLHelper.getRouteStations(dbHelper.getReadableDatabase(), route_name);
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this.getApplicationContext(), android.R.layout.simple_spinner_item, startStations);
         start_station_spinner.setAdapter(adapter);
 
-        String start = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "start_station", startStations[0]);
+
+        String start = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "start_station",
+                startStations.length>0?startStations[0]: getResources().getString(R.string.default_start_station));
         start_station_spinner.setSelection(adapter.getPosition(Utils.capitalize(start)));
 
         stop_station_spinner.setAdapter(adapter);
-        String stop = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "stop_station", startStations[1]);
+        String stop = SQLHelper.get_user_pref_value(dbHelper.getReadableDatabase(), "stop_station",
+                startStations.length>1?startStations[1]:getResources().getString(R.string.default_stop_station));
 
         stop_station_spinner.setSelection(adapter.getPosition(Utils.capitalize(stop)));
 
@@ -86,6 +89,15 @@ public class SettingsActivity extends Activity {
                 //Toast.makeText(rootView.getContext(), "Selected :" + route_name , Toast.LENGTH_LONG).show();
                 // need to update adaptor value .. and refresh
                 String startStations[] = SQLHelper.getRouteStations( dbHelper.getReadableDatabase(), route_name );
+                if (startStations.length<2 ) {
+                    String tstartStations[] = SQLHelper.getRouteStations(dbHelper.getReadableDatabase(), route_name);
+                    String start = getResources().getString(R.string.default_start_station);
+                    String stop = getResources().getString(R.string.default_stop_station);
+                    if (tstartStations.length > 1) {
+                        startStations = tstartStations;
+                    }
+                }
+
                 ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(getApplicationContext(), android.R.layout.simple_spinner_item,  startStations);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -96,8 +108,14 @@ public class SettingsActivity extends Activity {
                 stop_station_spinner.invalidate();
                 adapter.notifyDataSetChanged();
 
-                String start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", startStations[0] );
-                String stop  = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "stop_station", startStations[1] );
+                String default_start_station = getResources().getString(R.string.default_start_station);
+                String default_stop_station = getResources().getString(R.string.default_stop_station);
+                if(startStations.length>1) {
+                    default_start_station = startStations[0];
+                    default_stop_station = startStations[1];
+                }
+                String start = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "start_station", default_start_station);
+                String stop  = SQLHelper.get_user_pref_value( dbHelper.getReadableDatabase(), "stop_station", default_stop_station );
 
                 int spinnerPosition = adapter.getPosition(Utils.capitalize(start));
                 stop_station_spinner.setSelection(spinnerPosition);
@@ -129,13 +147,23 @@ public class SettingsActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Spinner st = (Spinner) findViewById(R.id.start_station_spinner);
-                Spinner sp = (Spinner) findViewById(R.id.stop_station_spinner);
+                Spinner st = findViewById(R.id.start_station_spinner);
+                Spinner sp = findViewById(R.id.stop_station_spinner);
                 Spinner routes_spinner = findViewById(R.id.routes_spinner);
 
-                String start = st.getSelectedItem().toString();
-                String stop = sp.getSelectedItem().toString();
+                String start = st.getSelectedItem()!=null?st.getSelectedItem().toString():null;
+                String stop = st.getSelectedItem()!=null?st.getSelectedItem().toString():null;
+
                 String route_name = routes_spinner.getSelectedItem().toString();
+                if (start == null || stop == null ) {
+                    String startStations[] = SQLHelper.getRouteStations(dbHelper.getReadableDatabase(), route_name);
+                    start = getResources().getString(R.string.default_start_station);
+                    stop = getResources().getString(R.string.default_stop_station);
+                    if (startStations.length > 1) {
+                        start = startStations[0];
+                        stop = startStations[1];
+                    }
+                }
 
                 if (start.isEmpty() || stop.isEmpty()) {
                     Toast.makeText(getApplicationContext(), (String) "Both start and stop stations must be selected",
