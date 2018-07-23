@@ -22,8 +22,13 @@ public class TestJobService extends JobService {
 	@Override
 	public boolean onStartJob(JobParameters params) {
 		Log.d("JOB", "onStartJob scheduled job just ran, will check for status un bind passes");
-		mConnection = new LocalServiceConnection(this, params);
-		bindService(new Intent(this, SystemService.class), mConnection, Context.BIND_AUTO_CREATE);
+		try {
+            mConnection = new LocalServiceConnection(this, params);
+            bindService(new Intent(this, SystemService.class), mConnection, Context.BIND_AUTO_CREATE);
+        } catch(Exception e) {
+		    Log.e("JOB", "failed to bind to service " + e.getMessage());
+            jobFinished(params, true);
+        }
 		//jobFinished(params, true);
 		return true;
 	}
@@ -31,8 +36,9 @@ public class TestJobService extends JobService {
 	@Override
 	public boolean onStopJob(JobParameters params) {
 		Log.d("JOB", "onStartJob scheduled job just ran, will check for status un bind passes");
-		unbindService(mConnection);
-		mConnection  = null;
+		if(mConnection!=null){
+		    unbindService(mConnection);mConnection  = null;
+        }
 		return true;
 	}
 
@@ -48,14 +54,16 @@ public class TestJobService extends JobService {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			Log.d("JOB", "TestJobService onServiceConnected");
 			SystemService systemService = ((RemoteBinder)service).getService();
-			systemService.checkForUpdate();
-            job.jobFinished(params, true);
-            unbindService(mConnection);
+			try {
+                systemService.checkForUpdate();
+            } finally {
+                job.jobFinished(params, true);
+                unbindService(mConnection);mConnection=null;
+            }
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
 			Log.d("JOB", "TestJobService onServiceDisconnected");
-
 		}
 	}
 
