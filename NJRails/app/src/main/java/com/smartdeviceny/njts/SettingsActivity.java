@@ -152,7 +152,7 @@ public class SettingsActivity extends Activity {
                 Spinner routes_spinner = findViewById(R.id.routes_spinner);
 
                 String start = st.getSelectedItem()!=null?st.getSelectedItem().toString():null;
-                String stop = st.getSelectedItem()!=null?st.getSelectedItem().toString():null;
+                String stop = st.getSelectedItem()!=null?sp.getSelectedItem().toString():null;
 
                 String route_name = routes_spinner.getSelectedItem().toString();
                 if (start == null || stop == null ) {
