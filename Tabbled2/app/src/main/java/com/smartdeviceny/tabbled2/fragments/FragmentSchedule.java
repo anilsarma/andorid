@@ -21,6 +21,7 @@ import com.smartdeviceny.tabbled2.adapters.RecycleSheduleAdaptor;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FragmentSchedule extends Fragment implements ServiceConnected {
     RecycleSheduleAdaptor adapter;
@@ -51,16 +52,17 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         //adapter.setClickListener(getc);
         recyclerView.setAdapter(adapter);
 
-//        SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.schedule_vision_scroll_view);
-//        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.schedule_vision_scroll_view);
-//                WebView web = getActivity().findViewById(R.id.nj_map_view_layout);
-//                web.reload();
-//                swipeRefreshLayout.setRefreshing(false);
-//            }
-//        });
+        SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.fragment_njt_schedule);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.fragment_njt_schedule);
+                swipeRefreshLayout.setRefreshing(false);
+                if( ((MainActivity)getActivity()).systemService  != null ) {
+                    ((MainActivity)getActivity()).systemService.getDepartureVision("NY");
+                }
+            }
+        });
 
 //        WebView web = getActivity().findViewById(R.id.nj_map_view_layout);
 //        web.loadUrl("http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=NY");
@@ -82,6 +84,15 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         super.onViewCreated(view, savedInstanceState);
         //Toast.makeText(getActivity().getApplicationContext(), "OnViewCreated", Toast.LENGTH_LONG).show();
 
+    }
+
+    @Override
+    public void onDepartureVisionUpdated(SystemService systemService) {
+        // get the departure vision data.
+        HashMap<String, SystemService.DepartureVisionData> data =  systemService.getCachedDepartureVisionStatus_byTrip();
+
+        adapter.updateDepartureVision(data);
+        adapter.notifyDataSetChanged();
     }
 
     @Override

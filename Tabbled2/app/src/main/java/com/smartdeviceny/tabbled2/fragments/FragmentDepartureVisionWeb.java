@@ -25,6 +25,16 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
     }
 
     @Override
+    public void onSystemServiceConnected(SystemService systemService) {
+
+    }
+
+    @Override
+    public void onDepartureVisionUpdated(SystemService systemService) {
+
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.departure_vision_layout);
@@ -57,11 +67,6 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
 
         super.onViewCreated(view, savedInstanceState);
         //Toast.makeText(getActivity().getApplicationContext(), "OnViewCreated", Toast.LENGTH_LONG).show();
-
-    }
-
-    @Override
-    public void onSystemServiceConnected(SystemService systemService) {
 
     }
 }

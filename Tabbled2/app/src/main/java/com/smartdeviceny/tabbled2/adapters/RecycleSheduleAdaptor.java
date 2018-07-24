@@ -15,6 +15,7 @@ import com.smartdeviceny.tabbled2.SystemService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAdaptor.ViewHolder> {
@@ -64,6 +65,11 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
+    HashMap<String, SystemService.DepartureVisionData> departureVision = new HashMap<>();
+
+    public void updateDepartureVision(HashMap<String, SystemService.DepartureVisionData> departureVision) {
+        this.departureVision = departureVision;
+    }
 
     public void updateRoutes( List<SystemService.Route> routes) {
         this.mData = routes;
@@ -83,21 +89,43 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
     public void onBindViewHolder(ViewHolder holder, int position) {
         SystemService.Route rt = mData.get(position);
 
+        SystemService.Route route = mData.get(position);
+        SystemService.DepartureVisionData dv = departureVision.get(route.trip_id);
+
         String train_header = mData.get(position).route_name + " #" + mData.get(position).trip_id;
         holder.train_name.setText(train_header);
-
         holder.track_number.setVisibility(View.INVISIBLE);
-        holder.train_live_header.setVisibility(View.INVISIBLE);
-        holder.train_live_details.setVisibility(View.INVISIBLE);
+
+        holder.train_status_header.setVisibility(View.INVISIBLE);
         holder.track_status_details.setVisibility(View.INVISIBLE);
 
-        holder.departure_time.setText(mData.get(position).departture_time);
-        holder.arrival_time.setText(mData.get(position).destination_time);
+        holder.train_live_header.setVisibility(View.INVISIBLE);
+        holder.train_live_details.setVisibility(View.INVISIBLE);
+
+        holder.detail_button.setVisibility(View.GONE);
+
+        if( dv !=null ) {
+            holder.track_number.setVisibility(View.VISIBLE);
+            holder.track_number.setText(dv.trip);
+
+            holder.train_live_header.setVisibility(View.VISIBLE);
+            holder.train_live_details.setVisibility(View.VISIBLE);
+            holder.train_live_details.setText(dv.status);
+        }
+
+
+
         SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat printFormat = new SimpleDateFormat("HH:mm");
+
         String duration = "";
         try {
             Date st_time = timeformat.parse(mData.get(position).departture_time);
             Date end_time = timeformat.parse(mData.get(position).destination_time);
+
+            holder.departure_time.setText(printFormat.format(st_time ));
+            holder.arrival_time.setText(printFormat.format(end_time ));
+
             long milli = end_time.getTime() - st_time.getTime();
             long minutes = milli/(60*1000);
             duration = "" + new Long(minutes).toString() + " mins" ;

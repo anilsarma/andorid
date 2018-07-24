@@ -198,7 +198,16 @@ public class MainActivity extends AppCompatActivity {
                 if(progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
                 }
-            } else {
+            } else if (intent.getAction().equals("departure-vision-updated" )) {
+                Log.d("DVA", "departure-vision-updated");
+                for(Fragment f:getSupportFragmentManager().getFragments()) {
+                    ServiceConnected frag = (ServiceConnected) f;
+                    if (frag != null) {
+                        frag.onDepartureVisionUpdated(systemService);
+                    }
+                }
+            }
+            else {
                 Log.d("receiver", "got omething not sure what " + intent.getAction());
             }
         }

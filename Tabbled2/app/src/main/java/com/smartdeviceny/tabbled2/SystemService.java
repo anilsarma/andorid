@@ -7,7 +7,6 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -309,6 +308,7 @@ public class SystemService extends Service {
         return result;
     }
     HashMap<String, ArrayList<HashMap<String, Object>>> status = new HashMap<>();
+    HashMap<String, DepartureVisionData> status_by_trip = new HashMap<>();
     public void getDepartureVision(String station) {
         // check if we have a recent download, less than 1 minute old
         final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
@@ -319,6 +319,11 @@ public class SystemService extends Service {
                     Document doc = Jsoup.parse(file, null, "http://dv.njtransit.com");
                     ArrayList<HashMap<String, Object>> result = parseDepartureVision(station, doc);
                     status.put("NY", result);
+                    for(HashMap<String, Object> dv:result) {
+                        DepartureVisionData dd = new DepartureVisionData(dv);
+                        status_by_trip.put(dd.trip, dd);
+
+                    }
                     sendDepartVisionUpdated();
                     // send this off on an intent.
                 } catch(Exception e) {
@@ -378,9 +383,30 @@ public class SystemService extends Service {
         }
         return r;
     }
+    public class DepartureVisionData {
+        public String time;
+        public String to;
+        public String track;
+        public String line;
+        public String status;
+        public String trip;
+        public String station;
 
+        public DepartureVisionData(HashMap<String, Object> data) {
+            time = data.get("time").toString();
+            to = data.get("to").toString();
+            track = data.get("track").toString();
+            line = data.get("line").toString();
+            status = data.get("status").toString();
+            trip = data.get("train").toString();
+            station = data.get("station").toString();
+        }
+    }
     public HashMap<String, ArrayList<HashMap<String, Object>>> getCachedDepartureVisionStatus() {
         return  status;
+    }
+    public HashMap<String, DepartureVisionData>getCachedDepartureVisionStatus_byTrip() {
+        return  status_by_trip;
     }
 
     public class LocalbroadcastReceiver extends BroadcastReceiver {
