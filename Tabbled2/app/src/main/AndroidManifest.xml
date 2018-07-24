@@ -16,6 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:enabled="true" android:name=".SystemService" />
+        <receiver android:name=".MainActivity$LocalBcstReceiver" android:enabled="true"/>
+        <receiver android:name=".SystemService$LocalbroadcastReceiver" android:enabled="true"/>
+
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

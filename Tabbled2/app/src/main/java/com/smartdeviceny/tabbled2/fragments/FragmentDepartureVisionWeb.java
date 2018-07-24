@@ -1,23 +1,26 @@
-package com.smartdeviceny.tabbled2;
+package com.smartdeviceny.tabbled2.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.ScrollView;
-import android.widget.Toast;
 
-public class DepartureVisionWebFragment extends Fragment {
+import com.smartdeviceny.tabbled2.R;
+import com.smartdeviceny.tabbled2.SystemService;
+import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
+
+public class FragmentDepartureVisionWeb extends Fragment implements ServiceConnected {
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.departure_vision_web_fragment, container, false);
+        return inflater.inflate(R.layout.fragment_departure_vision_web, container, false);
         //return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -41,7 +44,7 @@ public class DepartureVisionWebFragment extends Fragment {
         web.getSettings().setLoadWithOverviewMode(true);
         web.getSettings().setUseWideViewPort(true);
 
-        ScrollView scrollView = getActivity().findViewById(R.id.departure_vision_scroll_view);
+        NestedScrollView scrollView = getActivity().findViewById(R.id.departure_vision_scroll_view);
         //scrollView.getChildAt();
         scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
@@ -54,6 +57,11 @@ public class DepartureVisionWebFragment extends Fragment {
 
         super.onViewCreated(view, savedInstanceState);
         //Toast.makeText(getActivity().getApplicationContext(), "OnViewCreated", Toast.LENGTH_LONG).show();
+
+    }
+
+    @Override
+    public void onSystemServiceConnected(SystemService systemService) {
 
     }
 }
