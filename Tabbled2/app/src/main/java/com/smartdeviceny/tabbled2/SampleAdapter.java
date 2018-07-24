@@ -14,7 +14,7 @@ public class SampleAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         switch(position) {
-            case 0: return new FragmentOne();
+            case 0: return new DepartureVisionWebFragment();
             case 1: return new FragmentOne();
             case 2: return new FragmentOne();
         }
@@ -25,7 +25,7 @@ public class SampleAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         switch(position) {
-            case 0: return "Tab 1 item";
+            case 0: return "Vision";
             case 1: return "Tab 2 item";
             case 2: return "Tab 3 item";
         }

@@ -13,7 +13,6 @@ public class FragmentOne extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         inflater.inflate(R.layout.fragment_one, container, false);
-
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 }

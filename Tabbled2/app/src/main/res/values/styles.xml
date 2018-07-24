@@ -21,15 +21,15 @@
         <item name="android:textColorSecondary">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.ActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/gray</item>
+        <item name="colorPrimaryDark">@color/gray</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
     <style name="CustomTabTextAppearance" parent="android:TextAppearance">
         <!-- Custom Attr-->
-
+        <item name="android:textColor">@color/gray</item>
     </style>
 
 </resources>
