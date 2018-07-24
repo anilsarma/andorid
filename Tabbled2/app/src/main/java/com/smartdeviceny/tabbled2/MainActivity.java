@@ -19,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.smartdeviceny.tabbled2.adapters.FragmentPagerMainPageAdaptor;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
@@ -109,6 +110,15 @@ public class MainActivity extends AppCompatActivity {
        // RecyclerView rv;
         //rv.
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(systemService!=null) {
+            // TODO:;
+            systemService.getDepartureVision("NY");
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
