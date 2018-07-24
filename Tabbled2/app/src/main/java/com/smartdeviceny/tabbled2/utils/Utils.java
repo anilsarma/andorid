@@ -144,6 +144,7 @@ public class Utils {
             }
             result.add(data);
         }
+        cursor.close();
         return result;
     }
     public static float pxFromDp(float dp, Context mContext) {

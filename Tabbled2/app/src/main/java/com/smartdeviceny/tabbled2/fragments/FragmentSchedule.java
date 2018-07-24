@@ -91,6 +91,10 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         // get the departure vision data.
         HashMap<String, SystemService.DepartureVisionData> data =  systemService.getCachedDepartureVisionStatus_byTrip();
 
+        Log.d("FRAGS", "got departure vision " + data.size());
+        for(String dv: data.keySet()) {
+            Log.d("FRAGS", "got departure vision " + dv + " " + data.get(dv).line);
+        }
         adapter.updateDepartureVision(data);
         adapter.notifyDataSetChanged();
     }
@@ -106,6 +110,7 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         }
         else {
             routes = ((MainActivity)this.getActivity()).systemService.getRoutes("New York Penn Station", "New Brunswick", null);
+            ((MainActivity)getActivity()).systemService.getDepartureVision("NY");
         }
         adapter.updateRoutes(routes);
         adapter.notifyDataSetChanged();;

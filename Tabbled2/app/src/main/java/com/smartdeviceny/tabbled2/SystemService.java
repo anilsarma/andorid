@@ -321,8 +321,7 @@ public class SystemService extends Service {
                     status.put("NY", result);
                     for(HashMap<String, Object> dv:result) {
                         DepartureVisionData dd = new DepartureVisionData(dv);
-                        status_by_trip.put(dd.trip, dd);
-
+                        status_by_trip.put(dd.block_id, dd);
                     }
                     sendDepartVisionUpdated();
                     // send this off on an intent.
@@ -347,14 +346,14 @@ public class SystemService extends Service {
     }
     public class Route {
         public String departture_time;
-        public String destination_time;
+        public String arrival_time;
         public String block_id;
         public String route_name;
         public String trip_id;
 
         public Route(HashMap<String, Object> data) {
             departture_time = data.get("departure_time").toString();
-            destination_time = data.get("destination_time").toString();
+            arrival_time = data.get("destination_time").toString();
             block_id = data.get("block_id").toString();
             route_name = data.get("route_long_name").toString();
             trip_id = data.get("trip_id").toString();
@@ -389,7 +388,7 @@ public class SystemService extends Service {
         public String track;
         public String line;
         public String status;
-        public String trip;
+        public String block_id;
         public String station;
 
         public DepartureVisionData(HashMap<String, Object> data) {
@@ -398,7 +397,7 @@ public class SystemService extends Service {
             track = data.get("track").toString();
             line = data.get("line").toString();
             status = data.get("status").toString();
-            trip = data.get("train").toString();
+            block_id = data.get("train").toString();
             station = data.get("station").toString();
         }
     }

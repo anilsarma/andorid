@@ -1,7 +1,8 @@
 package com.smartdeviceny.tabbled2.adapters;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.smartdeviceny.tabbled2.R;
 import com.smartdeviceny.tabbled2.SystemService;
@@ -90,9 +92,9 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         SystemService.Route rt = mData.get(position);
 
         SystemService.Route route = mData.get(position);
-        SystemService.DepartureVisionData dv = departureVision.get(route.trip_id);
+        SystemService.DepartureVisionData dv = departureVision.get(route.block_id);
 
-        String train_header = mData.get(position).route_name + " #" + mData.get(position).trip_id;
+        String train_header = mData.get(position).route_name + " #" + route.block_id;
         holder.train_name.setText(train_header);
         holder.track_number.setVisibility(View.INVISIBLE);
 
@@ -103,32 +105,71 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         holder.train_live_details.setVisibility(View.INVISIBLE);
 
         holder.detail_button.setVisibility(View.GONE);
-
+        SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat printFormat = new SimpleDateFormat("HH:mm");
         if( dv !=null ) {
-            holder.track_number.setVisibility(View.VISIBLE);
-            holder.track_number.setText(dv.trip);
+            Log.d("REC", "got departure vision train:" + dv.block_id + " track:" + dv.track + " status:" + dv.status);
+            if( !dv.track.isEmpty()) {
+                holder.track_number.setVisibility(View.VISIBLE);
+                holder.track_number.setText(dv.track);
+            }
 
             holder.train_live_header.setVisibility(View.VISIBLE);
             holder.train_live_details.setVisibility(View.VISIBLE);
             holder.train_live_details.setText(dv.status);
         }
+        else {
+            Log.d("REC", "DV not found for block_id:" + route.block_id);
+        }
 
 
-
-        SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss");
-        SimpleDateFormat printFormat = new SimpleDateFormat("HH:mm");
 
         String duration = "";
         try {
-            Date st_time = timeformat.parse(mData.get(position).departture_time);
-            Date end_time = timeformat.parse(mData.get(position).destination_time);
-
+            Date st_time = timeformat.parse(route.departture_time);
+            Date end_time = timeformat.parse(route.arrival_time);
+            Date now = new Date();
             holder.departure_time.setText(printFormat.format(st_time ));
             holder.arrival_time.setText(printFormat.format(end_time ));
 
             long milli = end_time.getTime() - st_time.getTime();
             long minutes = milli/(60*1000);
-            duration = "" + new Long(minutes).toString() + " mins" ;
+            duration ="" + minutes + " mins";
+
+            long diff = (st_time.getTime() - (now.getTime()))/(1000*60);
+            if ((diff >=-10) && (diff < 120) && (dv !=null)) {
+                String schedule  = "Scheduled in " + diff + " mins" ;
+                if ( diff < 0 ) {
+                    schedule= "Departed " + Math.abs(diff) + " minutes ago ";
+                }
+                holder.train_status_header.setVisibility(View.VISIBLE);
+                holder.track_status_details.setVisibility(View.VISIBLE);
+                //holder.train_status_header.
+                holder.track_status_details.setText(schedule);
+//                if (diff > 0 ) { // &&  fav.contains("" + block_id )) {
+//                    if(!notification) {
+//                        NotificationCompat.Builder mBuilder =
+//                                new NotificationCompat.Builder(getContext().getApplicationContext())
+//                                        .setSmallIcon(R.mipmap.app_njs_icon)
+//                                        .setTicker("Upgrade (Open to see the info).")
+//                                        .setContentTitle("Train " + block_id + " Track# " + platform  )
+//                                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+//                                        .setContentText( Utils.formatToLocalTime(Utils.parseLocalTime(departture_time)) + " departure in " +  Math.abs(diff) + "(mins)" );
+//                        // NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//                        Notification notify = mBuilder.build();
+//
+//                        notify.flags|= Notification.FLAG_AUTO_CANCEL;
+//                        //notify.defaults |= Notification.DEFAULT_VIBRATE;
+//                        final NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+//                        mNotificationManager.notify(R.integer.NOTIFICATION_ROUTE_STATUS, notify);
+//
+//                        Toast.makeText(getContext(), (String) "sent notification ", Toast.LENGTH_SHORT).show();
+//                        notification = true;
+//                    }
+//                }
+            }
+
         } catch (Exception e) {
         }
         holder.duration.setText(duration);

@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction("custom-event-name");
         filter.addAction("database-ready");
         filter.addAction("database-check-complete");
-        filter.addAction("departure-vision-update");
+        filter.addAction("departure-vision-updated");
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
 
 
