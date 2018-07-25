@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TableRow;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,6 +36,15 @@ import java.util.zip.ZipInputStream;
  */
 
 public class Utils {
+
+    static public String getTodayYYYYMMDD(@Nullable  Date dt)
+    {
+        if(dt ==null) {
+            dt = new Date();
+        }
+        DateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
+        return dateFormat.format(dt);
+    }
 
     static public String formatToLocalDate(Date dt)
     {
@@ -369,5 +380,11 @@ public class Utils {
         if(file != null ) {
             try {file.delete();} catch (Exception e){}
         }
+    }
+
+    static  public Date makeDate(String yyyymmdd, String time) throws ParseException {
+        DateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+        Date tm = dateTimeFormat.parse("" + yyyymmdd + " "  + time);
+        return tm;
     }
 }

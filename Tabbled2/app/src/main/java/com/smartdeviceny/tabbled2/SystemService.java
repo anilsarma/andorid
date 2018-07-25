@@ -27,6 +27,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -350,13 +353,28 @@ public class SystemService extends Service {
         public String block_id;
         public String route_name;
         public String trip_id;
+        public String date;
 
-        public Route(HashMap<String, Object> data) {
+        public Route(String date, HashMap<String, Object> data) {
             departture_time = data.get("departure_time").toString();
             arrival_time = data.get("destination_time").toString();
             block_id = data.get("block_id").toString();
             route_name = data.get("route_long_name").toString();
             trip_id = data.get("trip_id").toString();
+            this.date  = "" + date;
+        }
+
+
+
+        public Date getDate(String time) throws ParseException {
+            DateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+            Date tm = dateTimeFormat.parse(date + " "  + time);
+            return tm;
+        }
+
+        public String getPrintableTime(String time) throws ParseException {
+            SimpleDateFormat printFormat = new SimpleDateFormat("hh:mm a");
+            return printFormat.format(getDate(time));
         }
     }
     // this is a syncronous call
@@ -370,7 +388,7 @@ public class SystemService extends Service {
             db = sql.getReadableDatabase();
             ArrayList<HashMap<String, Object>> rotues = Utils.parseCursor(SQLHelper.getRoutes(db, from, to, date));
             for (HashMap<String, Object> rt : rotues) {
-                r.add(new Route(rt));
+                r.add(new Route("" + date, rt));
             }
         } catch(Exception e ) {
             Log.d("SVC", "error during getRoutes " + e.getMessage());

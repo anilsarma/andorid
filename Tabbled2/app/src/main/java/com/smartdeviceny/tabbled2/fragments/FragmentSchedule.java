@@ -1,9 +1,13 @@
 package com.smartdeviceny.tabbled2.fragments;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,14 +17,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import com.smartdeviceny.tabbled2.MainActivity;
 import com.smartdeviceny.tabbled2.R;
 import com.smartdeviceny.tabbled2.SystemService;
 import com.smartdeviceny.tabbled2.adapters.RecycleSheduleAdaptor;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
+import com.smartdeviceny.tabbled2.utils.Utils;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 public class FragmentSchedule extends Fragment implements ServiceConnected {
@@ -97,6 +105,16 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         }
         adapter.updateDepartureVision(data);
         adapter.notifyDataSetChanged();
+        for(SystemService.DepartureVisionData dv:data.values()) {
+           try {
+               if(notifyUser(dv) ) {
+                   break;
+               }
+           } catch(Exception e ) {
+
+           }
+        }
+
     }
 
     @Override
@@ -113,7 +131,54 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
             ((MainActivity)getActivity()).systemService.getDepartureVision("NY");
         }
         adapter.updateRoutes(routes);
-        adapter.notifyDataSetChanged();;
+        adapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(getPosition(routes));
+
         Log.d("FRAG", "updated routes");
+    }
+    int getPosition(ArrayList<SystemService.Route> routes) {
+        int index = -1;
+        int i = 0;
+        Date now = new Date();
+        try {
+            for (SystemService.Route rt : routes) {
+                if (rt.getDate(rt.arrival_time).getTime() > now.getTime()) {
+                    break;
+                }
+                index = i;
+                i++;
+            }
+        } catch (Exception e) {
+        }
+        return index;
+    }
+    boolean notifyUser( SystemService.DepartureVisionData dv) throws ParseException
+    {
+        if (dv == null) {
+            return false;
+        }
+        long diff = Utils.makeDate(Utils.getTodayYYYYMMDD(null),  dv.time).getTime() - new Date().getTime();
+        if (diff > 0 ) {  // other checks needed.
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(getActivity().getApplicationContext())
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setTicker("NJS")
+                            .setContentTitle("Train " + dv.block_id + " Track# " + dv.track  )
+                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                            .setContentText( Utils.formatToLocalTime(Utils.parseLocalTime(dv.time)) + " departure in " +  Math.abs(diff) + "(mins)" );
+            // NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            Notification notify = mBuilder.build();
+
+            notify.flags|= Notification.FLAG_AUTO_CANCEL;
+            final NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(1, notify);
+
+            Toast.makeText(getActivity().getApplicationContext(), (String) "sent notification ", Toast.LENGTH_SHORT).show();
+            return true;
+            //notification = true;
+        }
+        return  false;
+
     }
 }

@@ -3,18 +3,23 @@ package com.smartdeviceny.tabbled2.adapters;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.res.Resources;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.smartdeviceny.tabbled2.R;
 import com.smartdeviceny.tabbled2.SystemService;
+import com.smartdeviceny.tabbled2.utils.Utils;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,6 +37,8 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         TextView departure_time;
         TextView duration;
         TextView arrival_time;
+        LinearLayout train_live_layout;
+        LinearLayout train_status_layout;
 
 
         Button detail_button;
@@ -49,6 +56,10 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             duration = itemView.findViewById(R.id.duration);
             arrival_time = itemView.findViewById(R.id.arrival_time);
 
+            train_live_layout = itemView.findViewById(R.id.train_live_layout);
+            train_status_layout = itemView.findViewById(R.id.train_status_layout);
+
+
 
             //myTextView = itemView.findViewById(R.id.tvAnimalName);
             //itemView.setOnClickListener(this);
@@ -61,11 +72,19 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
     }
     private LayoutInflater mInflater;
     private List<SystemService.Route> mData;
+    int resid_delayed;
+    int resid_normal;
+    int resid_selected;
 
     // data is passed into the constructor
     public RecycleSheduleAdaptor(Context context, List<SystemService.Route> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        Resources resources = mInflater.getContext().getApplicationContext().getResources();
+        resid_delayed = resources.getIdentifier("route_background_delayed", "drawable", mInflater.getContext().getApplicationContext().getPackageName());
+        resid_normal = resources.getIdentifier("route_background", "drawable", mInflater.getContext().getApplicationContext().getPackageName());
+        resid_selected = resources.getIdentifier("route_background_selected", "drawable", mInflater.getContext().getApplicationContext().getPackageName());
+
     }
     HashMap<String, SystemService.DepartureVisionData> departureVision = new HashMap<>();
 
@@ -104,9 +123,15 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         holder.train_live_header.setVisibility(View.INVISIBLE);
         holder.train_live_details.setVisibility(View.INVISIBLE);
 
+        holder.train_status_layout.setVisibility(View.GONE);
+        holder.train_live_details.setVisibility(View.GONE);
+
         holder.detail_button.setVisibility(View.GONE);
+
+        holder.itemView.setBackgroundResource(resid_normal);
+
         SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss");
-        SimpleDateFormat printFormat = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat printFormat = new SimpleDateFormat("hh:mm a");
         if( dv !=null ) {
             Log.d("REC", "got departure vision train:" + dv.block_id + " track:" + dv.track + " status:" + dv.status);
             if( !dv.track.isEmpty()) {
@@ -114,9 +139,16 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                 holder.track_number.setText(dv.track);
             }
 
-            holder.train_live_header.setVisibility(View.VISIBLE);
-            holder.train_live_details.setVisibility(View.VISIBLE);
-            holder.train_live_details.setText(dv.status);
+            if( !dv.status.isEmpty()) {
+                holder.train_live_layout.setVisibility(View.VISIBLE);
+                holder.train_live_header.setVisibility(View.VISIBLE);
+                holder.train_live_details.setVisibility(View.VISIBLE);
+                holder.train_live_details.setText(dv.status);
+                String s = dv.status.toUpperCase();
+                if (s.contains("CANCEL") || s.contains("DELAY")) {
+                    holder.itemView.setBackgroundResource(resid_delayed);
+                }
+            }
         }
         else {
             Log.d("REC", "DV not found for block_id:" + route.block_id);
@@ -126,9 +158,13 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
 
         String duration = "";
         try {
-            Date st_time = timeformat.parse(route.departture_time);
-            Date end_time = timeformat.parse(route.arrival_time);
+            //Date st_time = timeformat.parse(route.departture_time);
+           // Date end_time = timeformat.parse(route.arrival_time);
             Date now = new Date();
+            Date st_time = route.getDate(route.departture_time);
+            Date end_time = route.getDate(route.arrival_time);
+
+
             holder.departure_time.setText(printFormat.format(st_time ));
             holder.arrival_time.setText(printFormat.format(end_time ));
 
@@ -136,41 +172,23 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             long minutes = milli/(60*1000);
             duration ="" + minutes + " mins";
 
-            long diff = (st_time.getTime() - (now.getTime()))/(1000*60);
+            long diff = (st_time.getTime() - now.getTime())/(1000*60);
             if ((diff >=-10) && (diff < 120) && (dv !=null)) {
                 String schedule  = "Scheduled in " + diff + " mins" ;
                 if ( diff < 0 ) {
                     schedule= "Departed " + Math.abs(diff) + " minutes ago ";
                 }
+                holder.train_status_layout.setVisibility(View.VISIBLE);
                 holder.train_status_header.setVisibility(View.VISIBLE);
                 holder.track_status_details.setVisibility(View.VISIBLE);
                 //holder.train_status_header.
                 holder.track_status_details.setText(schedule);
-//                if (diff > 0 ) { // &&  fav.contains("" + block_id )) {
-//                    if(!notification) {
-//                        NotificationCompat.Builder mBuilder =
-//                                new NotificationCompat.Builder(getContext().getApplicationContext())
-//                                        .setSmallIcon(R.mipmap.app_njs_icon)
-//                                        .setTicker("Upgrade (Open to see the info).")
-//                                        .setContentTitle("Train " + block_id + " Track# " + platform  )
-//                                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-//                                        .setContentText( Utils.formatToLocalTime(Utils.parseLocalTime(departture_time)) + " departure in " +  Math.abs(diff) + "(mins)" );
-//                        // NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//                        Notification notify = mBuilder.build();
-//
-//                        notify.flags|= Notification.FLAG_AUTO_CANCEL;
-//                        //notify.defaults |= Notification.DEFAULT_VIBRATE;
-//                        final NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-//                        mNotificationManager.notify(R.integer.NOTIFICATION_ROUTE_STATUS, notify);
-//
-//                        Toast.makeText(getContext(), (String) "sent notification ", Toast.LENGTH_SHORT).show();
-//                        notification = true;
-//                    }
-//                }
+
             }
 
         } catch (Exception e) {
+            Log.d("REC", "issue here " +  e.getMessage() );
+            e.printStackTrace();
         }
         holder.duration.setText(duration);
         Log.d("REC", "setting holder for " + position);

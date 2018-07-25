@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/route_background_selected"
+    android:background="@drawable/route_background"
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,7 +14,7 @@
             android:id="@+id/train_name"
             android:text="Northeast #7817"
             android:padding="10dp"
-            android:textSize="17sp"
+            android:textSize="16sp"
             android:textColor="#80FFFFFF"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -53,6 +53,7 @@
             android:text="details" />
     </LinearLayout>
     <LinearLayout
+        android:id="@+id/train_status_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -74,7 +75,7 @@
             android:text="Track 6, Route Delayed"
             android:paddingStart="5sp"
             android:padding="0sp"
-            android:textSize="20sp"
+            android:textSize="17sp"
             android:gravity="center_horizontal"
             android:textColor="#7FFFFFFF"
 
@@ -84,6 +85,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/train_live_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -107,7 +109,7 @@
             android:text="Train leaves in 100 minutes"
             android:paddingStart="5sp"
             android:padding="0sp"
-            android:textSize="20sp"
+            android:textSize="17sp"
             android:gravity="center_horizontal"
             android:textColor="#7FFFFFFF"
 
@@ -168,8 +170,8 @@
                     android:id="@+id/departure_time"
                     android:text="7:45AM"
 
-                    android:textSize="20sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
+                    android:textStyle="normal"
 
                     android:textColor="#AFFFFFFF"
                     android:gravity="center"
@@ -177,8 +179,8 @@
                 <TextView
                     android:id="@+id/duration"
                     android:text="81 min"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:textStyle="normal"
 
                     android:textColor="#AFFFFFFF"
                     android:gravity="center"
@@ -186,15 +188,13 @@
                 <TextView
                     android:id="@+id/arrival_time"
                     android:text="10:20AM"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
+                    android:textStyle="normal"
 
                     android:textColor="#AFFFFFFF"
                     android:gravity="center"
                     android:layout_column="3"/>
             </TableRow>
         </TableLayout>
-
-
     </LinearLayout>
 </LinearLayout>
