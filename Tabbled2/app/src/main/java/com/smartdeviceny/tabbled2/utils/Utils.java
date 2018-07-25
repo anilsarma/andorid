@@ -332,7 +332,7 @@ public class Utils {
         if ( ms_frequency == null ) {
             ms_frequency = new Integer(60*1000); // every minute.
         }
-        builder.setMinimumLatency(60*1 * 1000); // wait at least
+        builder.setMinimumLatency(ms_frequency); // wait at least
         builder.setOverrideDeadline((int)(5* 1000)); // maximum delay
         //builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED); // require unmetered network
         //builder.setRequiresDeviceIdle(true); // device should be idle

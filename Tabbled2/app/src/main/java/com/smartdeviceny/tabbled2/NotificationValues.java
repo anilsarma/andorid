@@ -5,7 +5,7 @@ public interface NotificationValues {
     String BROADCAT_DATABASE_READY = "database-ready";
     String BROADCAT_DATABASE_CHECK_COMPLETE = "database-check-complete";
     String BROADCAT_PERIODIC_TIMER = "periodic-timer";
-
+    String BROADCAT_SEND_DEPARTURE_VISION_PING = "send-departure-vision-pings";
 
 
 }

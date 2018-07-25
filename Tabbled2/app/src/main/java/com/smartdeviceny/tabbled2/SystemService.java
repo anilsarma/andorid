@@ -7,14 +7,17 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
 import com.smartdeviceny.tabbled2.utils.DownloadFile;
 import com.smartdeviceny.tabbled2.utils.SQLHelper;
 import com.smartdeviceny.tabbled2.utils.SQLiteLocalDatabase;
@@ -41,8 +44,6 @@ public class SystemService extends Service {
     boolean           checkingVersion;
     DownloadFile downloader;
     SQLiteLocalDatabase sql;
-    BroadcastReceiver receiver = new LocalbroadcastReceiver(this);
-
 
     DownloadFile.Callback callback = new DownloadFile.Callback() {
         @Override
@@ -65,6 +66,10 @@ public class SystemService extends Service {
     public void onCreate() {
         downloader = new DownloadFile(this.getApplicationContext(),  callback);
         super.onCreate();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(NotificationValues.BROADCAT_SEND_DEPARTURE_VISION_PING);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
+
         setupDb();
         sendDatabaseReady();
         checkForUpdate();
@@ -511,18 +516,21 @@ public class SystemService extends Service {
         return  status_by_trip;
     }
 
-    public class LocalbroadcastReceiver extends BroadcastReceiver {
-        SystemService service;
-        public LocalbroadcastReceiver(){}
 
-        public LocalbroadcastReceiver(SystemService service) {
-            this.service = service;
-        }
+
+    public class LocalBcstReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(service !=null ) {
-                service.checkForUpdate();
+            // TODO Auto-generated method stub
+            Log.d("MAIN", "onReceive " + intent.getAction());
+            if (intent.getAction().equals(NotificationValues.BROADCAT_SEND_DEPARTURE_VISION_PING )) {
+                SystemService.this.sendDepartureVisionPings();
+            }
+            else {
+                Log.d("receiver", "got omething not sure what " + intent.getAction());
             }
         }
     }
+    // Our handler for received Intents. This will be called whenever an Intent
+    private BroadcastReceiver mMessageReceiver = new SystemService.LocalBcstReceiver();
 }
