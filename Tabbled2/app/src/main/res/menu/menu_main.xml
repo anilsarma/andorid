@@ -5,6 +5,7 @@
         android:id="@+id/menu_Settings"
         android:titleCondensed="Settings"
         android:title="Settings"
+        android:icon="@android:drawable/ic_menu_rotate"
 
         app:showAsAction="always">
     </item>
