@@ -143,7 +143,7 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         try {
             for (SystemService.Route rt : routes) {
                 if (rt.getDate(rt.arrival_time).getTime() > now.getTime()) {
-                    break;
+                    return i;
                 }
                 index = i;
                 i++;
