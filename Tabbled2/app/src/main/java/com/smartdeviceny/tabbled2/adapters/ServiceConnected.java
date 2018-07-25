@@ -5,4 +5,5 @@ import com.smartdeviceny.tabbled2.SystemService;
 public interface ServiceConnected {
     void onSystemServiceConnected(SystemService systemService);
     void onDepartureVisionUpdated(SystemService systemService);
+    void onTimerEvent(SystemService systemService);
 }

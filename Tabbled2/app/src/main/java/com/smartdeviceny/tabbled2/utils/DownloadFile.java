@@ -71,7 +71,7 @@ public class DownloadFile {
         @Override
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
-            Log.d("download", "BroadcastReceiver::onReceive");
+            //Log.d("DLD", "BroadcastReceiver::onReceive");
             //String action = intent.getAction();
             //if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action))
             {
@@ -85,16 +85,16 @@ public class DownloadFile {
             long rids[] = requestid.stream().mapToLong(l->l).toArray();
             query.setFilterById(rids);
             if (rids.length==0) {
-                Log.d("download", "no pending requests" + intent.getAction());
+                //Log.d("DNLD", "no pending requests " + intent.getAction());
                 return;
             }
-            Log.d("download", "hadle download complete" + intent.getAction());
+            //Log.d("DNLD", "hadle download complete" + intent.getAction());
             Cursor c = manager.query(query);
 
             for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
                 int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 int ID = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_ID));
-                Log.d("DNLD", "checking entry " + status + " " + ID);
+                //Log.d("DNLD", "checking entry " + status + " " + ID);
 
                 if ((status & DownloadManager.STATUS_SUCCESSFUL) == DownloadManager.STATUS_SUCCESSFUL) {
                     File mFile = new File(Uri.parse(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))).getPath());
@@ -125,7 +125,7 @@ public class DownloadFile {
                     Log.d("DNLD", "Pending ID " + ID + " url:" + url);
                 }
             } // for loop
-            Log.d("DNLD", "loop done");
+            //Log.d("DNLD", "loop done");
         }
     } // Receiver
 

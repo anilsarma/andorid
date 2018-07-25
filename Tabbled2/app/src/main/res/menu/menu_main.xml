@@ -2,11 +2,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/menu_Refresh"
+        android:titleCondensed="Refresh"
+        android:title="Refresh"
+        android:icon="@android:drawable/ic_menu_rotate"
+        app:showAsAction="collapseActionView">
+    </item>
+    <item
         android:id="@+id/menu_Settings"
         android:titleCondensed="Settings"
         android:title="Settings"
-        android:icon="@android:drawable/ic_menu_rotate"
-
+        android:icon="@android:drawable/ic_menu_manage"
         app:showAsAction="always">
     </item>
 </menu>

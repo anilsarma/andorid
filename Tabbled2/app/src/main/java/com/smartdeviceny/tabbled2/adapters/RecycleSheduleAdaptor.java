@@ -20,6 +20,7 @@ import com.smartdeviceny.tabbled2.SystemService;
 import com.smartdeviceny.tabbled2.utils.Utils;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -75,6 +76,11 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
     int resid_delayed;
     int resid_normal;
     int resid_selected;
+    int resid_round_gray;
+    int resid_round_red;
+    int resid_round_green;
+    int resid_green;
+    int resid_gray;
 
     // data is passed into the constructor
     public RecycleSheduleAdaptor(Context context, List<SystemService.Route> data) {
@@ -85,25 +91,44 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         resid_normal = resources.getIdentifier("route_background", "drawable", mInflater.getContext().getApplicationContext().getPackageName());
         resid_selected = resources.getIdentifier("route_background_selected", "drawable", mInflater.getContext().getApplicationContext().getPackageName());
 
+        resid_round_green = resources.getIdentifier("card_text_border_green", "drawable", mInflater.getContext().getApplicationContext().getPackageName());
+        resid_round_red = resources.getIdentifier("card_text_border_red", "drawable", mInflater.getContext().getApplicationContext().getPackageName());
+        resid_round_gray= resources.getIdentifier("resid_round_gray", "drawable", mInflater.getContext().getApplicationContext().getPackageName());
+        resid_green= resources.getIdentifier("@android:color/holo_green_dark", "color", mInflater.getContext().getApplicationContext().getPackageName());
+        resid_gray= resources.getIdentifier("@android:color/darker_gray", "color", mInflater.getContext().getApplicationContext().getPackageName());
+
+        Log.d("REC", "resource green " + resid_green  + " " + resid_gray);
+        //@android:color/holo_green_dark
+
     }
     HashMap<String, SystemService.DepartureVisionData> departureVision = new HashMap<>();
 
     public void updateDepartureVision(HashMap<String, SystemService.DepartureVisionData> departureVision) {
         HashMap<String, SystemService.DepartureVisionData> tmp = new HashMap<>();
 
+        HashMap<String, SystemService.DepartureVisionData> track = new HashMap<>();
         for( String key:this.departureVision.keySet()) {
             SystemService.DepartureVisionData data = this.departureVision.get(key);
             if ( data.track.isEmpty() && data.status.isEmpty()) {
                 //this.departureVision.remove(key);
             } else {
                 tmp.put(key, data);
+                if(!data.track.isEmpty()) {
+                    track.put(data.track, data);
+                }
             }
-
-
         }
         for( String key:departureVision.keySet()) {
             SystemService.DepartureVisionData data = departureVision.get(key);
             tmp.put(key, data);
+            if(!data.track.isEmpty()) {
+                SystemService.DepartureVisionData td = track.get(data.track);
+                if(td!=null) {
+                    td.track = "";
+                    td.status = ""; // new entry exits so clear the old entry.
+                }
+
+            }
         }
         this.departureVision = tmp;
     }
@@ -124,6 +149,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Date now = new Date();
         SystemService.Route rt = mData.get(position);
 
         SystemService.Route route = mData.get(position);
@@ -153,6 +179,20 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             if( !dv.track.isEmpty()) {
                 holder.track_number.setVisibility(View.VISIBLE);
                 holder.track_number.setText(dv.track);
+                holder.track_number.setBackgroundResource(resid_round_green);
+                try {
+                    Date tm = Utils.makeDate(Utils.getTodayYYYYMMDD(null), dv.time);
+                    long diff = now.getTime() - tm.getTime();
+                    if ( diff > 2 * 1000 * 60) { // more than 5 minutes
+                        // check the creation time
+                        long cdiff = now.getTime() - dv.createTime.getTime();
+                        if( cdiff > 2 * 1000* 60) {
+                            holder.track_number.setBackgroundResource(resid_round_gray);
+                        }
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
 
             if( !dv.status.isEmpty()) {
@@ -163,23 +203,21 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                 String s = dv.status.toUpperCase();
                 if (s.contains("CANCEL") || s.contains("DELAY")) {
                     holder.itemView.setBackgroundResource(resid_delayed);
+                    holder.track_number.setBackgroundResource(resid_round_red);
                 }
             }
         }
         else {
-            Log.d("REC", "DV not found for block_id:" + route.block_id);
+            //Log.d("REC", "DV not found for block_id:" + route.block_id);
         }
-
-
 
         String duration = "";
         try {
             //Date st_time = timeformat.parse(route.departture_time);
            // Date end_time = timeformat.parse(route.arrival_time);
-            Date now = new Date();
+
             Date st_time = route.getDate(route.departture_time);
             Date end_time = route.getDate(route.arrival_time);
-
 
             holder.departure_time.setText(printFormat.format(st_time ));
             holder.arrival_time.setText(printFormat.format(end_time ));
@@ -190,16 +228,17 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
 
             long diff = (st_time.getTime() - now.getTime())/(1000*60);
             if ((diff >=-10) && (diff < 120) && (dv !=null)) {
-                String schedule  = "Scheduled in " + diff + " mins" ;
+                String schedule  = "departs in " + diff + " mins" ;
+                holder.train_status_header.setBackgroundResource(resid_green);
                 if ( diff < 0 ) {
-                    schedule= "Departed " + Math.abs(diff) + " minutes ago ";
+                    schedule= "departed " + Math.abs(diff) + " minutes ago ";
+                    holder.train_status_header.setBackgroundResource(resid_gray);
                 }
                 holder.train_status_layout.setVisibility(View.VISIBLE);
                 holder.train_status_header.setVisibility(View.VISIBLE);
                 holder.track_status_details.setVisibility(View.VISIBLE);
                 //holder.train_status_header.
                 holder.track_status_details.setText(schedule);
-
             }
 
         } catch (Exception e) {
@@ -207,7 +246,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             e.printStackTrace();
         }
         holder.duration.setText(duration);
-        Log.d("REC", "setting holder for " + position);
+        //Log.d("REC", "setting holder for " + position);
 
     }
 

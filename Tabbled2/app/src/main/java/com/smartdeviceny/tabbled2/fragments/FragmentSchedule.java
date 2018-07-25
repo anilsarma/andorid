@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -67,7 +68,7 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
                 SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.fragment_njt_schedule);
                 swipeRefreshLayout.setRefreshing(false);
                 if( ((MainActivity)getActivity()).systemService  != null ) {
-                    ((MainActivity)getActivity()).systemService.getDepartureVision("NY");
+                    ((MainActivity)getActivity()).systemService.getDepartureVision("NY", 0);
                 }
             }
         });
@@ -91,7 +92,14 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
 
         super.onViewCreated(view, savedInstanceState);
         //Toast.makeText(getActivity().getApplicationContext(), "OnViewCreated", Toast.LENGTH_LONG).show();
+    }
 
+    @Override
+    public void onTimerEvent(SystemService systemService) {
+        // give it a little kick.
+        RecyclerView recyclerView = getActivity().findViewById(R.id.schedule_vision_scroll_view);
+        adapter.notifyDataSetChanged();
+        recyclerView.invalidate();
     }
 
     @Override
@@ -99,12 +107,18 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         // get the departure vision data.
         HashMap<String, SystemService.DepartureVisionData> data =  systemService.getCachedDepartureVisionStatus_byTrip();
 
-        Log.d("FRAGS", "got departure vision " + data.size());
-        for(String dv: data.keySet()) {
-            Log.d("FRAGS", "got departure vision " + dv + " " + data.get(dv).line);
-        }
+        //Log.d("FRAGS", "got departure vision " + data.size());
+//        for(String dv: data.keySet()) {
+//            Log.d("FRAGS", "got departure vision " + dv + " " + data.get(dv).line);
+//        }
+
         adapter.updateDepartureVision(data);
         adapter.notifyDataSetChanged();
+        RecyclerView recyclerView = getActivity().findViewById(R.id.schedule_vision_scroll_view);
+        if(recyclerView !=null) {
+            recyclerView.invalidate();
+        }
+        ((MainActivity)getActivity()).systemService.updateDapartureVisionCheck("NY");
         for(SystemService.DepartureVisionData dv:data.values()) {
            try {
                if(notifyUser(dv) ) {
@@ -128,11 +142,12 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         }
         else {
             routes = ((MainActivity)this.getActivity()).systemService.getRoutes("New York Penn Station", "New Brunswick", null);
-            ((MainActivity)getActivity()).systemService.getDepartureVision("NY");
+            ((MainActivity)getActivity()).systemService.getDepartureVision("NY", 30000);
         }
         adapter.updateRoutes(routes);
         adapter.notifyDataSetChanged();
         recyclerView.scrollToPosition(getPosition(routes));
+
 
         Log.d("FRAG", "updated routes");
     }

@@ -25,6 +25,11 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
     }
 
     @Override
+    public void onTimerEvent(SystemService systemService) {
+
+    }
+
+    @Override
     public void onSystemServiceConnected(SystemService systemService) {
 
     }

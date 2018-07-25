@@ -326,11 +326,14 @@ public class Utils {
         return str.toString();
     }
 
-    public static void scheduleJob(Context context, @NonNull Class<?> cls) {
+    public static void scheduleJob(Context context, @NonNull Class<?> cls, @Nullable Integer ms_frequency) {
         ComponentName serviceComponent = new ComponentName(context, cls);
         JobInfo.Builder builder = new JobInfo.Builder(0, serviceComponent);
-        builder.setMinimumLatency(60*2 * 1000); // wait at least
-        builder.setOverrideDeadline((int)(60*1.5 * 1000)); // maximum delay
+        if ( ms_frequency == null ) {
+            ms_frequency = new Integer(60*1000); // every minute.
+        }
+        builder.setMinimumLatency(60*1 * 1000); // wait at least
+        builder.setOverrideDeadline((int)(5* 1000)); // maximum delay
         //builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED); // require unmetered network
         //builder.setRequiresDeviceIdle(true); // device should be idle
         //builder.setRequiresCharging(true); // we don't care if the device is charging or not

@@ -21,6 +21,11 @@ public class FragmentOne extends Fragment implements ServiceConnected{
     }
 
     @Override
+    public void onTimerEvent(SystemService systemService) {
+
+    }
+
+    @Override
     public void onDepartureVisionUpdated(SystemService systemService) {
 
     }

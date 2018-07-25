@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.smartdeviceny.tabbled2.utils.DownloadFile;
 import com.smartdeviceny.tabbled2.utils.SQLHelper;
@@ -67,7 +68,7 @@ public class SystemService extends Service {
         setupDb();
         sendDatabaseReady();
         checkForUpdate();
-
+        Utils.scheduleJob(this.getApplicationContext(), DepartureVisionJobService.class, 30*1000); //Nyquist criteria
     }
 
     @Override
@@ -169,7 +170,7 @@ public class SystemService extends Service {
                     sendDatabaseReady();
 
                 }
-                return false;
+                return true;
             }
 
             @Override
@@ -198,24 +199,31 @@ public class SystemService extends Service {
 
     private void sendDatabaseReady() {
         if( isDatabaseReady() ) {
-            Intent intent = new Intent("database-ready");
+            Intent intent = new Intent(NotificationValues.BROADCAT_DATABASE_READY);
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
             Log.d("SVC", "sending database ready");
         }
     }
 
     private void sendCheckcomplete() {
-        Intent intent = new Intent("database-check-complete");
+        Intent intent = new Intent(NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        Log.d("SVC", "sending database-check-complete");
+        Log.d("SVC", "sending " + NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);
 
     }
     private void sendDepartVisionUpdated() {
-        Intent intent = new Intent("departure-vision-updated");
+        Intent intent = new Intent(NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        Log.d("SVC", "sending departure-vision-updated");
-
+        Log.d("SVC", "sending " + NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
+        Toast.makeText(getApplicationContext(),"sending " + NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED, Toast.LENGTH_SHORT).show();
     }
+
+    public void sendTimerEvent() {
+        Intent intent = new Intent(NotificationValues.BROADCAT_PERIODIC_TIMER);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        Log.d("SVC", "sending " + NotificationValues.BROADCAT_PERIODIC_TIMER);
+    }
+
     // SQL related messages similar to the uil
     public boolean isDatabaseReady() {
         if(sql == null ) {
@@ -270,7 +278,7 @@ public class SystemService extends Service {
     }
 
     ArrayList<HashMap<String, Object>> parseDepartureVision(String station, Document doc) {
-        Log.d("DV", "parsing Departure vision Doc");
+        //Log.d("DV", "parsing Departure vision Doc");
         ArrayList<HashMap<String, Object>> result =  new ArrayList<HashMap<String, Object>>();
         try {
             Element table = doc.getElementById("GridView1");
@@ -300,7 +308,7 @@ public class SystemService extends Service {
                 data.put("status", status);
                 data.put("train", train);
                 data.put("station", station);
-                Log.d("DV", "details time:" + time +  " to:" + to + " track:" + track + " line:" + line + " status:" + status + " train:" + train + " station:" + station );
+                //Log.d("DV", "details time:" + time +  " to:" + to + " track:" + track + " line:" + line + " status:" + status + " train:" + train + " station:" + station );
                 result.add(data);
             }
 
@@ -312,7 +320,72 @@ public class SystemService extends Service {
     }
     HashMap<String, ArrayList<HashMap<String, Object>>> status = new HashMap<>();
     HashMap<String, DepartureVisionData> status_by_trip = new HashMap<>();
-    public void getDepartureVision(String station) {
+    ArrayList<String> dvPendingRequests = new ArrayList<>();
+    HashMap<String, Date> lastRequestTime = new HashMap<>();
+    HashMap<String, Date> lastApiCallTime = new HashMap<>();
+    public Date updateDapartureVisionCheck(String station)
+    {
+        Log.d("SVC", "updateDapartureVisionCheck for DV:" + station );
+        synchronized (lastRequestTime) {
+            Date last = lastApiCallTime.get(station);
+            lastRequestTime.put(station, new Date());
+            return last;
+        }
+    }
+    // the idea here is that this will be periodically triggered
+    // when ever we have data.
+    public boolean sendDepartureVisionPings()
+    {
+        Date now = new Date();
+        boolean scheduled = false;
+        synchronized (lastRequestTime) {
+            for(String station:lastRequestTime.keySet()) {
+                Date dt = lastRequestTime.get(station);
+                if( (now.getTime() - dt.getTime())< (10 * 1000 * 60 ) ) { // in minutes TODO:: make this configurable by user.
+                    Log.d("SVC", "scheduling request for DV:" + station );
+                    try {
+                        _getDepartureVision(station);
+                    } catch(Exception e) {
+                        // don't really care.
+                    }
+                    scheduled = true;
+                } else {
+                    Log.d("SVC", "Request expired DV:" + station + " Time:" + dt + " now:" + now + " diff:" + (now.getTime() - dt.getTime())/1000  + " secs");
+                }
+            }
+        }
+        return scheduled;
+    }
+    public void getDepartureVision(String station, @Nullable Integer check_lastime) {
+        String url = "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+ station;
+        Date last = updateDapartureVisionCheck(station);
+        synchronized (dvPendingRequests) {
+            if (dvPendingRequests.contains(url)) {
+                Log.d("SVC", "pending request found for  DV:" + station );
+                return;
+            }
+            dvPendingRequests.add(url);
+        }
+        if ( check_lastime == null ) {
+            check_lastime = new Integer(0);
+        }
+        if (check_lastime > 0 && last!=null) {
+            Date now = new Date();
+            if(check_lastime > 0) {
+                if ((now.getTime()-last.getTime())<check_lastime) {
+                    return; // too early
+                }
+            }
+        }
+
+        _getDepartureVision(station);
+    }
+
+    public void _getDepartureVision(String station) {
+        String url = "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+ station;
+        synchronized (lastRequestTime) {
+            lastApiCallTime.put(station, new Date());
+        }
         // check if we have a recent download, less than 1 minute old
         final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
             @Override
@@ -329,7 +402,11 @@ public class SystemService extends Service {
                     sendDepartVisionUpdated();
                     // send this off on an intent.
                 } catch(Exception e) {
-                    Log.d("SOUP", "Failed to parse soup " + e.getMessage());
+                    Log.d("SVC", "Failed to parse soup " + e.getMessage());
+                } finally {
+                    synchronized (dvPendingRequests) {
+                        dvPendingRequests.remove(url);
+                    }
                 }
                 file.delete();
                 return true;
@@ -337,12 +414,18 @@ public class SystemService extends Service {
 
             @Override
             public void downloadFailed(DownloadFile d,long id, String url) {
-                Log.d("SQL", "download of SQL file failed " + url);
-                checkingVersion=false;  // could not get a version string, we will do it later.
+                try {
+                    Log.d("SVC", "download of SQL file failed " + url);
+                    checkingVersion = false;  // could not get a version string, we will do it later.
+                } finally {
+                    synchronized (dvPendingRequests) {
+                        dvPendingRequests.remove(url);
+                    }
+                }
             }
         });
 
-        d.downloadFile("http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+ station, "njts_departure_vision_" + station.toLowerCase() + ".html",
+        d.downloadFile(url, "njts_departure_vision_" + station.toLowerCase() + ".html",
                 "NJ Transit DepartureVision",
                 DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "text/html");
 
@@ -408,6 +491,7 @@ public class SystemService extends Service {
         public String status;
         public String block_id;
         public String station;
+        public Date   createTime; // time this object was created
 
         public DepartureVisionData(HashMap<String, Object> data) {
             time = data.get("time").toString();
@@ -417,6 +501,7 @@ public class SystemService extends Service {
             status = data.get("status").toString();
             block_id = data.get("train").toString();
             station = data.get("station").toString();
+            createTime = new Date();
         }
     }
     public HashMap<String, ArrayList<HashMap<String, Object>>> getCachedDepartureVisionStatus() {

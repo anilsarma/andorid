@@ -38,10 +38,11 @@ public class MainActivity extends AppCompatActivity {
         startService(new Intent(MainActivity.this, SystemService.class));
         doBindService();
         IntentFilter filter = new IntentFilter();
-        filter.addAction("custom-event-name");
-        filter.addAction("database-ready");
-        filter.addAction("database-check-complete");
-        filter.addAction("departure-vision-updated");
+
+        filter.addAction(NotificationValues.BROADCAT_DATABASE_READY);
+        filter.addAction(NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);
+        filter.addAction(NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
+        filter.addAction(NotificationValues.BROADCAT_PERIODIC_TIMER);
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
 
 
@@ -93,6 +94,16 @@ public class MainActivity extends AppCompatActivity {
         super.onPostResume();
     }
 
+    @Override
+    protected void onResume() {
+        // just in case
+        systemService = null;
+        startService(new Intent(MainActivity.this, SystemService.class));
+        doBindService();
+        super.onResume();
+    }
+
+
     private Toolbar initToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
 
@@ -116,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(systemService!=null) {
             // TODO:;
-            systemService.getDepartureVision("NY");
+            systemService.getDepartureVision("NY", 30000);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -198,31 +209,45 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
             Log.d("MAIN", "onReceive " + intent.getAction());
-            if (intent.getAction().equals("database-ready" )) {
+            if (intent.getAction().equals(NotificationValues.BROADCAT_DATABASE_READY )) {
                 Log.d("receiver", "Database is ready we can do all the good stuff");
                 if(progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
                 }
-            } else if (intent.getAction().equals("database-check-complete" )) {
-                Log.d("receiver", "database-check-complete");
+            } else if (intent.getAction().equals(NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE)) {
+                Log.d("receiver", NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);
                 if(progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
                 }
-            } else if (intent.getAction().equals("departure-vision-updated" )) {
-                Log.d("DVA", "departure-vision-updated");
+            } else if (intent.getAction().equals(NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED )) {
+                Log.d("DVA", NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
+                boolean hasfrag = false;
                 for(Fragment f:getSupportFragmentManager().getFragments()) {
                     ServiceConnected frag = (ServiceConnected) f;
                     if (frag != null) {
+                        hasfrag = true;
                         frag.onDepartureVisionUpdated(systemService);
                     }
                 }
+//                if(hasfrag) {
+//                    updateDapartureVisionCheck()
+//                }
+            } else if (intent.getAction().equals(NotificationValues.BROADCAT_PERIODIC_TIMER )) {
+            Log.d("DVA", NotificationValues.BROADCAT_PERIODIC_TIMER);
+            boolean hasfrag = false;
+            for(Fragment f:getSupportFragmentManager().getFragments()) {
+                ServiceConnected frag = (ServiceConnected) f;
+                if (frag != null) {
+                    hasfrag = true;
+                    frag.onTimerEvent(systemService);
+                }
             }
+        }
             else {
                 Log.d("receiver", "got omething not sure what " + intent.getAction());
             }
         }
     }
     // Our handler for received Intents. This will be called whenever an Intent
-    // with an action named "custom-event-name" is broadcasted.
     private BroadcastReceiver mMessageReceiver = new LocalBcstReceiver();
 }
