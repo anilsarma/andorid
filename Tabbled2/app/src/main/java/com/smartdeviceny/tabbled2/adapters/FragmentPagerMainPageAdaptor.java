@@ -31,7 +31,7 @@ public class FragmentPagerMainPageAdaptor extends FragmentPagerAdapter {
         switch(position) {
             case 0: return "Vision";
             case 1: return "Schedule";
-            case 2: return "Tab 3 item";
+            case 2: return "Alerts";
         }
         return "";
     }
