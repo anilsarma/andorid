@@ -89,17 +89,23 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
     HashMap<String, SystemService.DepartureVisionData> departureVision = new HashMap<>();
 
     public void updateDepartureVision(HashMap<String, SystemService.DepartureVisionData> departureVision) {
+        HashMap<String, SystemService.DepartureVisionData> tmp = new HashMap<>();
+
         for( String key:this.departureVision.keySet()) {
             SystemService.DepartureVisionData data = this.departureVision.get(key);
             if ( data.track.isEmpty() && data.status.isEmpty()) {
-                this.departureVision.remove(key);
+                //this.departureVision.remove(key);
+            } else {
+                tmp.put(key, data);
             }
+
+
         }
         for( String key:departureVision.keySet()) {
             SystemService.DepartureVisionData data = departureVision.get(key);
-            this.departureVision.put(key, data);
+            tmp.put(key, data);
         }
-        //this.departureVision = departureVision;
+        this.departureVision = tmp;
     }
 
     public void updateRoutes( List<SystemService.Route> routes) {
