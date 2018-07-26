@@ -349,7 +349,7 @@ public class SystemService extends Service {
                 if( (now.getTime() - dt.getTime())< (10 * 1000 * 60 ) ) { // in minutes TODO:: make this configurable by user.
                     Log.d("SVC", "scheduling request for DV:" + station );
                     try {
-                        _getDepartureVision(station, 45000);
+                        _getDepartureVision(station, 30000);
                     } catch(Exception e) {
                         // don't really care.
                     }
