@@ -108,7 +108,7 @@ public class SystemService extends Service {
             public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
                 String version_str = Utils.getFileContent(file);
                 _checkRemoteDBZipUpdate(version_str);
-                file.delete();
+                file.getAbsoluteFile().delete();
                 return true;
             }
 
@@ -413,7 +413,7 @@ public class SystemService extends Service {
                         dvPendingRequests.remove(url);
                     }
                 }
-                file.delete();
+                file.getAbsoluteFile().delete();
                 return true;
             }
 

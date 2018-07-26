@@ -29,7 +29,7 @@ public class DepartureVisionJobService extends JobService {
         } catch(Exception e) {
           e.printStackTrace();
         } finally {
-            Utils.scheduleJob(this.getApplicationContext(), DepartureVisionJobService.class, 15*1000, false);
+            Utils.scheduleJob(this.getApplicationContext(), DepartureVisionJobService.class, 30*1000, false);
             jobFinished(jobParameters, true);
             Log.d("JOB", "onStartJob - periodic job, complete");
             return false; // let the system know we have no job running ..

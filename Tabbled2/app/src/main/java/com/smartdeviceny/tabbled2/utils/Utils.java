@@ -390,7 +390,7 @@ public class Utils {
 
     static public void delete(File file) {
         if(file != null ) {
-            try {file.delete();} catch (Exception e){}
+            try {file.getAbsoluteFile().delete();} catch (Exception e){}
         }
     }
 
