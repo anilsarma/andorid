@@ -23,6 +23,7 @@ import android.view.MenuItem;
 
 import com.smartdeviceny.tabbled2.adapters.FragmentPagerMainPageAdaptor;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
+import com.smartdeviceny.tabbled2.utils.Utils;
 
 
 import java.util.ArrayList;
@@ -36,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         startService(new Intent(MainActivity.this, SystemService.class));
+
+        // bug in noughat... crap
+        Utils.scheduleJob(this.getApplicationContext(), DepartureVisionJobService.class, 15*1000, false);
         doBindService();
         IntentFilter filter = new IntentFilter();
 
@@ -103,6 +107,11 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    @Override
+    protected void onPause() {
+        doUnbindService();
+        super.onPause();
+    }
 
     private Toolbar initToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -226,7 +235,9 @@ public class MainActivity extends AppCompatActivity {
                     ServiceConnected frag = (ServiceConnected) f;
                     if (frag != null) {
                         hasfrag = true;
-                        frag.onDepartureVisionUpdated(systemService);
+                        if(systemService != null ) {
+                            frag.onDepartureVisionUpdated(systemService);
+                        }
                     }
                 }
 //                if(hasfrag) {
@@ -239,7 +250,9 @@ public class MainActivity extends AppCompatActivity {
                 ServiceConnected frag = (ServiceConnected) f;
                 if (frag != null) {
                     hasfrag = true;
-                    frag.onTimerEvent(systemService);
+                    if(systemService != null ) {
+                        frag.onTimerEvent(systemService);
+                    }
                 }
             }
         }

@@ -326,19 +326,28 @@ public class Utils {
         return str.toString();
     }
 
-    public static void scheduleJob(Context context, @NonNull Class<?> cls, @Nullable Integer ms_frequency) {
+    public static void scheduleJob(Context context, @NonNull Class<?> cls, @Nullable Integer ms_frequency, boolean periodic) {
         ComponentName serviceComponent = new ComponentName(context, cls);
-        JobInfo.Builder builder = new JobInfo.Builder(0, serviceComponent);
+        JobInfo.Builder builder = new JobInfo.Builder(1, serviceComponent);
         if ( ms_frequency == null ) {
             ms_frequency = new Integer(60*1000); // every minute.
         }
-        builder.setMinimumLatency(ms_frequency); // wait at least
-        builder.setOverrideDeadline((int)(5* 1000)); // maximum delay
+        if( periodic ) {
+            builder.setPeriodic(ms_frequency);
+        } else {
+            builder.setMinimumLatency(ms_frequency); // wait at least
+            builder.setOverrideDeadline((int)(5* 1000)); // maximum delay
+        }
         //builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED); // require unmetered network
         //builder.setRequiresDeviceIdle(true); // device should be idle
         //builder.setRequiresCharging(true); // we don't care if the device is charging or not
         JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
-        jobScheduler.schedule(builder.build());
+        if(jobScheduler.schedule(builder.build()) <= 0) {
+            Log.e("JOB", "error: Some error while scheduling the job");
+        }
+        else {
+            Log.d("JOB", "job scheduled " + ms_frequency);
+        }
     }
 
     static public String getExtension(File name) {
@@ -385,8 +394,11 @@ public class Utils {
         }
     }
 
-    static  public Date makeDate(String yyyymmdd, String time) throws ParseException {
-        DateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+    static  public Date makeDate(String yyyymmdd, String time, @Nullable String format) throws ParseException {
+        if(format == null ) {
+            format = "yyyyMMdd HH:mm:ss";
+        }
+        DateFormat dateTimeFormat = new SimpleDateFormat(format);
         Date tm = dateTimeFormat.parse("" + yyyymmdd + " "  + time);
         return tm;
     }

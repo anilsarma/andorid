@@ -98,6 +98,7 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
     public void onTimerEvent(SystemService systemService) {
         // give it a little kick.
         RecyclerView recyclerView = getActivity().findViewById(R.id.schedule_vision_scroll_view);
+        adapter.updateDepartureVision(null);
         adapter.notifyDataSetChanged();
         recyclerView.invalidate();
     }
@@ -105,6 +106,7 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
     @Override
     public void onDepartureVisionUpdated(SystemService systemService) {
         // get the departure vision data.
+
         HashMap<String, SystemService.DepartureVisionData> data =  systemService.getCachedDepartureVisionStatus_byTrip();
 
         //Log.d("FRAGS", "got departure vision " + data.size());
@@ -116,6 +118,8 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         adapter.notifyDataSetChanged();
         RecyclerView recyclerView = getActivity().findViewById(R.id.schedule_vision_scroll_view);
         if(recyclerView !=null) {
+            //Toast.makeText(getActivity().getApplicationContext(), (String) "invalidate ", Toast.LENGTH_SHORT).show();
+            adapter.notifyDataSetChanged();
             recyclerView.invalidate();
         }
         ((MainActivity)getActivity()).systemService.updateDapartureVisionCheck("NY");
@@ -172,7 +176,7 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         if (dv == null) {
             return false;
         }
-        long diff = Utils.makeDate(Utils.getTodayYYYYMMDD(null),  dv.time).getTime() - new Date().getTime();
+        long diff = Utils.makeDate(Utils.getTodayYYYYMMDD(null),  dv.time, "yyyyMMdd HH:mm").getTime() - new Date().getTime();
         if (diff > 0 ) {  // other checks needed.
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(getActivity().getApplicationContext())

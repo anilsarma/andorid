@@ -11,6 +11,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.smartdeviceny.tabbled2.utils.Utils;
+
 public class DepartureVisionJobService extends JobService {
 
     public DepartureVisionJobService() {
@@ -21,17 +23,23 @@ public class DepartureVisionJobService extends JobService {
     public boolean onStartJob(JobParameters jobParameters) {
         Log.d("JOB", "onStartJob - periodic job.");
 
-        sendDepartureVisionPings();
-        sendTimerEvent();
-        jobFinished(jobParameters, true);
-        Log.d("JOB", "onStartJob - periodic job, complete");
-        return true; // let the system know we have no job running ..
+        try {
+            sendDepartureVisionPings();
+            sendTimerEvent();
+        } catch(Exception e) {
+          e.printStackTrace();
+        } finally {
+            Utils.scheduleJob(this.getApplicationContext(), DepartureVisionJobService.class, 15*1000, false);
+            jobFinished(jobParameters, true);
+            Log.d("JOB", "onStartJob - periodic job, complete");
+            return false; // let the system know we have no job running ..
+        }
     }
 
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
         Log.d("JOB", "onStopJob - done");
-        return true;
+        return false;
     }
 
     public void sendTimerEvent() {

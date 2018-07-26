@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -103,7 +104,11 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
     }
     HashMap<String, SystemService.DepartureVisionData> departureVision = new HashMap<>();
 
-    public void updateDepartureVision(HashMap<String, SystemService.DepartureVisionData> departureVision) {
+    public void updateDepartureVision(@Nullable HashMap<String, SystemService.DepartureVisionData> departureVision) {
+        if(departureVision==null) {
+            this.departureVision =(HashMap<String, SystemService.DepartureVisionData>) this.departureVision.clone();
+            return;
+        }
         HashMap<String, SystemService.DepartureVisionData> tmp = new HashMap<>();
 
         HashMap<String, SystemService.DepartureVisionData> track = new HashMap<>();
@@ -172,6 +177,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
 
         holder.itemView.setBackgroundResource(resid_normal);
 
+        boolean canceled = false;
         SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss");
         SimpleDateFormat printFormat = new SimpleDateFormat("hh:mm a");
         if( dv !=null ) {
@@ -181,7 +187,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                 holder.track_number.setText(dv.track);
                 holder.track_number.setBackgroundResource(resid_round_green);
                 try {
-                    Date tm = Utils.makeDate(Utils.getTodayYYYYMMDD(null), dv.time);
+                    Date tm = Utils.makeDate(Utils.getTodayYYYYMMDD(null), dv.time, "yyyyMMdd HH:mm");
                     long diff = now.getTime() - tm.getTime();
                     if ( diff > 2 * 1000 * 60) { // more than 5 minutes
                         // check the creation time
@@ -204,6 +210,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                 if (s.contains("CANCEL") || s.contains("DELAY")) {
                     holder.itemView.setBackgroundResource(resid_delayed);
                     holder.track_number.setBackgroundResource(resid_round_red);
+                    canceled=true;
                 }
             }
         }
@@ -224,19 +231,22 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
 
             long milli = end_time.getTime() - st_time.getTime();
             long minutes = milli/(60*1000);
-            duration ="" + minutes + " mins";
+            duration ="" + minutes + " min";
 
             long diff = (st_time.getTime() - now.getTime())/(1000*60);
             if ((diff >=-10) && (diff < 120) && (dv !=null)) {
-                String schedule  = "departs in " + diff + " mins" ;
+                String schedule  = "departs in " + diff + " min" ;
                 holder.train_status_header.setBackgroundResource(resid_green);
                 if ( diff < 0 ) {
                     schedule= "departed " + Math.abs(diff) + " minutes ago ";
                     holder.train_status_header.setBackgroundResource(resid_gray);
                 }
-                holder.train_status_layout.setVisibility(View.VISIBLE);
-                holder.train_status_header.setVisibility(View.VISIBLE);
-                holder.track_status_details.setVisibility(View.VISIBLE);
+                if (!canceled) {
+                    holder.train_status_layout.setVisibility(View.VISIBLE);
+                    holder.train_status_header.setVisibility(View.VISIBLE);
+
+                    holder.track_status_details.setVisibility(View.VISIBLE);
+                }
                 //holder.train_status_header.
                 holder.track_status_details.setText(schedule);
             }

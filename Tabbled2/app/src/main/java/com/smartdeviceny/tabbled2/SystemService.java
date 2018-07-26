@@ -73,7 +73,7 @@ public class SystemService extends Service {
         setupDb();
         sendDatabaseReady();
         checkForUpdate();
-        Utils.scheduleJob(this.getApplicationContext(), DepartureVisionJobService.class, 30*1000); //Nyquist criteria
+        //Nyquist criteria
     }
 
     @Override
@@ -220,7 +220,7 @@ public class SystemService extends Service {
         Intent intent = new Intent(NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         Log.d("SVC", "sending " + NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
-        Toast.makeText(getApplicationContext(),"sending " + NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(),"sending " + NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED, Toast.LENGTH_SHORT).show();
     }
 
     public void sendTimerEvent() {
@@ -372,7 +372,7 @@ public class SystemService extends Service {
             dvPendingRequests.add(url);
         }
         if ( check_lastime == null ) {
-            check_lastime = new Integer(0);
+            check_lastime = new Integer(10000);
         }
         if (check_lastime > 0 && last!=null) {
             Date now = new Date();
