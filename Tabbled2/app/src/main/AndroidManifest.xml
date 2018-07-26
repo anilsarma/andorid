@@ -19,7 +19,9 @@
 
         <service android:enabled="true" android:name=".SystemService" />
 
-        <service android:enabled="true" android:name=".DepartureVisionJobService"  android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service android:enabled="true" android:name=".DepartureVisionJobService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
         <receiver android:name=".MainActivity$LocalBcstReceiver" android:enabled="true"/>
         <receiver android:name=".SystemService$LocalBcstReceiver" android:enabled="true"/>
 

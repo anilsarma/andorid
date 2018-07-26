@@ -20,7 +20,14 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_departure_vision_web, container, false);
+        try {
+            View view = inflater.inflate(R.layout.fragment_departure_vision_web, container, false);
+            WebView webview = (WebView)view.findViewById(R.id.nj_map_view_layout);
+            webview.getSettings().setJavaScriptEnabled(true);
+            return view;
+        }catch (Exception e) {
+            return null;
+        }
         //return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -48,6 +55,8 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
             public void onRefresh() {
                 SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.departure_vision_layout);
                 WebView web = getActivity().findViewById(R.id.nj_map_view_layout);
+                web.getSettings().setJavaScriptEnabled(false);
+
                 web.reload();
                 swipeRefreshLayout.setRefreshing(false);
             }
