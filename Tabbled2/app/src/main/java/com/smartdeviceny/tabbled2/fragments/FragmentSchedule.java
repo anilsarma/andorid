@@ -72,24 +72,6 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
                 }
             }
         });
-
-//        WebView web = getActivity().findViewById(R.id.nj_map_view_layout);
-//        web.loadUrl("http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=NY");
-//        web.getSettings().setBuiltInZoomControls(true);
-//        web.getSettings().setLoadWithOverviewMode(true);
-//        web.getSettings().setUseWideViewPort(true);
-//
-//        NestedScrollView scrollView = getActivity().findViewById(R.id.departure_vision_scroll_view);
-//        //scrollView.getChildAt();
-//        scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-//            @Override
-//            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-//                SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.departure_vision_layout);
-//                //LinearLayout llParent = findViewById(R.id.departure_vision_scroll);
-//                swipeRefreshLayout.setEnabled(scrollY ==0); // enable only if at the top.
-//            }
-//        });
-
         super.onViewCreated(view, savedInstanceState);
         //Toast.makeText(getActivity().getApplicationContext(), "OnViewCreated", Toast.LENGTH_LONG).show();
     }
@@ -98,7 +80,6 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
     public void onTimerEvent(SystemService systemService) {
         // give it a little kick.
         RecyclerView recyclerView = getActivity().findViewById(R.id.schedule_vision_scroll_view);
-        adapter.updateDepartureVision(null);
         adapter.notifyDataSetChanged();
         recyclerView.invalidate();
     }
@@ -106,14 +87,11 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
     @Override
     public void onDepartureVisionUpdated(SystemService systemService) {
         // get the departure vision data.
-
         HashMap<String, SystemService.DepartureVisionData> data =  systemService.getCachedDepartureVisionStatus_byTrip();
-
-        //Log.d("FRAGS", "got departure vision " + data.size());
-//        for(String dv: data.keySet()) {
-//            Log.d("FRAGS", "got departure vision " + dv + " " + data.get(dv).line);
-//        }
-
+        if(data.isEmpty() ) {
+            //nothing to do
+            return;
+        }
         adapter.updateDepartureVision(data);
         adapter.notifyDataSetChanged();
         RecyclerView recyclerView = getActivity().findViewById(R.id.schedule_vision_scroll_view);
@@ -150,9 +128,9 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         }
         adapter.updateRoutes(routes);
         adapter.notifyDataSetChanged();
+        onDepartureVisionUpdated(systemService); // inital paint.
+        // we do not want to do this all the time just when we reconnect.
         recyclerView.scrollToPosition(getPosition(routes));
-
-
         Log.d("FRAG", "updated routes");
     }
     int getPosition(ArrayList<SystemService.Route> routes) {
@@ -161,8 +139,8 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         Date now = new Date();
         try {
             for (SystemService.Route rt : routes) {
-                if (rt.getDate(rt.arrival_time).getTime() > now.getTime()) {
-                    return i;
+                if (rt.getDate(rt.departture_time).getTime() > now.getTime()) {
+                    break; // we want this to be in the middle of the page some what.
                 }
                 index = i;
                 i++;

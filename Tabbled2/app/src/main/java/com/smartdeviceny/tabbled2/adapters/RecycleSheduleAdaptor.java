@@ -1,11 +1,8 @@
 package com.smartdeviceny.tabbled2.adapters;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,13 +11,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.smartdeviceny.tabbled2.R;
 import com.smartdeviceny.tabbled2.SystemService;
 import com.smartdeviceny.tabbled2.utils.Utils;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -94,7 +89,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
 
         resid_round_green = resources.getIdentifier("card_text_border_green", "drawable", mInflater.getContext().getApplicationContext().getPackageName());
         resid_round_red = resources.getIdentifier("card_text_border_red", "drawable", mInflater.getContext().getApplicationContext().getPackageName());
-        resid_round_gray= resources.getIdentifier("resid_round_gray", "drawable", mInflater.getContext().getApplicationContext().getPackageName());
+        resid_round_gray= resources.getIdentifier("card_text_border_gray", "drawable", mInflater.getContext().getApplicationContext().getPackageName());
         resid_green= resources.getIdentifier("@android:color/holo_green_dark", "color", mInflater.getContext().getApplicationContext().getPackageName());
         resid_gray= resources.getIdentifier("@android:color/darker_gray", "color", mInflater.getContext().getApplicationContext().getPackageName());
 
@@ -105,18 +100,14 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
     HashMap<String, SystemService.DepartureVisionData> departureVision = new HashMap<>();
 
     public void updateDepartureVision(@Nullable HashMap<String, SystemService.DepartureVisionData> departureVision) {
-        if(departureVision==null) {
-            this.departureVision =(HashMap<String, SystemService.DepartureVisionData>) this.departureVision.clone();
-            return;
-        }
         HashMap<String, SystemService.DepartureVisionData> tmp = new HashMap<>();
-
         HashMap<String, SystemService.DepartureVisionData> track = new HashMap<>();
         for( String key:this.departureVision.keySet()) {
             SystemService.DepartureVisionData data = this.departureVision.get(key);
             if ( data.track.isEmpty() && data.status.isEmpty()) {
                 //this.departureVision.remove(key);
             } else {
+                data = data.clone();
                 tmp.put(key, data);
                 if(!data.track.isEmpty()) {
                     track.put(data.track, data);
@@ -125,14 +116,21 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         }
         for( String key:departureVision.keySet()) {
             SystemService.DepartureVisionData data = departureVision.get(key);
+            SystemService.DepartureVisionData old = tmp.get(key);
+            if(old != null ) {
+                data = data.clone();
+                if( data.track.isEmpty() && !old.track.isEmpty()) {
+                    data.track = old.track;
+                    data.stale = true;
+                }
+            }
             tmp.put(key, data);
             if(!data.track.isEmpty()) {
                 SystemService.DepartureVisionData td = track.get(data.track);
                 if(td!=null) {
-                    td.track = "";
+                    //td.track = ""; // do we want to really do this , history is nice
                     td.status = ""; // new entry exits so clear the old entry.
                 }
-
             }
         }
         this.departureVision = tmp;
@@ -178,6 +176,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         holder.itemView.setBackgroundResource(resid_normal);
 
         boolean canceled = false;
+        boolean oldEntry = false;
         SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss");
         SimpleDateFormat printFormat = new SimpleDateFormat("hh:mm a");
         if( dv !=null ) {
@@ -194,6 +193,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                         long cdiff = now.getTime() - dv.createTime.getTime();
                         if( cdiff > 2 * 1000* 60) {
                             holder.track_number.setBackgroundResource(resid_round_gray);
+                            oldEntry = true;
                         }
                     }
                 } catch (ParseException e) {
@@ -202,15 +202,19 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             }
 
             if( !dv.status.isEmpty()) {
-                holder.train_live_layout.setVisibility(View.VISIBLE);
-                holder.train_live_header.setVisibility(View.VISIBLE);
-                holder.train_live_details.setVisibility(View.VISIBLE);
-                holder.train_live_details.setText(dv.status);
+                if (!oldEntry) {
+                    holder.train_live_layout.setVisibility(View.VISIBLE);
+                    holder.train_live_header.setVisibility(View.VISIBLE);
+                    holder.train_live_details.setVisibility(View.VISIBLE);
+                    holder.train_live_details.setText(dv.status);
+                }
                 String s = dv.status.toUpperCase();
                 if (s.contains("CANCEL") || s.contains("DELAY")) {
                     holder.itemView.setBackgroundResource(resid_delayed);
                     holder.track_number.setBackgroundResource(resid_round_red);
-                    canceled=true;
+                    if( s.contains("CANCEL")) {
+                        canceled = true;
+                    }
                 }
             }
         }
@@ -234,17 +238,18 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             duration ="" + minutes + " min";
 
             long diff = (st_time.getTime() - now.getTime())/(1000*60);
-            if ((diff >=-10) && (diff < 120) && (dv !=null)) {
+            if ((diff >=-10) && (diff < 120)) {
                 String schedule  = "departs in " + diff + " min" ;
                 holder.train_status_header.setBackgroundResource(resid_green);
                 if ( diff < 0 ) {
                     schedule= "departed " + Math.abs(diff) + " minutes ago ";
                     holder.train_status_header.setBackgroundResource(resid_gray);
                 }
-                if (!canceled) {
+                if (!canceled ) {
+                    // if the train has been canceled, the status is rubbish, for delayed we will use the
+                    // original departure time for now.
                     holder.train_status_layout.setVisibility(View.VISIBLE);
                     holder.train_status_header.setVisibility(View.VISIBLE);
-
                     holder.track_status_details.setVisibility(View.VISIBLE);
                 }
                 //holder.train_status_header.

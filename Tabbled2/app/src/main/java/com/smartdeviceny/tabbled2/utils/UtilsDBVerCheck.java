@@ -24,7 +24,7 @@ public class UtilsDBVerCheck {
         } catch (Exception e) {
             Log.d("SQL", "get routes failed need to download");
             sql.close();
-            dbFilePath.delete();
+            Utils.delete(dbFilePath);
             sql = null;
         }
         return sql;
@@ -38,7 +38,6 @@ public class UtilsDBVerCheck {
             ZipInputStream zis = Utils.getFileFromZip(new FileInputStream(downloadedZipFile), nameToExtract);
             Utils.writeExtractedFileToDisk(zis, new FileOutputStream(tmpFilename));
         } catch (IOException e)  {
-
         }
         return tmpFilename;
     }

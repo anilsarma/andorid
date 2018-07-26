@@ -104,7 +104,7 @@ public class DownloadFile {
                         removeFile = DownloadFile.this.callback.downloadComplete(DownloadFile.this, ID, url, mFile);
                     }
                     if (removeFile) {
-                        mFile.delete();
+                        Utils.delete(mFile);
                     }
                     requestid.remove(new Long(ID));
                 }

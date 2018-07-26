@@ -108,7 +108,7 @@ public class SystemService extends Service {
             public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
                 String version_str = Utils.getFileContent(file);
                 _checkRemoteDBZipUpdate(version_str);
-                file.getAbsoluteFile().delete();
+                Utils.delete(file);
                 return true;
             }
 
@@ -153,11 +153,11 @@ public class SystemService extends Service {
                     if(sql != null ) {
                         sql.close();
                         sql = null;
-                        dbFilePath.delete();
-                        Log.d("SQL", "renamed filed " + tmpFilename.getAbsolutePath() + " to " + dbFilePath.getAbsolutePath());
+                        Utils.delete(dbFilePath);
+                        Log.d("SQL", "renamed file " + tmpFilename.getAbsolutePath() + " to " + dbFilePath.getAbsolutePath());
                     }
 
-                    Log.d("SQL", "renamed filed " + tmpFilename.getAbsolutePath() + " to " + dbFilePath.getAbsolutePath());
+                    Log.d("SQL", "renamed file " + tmpFilename.getAbsolutePath() + " to " + dbFilePath.getAbsolutePath());
                     tmpFilename.renameTo(dbFilePath); tmpFilename = null;
                     //dbFilePath = new File(dbFilePath.getAbsolutePath());
 
@@ -171,6 +171,7 @@ public class SystemService extends Service {
                 finally {
                     Utils.delete(tmpFilename);
                     Utils.delete(tmpVersionFilename);
+                    Utils.delete(file);
                     sendCheckcomplete();
                     sendDatabaseReady();
 
@@ -276,11 +277,6 @@ public class SystemService extends Service {
         Log.d("SVC", "database schedule upgraded " + msg );
         mNotificationManager.notify(1, notification);
     }
-    HashMap<Integer, ArrayList<String>> departureVisionSubscriptions = new HashMap<Integer, ArrayList<String>>();
-    public void subscribeDepartureVision(int uniqueid, ArrayList<String> departureVisionSubscriptionStations) {
-        // update the subscriptions
-        departureVisionSubscriptions.put(uniqueid, departureVisionSubscriptionStations);
-    }
 
     ArrayList<HashMap<String, Object>> parseDepartureVision(String station, Document doc) {
         //Log.d("DV", "parsing Departure vision Doc");
@@ -289,6 +285,18 @@ public class SystemService extends Service {
             Element table = doc.getElementById("GridView1");
             Node node = table;
             List<Node> child = node.childNodes().get(1).childNodes();
+            String header_string = "";
+            if (child.size()>0) {
+                // discard the frist 3
+                //Log.d("DV", "child ===================== Size:" + child.size());
+                Node header = child.get(1);
+                List<Node> header_elements = header.childNodes();
+                Element h = (Element) header_elements.get(0);
+                header_string = h.child(0).html().toString() + " " + h.child(1).html().toString().replace("&nbsp; &nbsp; Select a train to view station stops", "");
+                System.out.println(header_string);
+            }
+
+
             // discard the frist 3
             //Log.d("DV", "child ===================== Size:" + child.size());
             for (int i = 3; i < child.size(); i++) {
@@ -300,12 +308,27 @@ public class SystemService extends Service {
                     continue;
                 }
                 HashMap<String, Object> data = new HashMap<>();
+                HashMap<String, String> stylemap = new HashMap<>();
+
+                try {
+                    String style[] = ((Element)tr).attr("style").split(";");
+                    for(String s:style) {
+                        String nvp[] = s.split(":");
+                        stylemap.put(nvp[0], nvp[1]);
+                    }
+                } catch (Exception e) {
+
+                }
+
                 String time = ((Element)td.get(1)).html().toString();
                 String to =  ((Element)td.get(3)).html().toString();
                 String track = ((Element)td.get(5)).html().toString();
                 String line = ((Element)td.get(7)).html().toString();
                 String train = ((Element)td.get(9)).html().toString();
-                String status =  ((Element)td.get(11)).html().toString();;
+                String status =  ((Element)td.get(11)).html().toString();
+                String background =  stylemap.get("background-color");
+                String foreground =  stylemap.get("color");
+
                 data.put("time", time);
                 data.put("to", to);
                 data.put("track", track);
@@ -313,6 +336,8 @@ public class SystemService extends Service {
                 data.put("status", status);
                 data.put("train", train);
                 data.put("station", station);
+                data.put("background", background);
+                data.put("foreground", foreground);
                 //Log.d("DV", "details time:" + time +  " to:" + to + " track:" + track + " line:" + line + " status:" + status + " train:" + train + " station:" + station );
                 result.add(data);
             }
@@ -406,10 +431,11 @@ public class SystemService extends Service {
             @Override
             public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
                 try {
+
                     //Log.d("DV", "File Content\n" + Utils.getEntireFileContent(file));
                     Document doc = Jsoup.parse(file, null, "http://dv.njtransit.com");
                     ArrayList<HashMap<String, Object>> result = parseDepartureVision(station, doc);
-                    status.put("NY", result);
+                    status.put(station, result);
                     for(HashMap<String, Object> dv:result) {
                         DepartureVisionData dd = new DepartureVisionData(dv);
                         status_by_trip.put(dd.block_id, dd);
@@ -423,7 +449,7 @@ public class SystemService extends Service {
                         dvPendingRequests.remove(url);
                     }
                 }
-                file.getAbsoluteFile().delete();
+                Utils.delete(file);
                 return true;
             }
 
@@ -431,7 +457,6 @@ public class SystemService extends Service {
             public void downloadFailed(DownloadFile d,long id, String url) {
                 try {
                     Log.d("SVC", "download of SQL file failed " + url);
-                    checkingVersion = false;  // could not get a version string, we will do it later.
                 } finally {
                     synchronized (dvPendingRequests) {
                         dvPendingRequests.remove(url);
@@ -499,14 +524,17 @@ public class SystemService extends Service {
         return r;
     }
     public class DepartureVisionData {
-        public String time;
-        public String to;
-        public String track;
-        public String line;
-        public String status;
-        public String block_id;
-        public String station;
-        public Date   createTime; // time this object was created
+        public String time="";
+        public String to="";
+        public String track="";
+        public String line="";
+        public String status="";
+        public String block_id="";
+        public String station="";
+        public Date   createTime=new Date(); // time this object was created
+        public boolean stale = false;
+        public DepartureVisionData() {
+        }
 
         public DepartureVisionData(HashMap<String, Object> data) {
             time = data.get("time").toString();
@@ -517,6 +545,21 @@ public class SystemService extends Service {
             block_id = data.get("train").toString();
             station = data.get("station").toString();
             createTime = new Date();
+        }
+
+
+        public DepartureVisionData clone()  {
+            DepartureVisionData obj = new DepartureVisionData();
+            // TODO not sure how to clone strings ..
+            obj.time = "" + this.time;
+            obj.to = "" + this.to;
+            obj.track = "" + this.track;
+            obj.line = "" + this.line;
+            obj.status = "" + this.status;
+            obj.block_id = "" + this.block_id;
+            obj.station = "" + this.station;
+            obj.createTime = this.createTime;
+            return obj;
         }
     }
     public HashMap<String, ArrayList<HashMap<String, Object>>> getCachedDepartureVisionStatus() {
