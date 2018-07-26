@@ -349,7 +349,7 @@ public class SystemService extends Service {
                 if( (now.getTime() - dt.getTime())< (10 * 1000 * 60 ) ) { // in minutes TODO:: make this configurable by user.
                     Log.d("SVC", "scheduling request for DV:" + station );
                     try {
-                        _getDepartureVision(station);
+                        _getDepartureVision(station, 45000);
                     } catch(Exception e) {
                         // don't really care.
                     }
@@ -371,8 +371,25 @@ public class SystemService extends Service {
             }
             dvPendingRequests.add(url);
         }
+
+
+        _getDepartureVision(station, check_lastime);
+    }
+
+    public void _getDepartureVision(String station, @Nullable  Integer check_lastime) {
+        String url = "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+ station;
+        synchronized (lastRequestTime) {
+            lastApiCallTime.put(station, new Date());
+        }
         if ( check_lastime == null ) {
             check_lastime = new Integer(10000);
+        }
+        if ( check_lastime == null ) {
+            check_lastime = new Integer(10000);
+        }
+        Date last = null;
+        synchronized (lastRequestTime) {
+            last = lastApiCallTime.get(station);
         }
         if (check_lastime > 0 && last!=null) {
             Date now = new Date();
@@ -381,15 +398,6 @@ public class SystemService extends Service {
                     return; // too early
                 }
             }
-        }
-
-        _getDepartureVision(station);
-    }
-
-    public void _getDepartureVision(String station) {
-        String url = "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+ station;
-        synchronized (lastRequestTime) {
-            lastApiCallTime.put(station, new Date());
         }
         // check if we have a recent download, less than 1 minute old
         final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {

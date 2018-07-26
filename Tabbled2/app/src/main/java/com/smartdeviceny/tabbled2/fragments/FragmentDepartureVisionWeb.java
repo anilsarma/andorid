@@ -22,8 +22,8 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         try {
             View view = inflater.inflate(R.layout.fragment_departure_vision_web, container, false);
-            WebView webview = (WebView)view.findViewById(R.id.nj_map_view_layout);
-            webview.getSettings().setJavaScriptEnabled(true);
+            //WebView webview = (WebView)view.findViewById(R.id.nj_map_view_layout);
+            //webview.getSettings().setJavaScriptEnabled(true);
             return view;
         }catch (Exception e) {
             return null;
