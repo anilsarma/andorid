@@ -378,9 +378,7 @@ public class SystemService extends Service {
 
     public void _getDepartureVision(String station, @Nullable  Integer check_lastime) {
         String url = "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+ station;
-        synchronized (lastRequestTime) {
-            lastApiCallTime.put(station, new Date());
-        }
+
         if ( check_lastime == null ) {
             check_lastime = new Integer(10000);
         }
@@ -398,6 +396,10 @@ public class SystemService extends Service {
                     return; // too early
                 }
             }
+        }
+
+        synchronized (lastRequestTime) {
+            lastApiCallTime.put(station, new Date());
         }
         // check if we have a recent download, less than 1 minute old
         final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
