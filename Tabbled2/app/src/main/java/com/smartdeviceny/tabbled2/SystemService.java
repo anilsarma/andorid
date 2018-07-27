@@ -81,6 +81,10 @@ public class SystemService extends Service {
         if(downloader !=null) {
             downloader.cleanup();
         }
+        if( sql != null ) {
+            sql.close();
+            sql = null;
+        }
         super.onDestroy();
     }
 
@@ -194,6 +198,7 @@ public class SystemService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        setupDb();
         return new RemoteBinder(this);
     }
 

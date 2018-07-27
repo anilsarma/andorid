@@ -139,6 +139,7 @@ public class SQLiteLocalDatabase extends SQLiteOpenHelper {
     public synchronized void close() {
         if (myDataBase != null) {
             myDataBase.close();
+            myDataBase  = null;
         }
         super.close();
     }
