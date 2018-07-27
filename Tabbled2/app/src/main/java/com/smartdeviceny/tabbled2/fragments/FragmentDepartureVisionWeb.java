@@ -48,36 +48,11 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-        SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.departure_vision_layout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.departure_vision_layout);
-                WebView web = getActivity().findViewById(R.id.nj_map_view_layout);
-                web.getSettings().setJavaScriptEnabled(false);
-
-                web.reload();
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
-
         WebView web = getActivity().findViewById(R.id.nj_map_view_layout);
         web.loadUrl("http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=NY");
         web.getSettings().setBuiltInZoomControls(true);
         web.getSettings().setLoadWithOverviewMode(true);
         web.getSettings().setUseWideViewPort(true);
-
-        NestedScrollView scrollView = getActivity().findViewById(R.id.departure_vision_scroll_view);
-        //scrollView.getChildAt();
-        scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.departure_vision_layout);
-                //LinearLayout llParent = findViewById(R.id.departure_vision_scroll);
-                swipeRefreshLayout.setEnabled(scrollY ==0); // enable only if at the top.
-            }
-        });
 
         super.onViewCreated(view, savedInstanceState);
         //Toast.makeText(getActivity().getApplicationContext(), "OnViewCreated", Toast.LENGTH_LONG).show();
