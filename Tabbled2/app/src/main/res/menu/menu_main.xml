@@ -5,7 +5,7 @@
         android:id="@+id/menu_reverse"
         android:titleCondensed="Reverse"
         android:title="Reverse"
-        android:icon="@android:drawable/ic_menu_revert"
+        android:icon="@android:drawable/ic_menu_directions"
         app:showAsAction="always">
     </item>
     <item
