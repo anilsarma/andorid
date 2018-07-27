@@ -160,7 +160,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         Date now = new Date();
         try {
             for (SystemService.Route rt : routes) {
-                if (rt.getDate(rt.departture_time).getTime() > now.getTime()) {
+                if (rt.departure_time_as_date.getTime() > now.getTime()) {
                     break; // we want this to be in the middle of the page some what.
                 }
                 index = i;

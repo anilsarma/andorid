@@ -546,28 +546,20 @@ public class SystemService extends Service {
                 sql.opendatabase();
                 db = sql.getReadableDatabase();
             }
-            ArrayList<HashMap<String, Object>> rotues = Utils.parseCursor(SQLHelper.getRoutes(db, from, to, date));
 
-            Date stDate = dateFmt.parse("" + date);
-            Date refDate = time24HFmt.parse("00:00:00");
-            for (HashMap<String, Object> rt : rotues) {
-//                String departture_time = rt.get("departure_time").toString();
-//                Date tm = time24HFmt.parse(departture_time);
-//                Log.d("SVC", " route " + departture_time + " "  + refDate + " " + tm);
-//                if ( refDate.getDay() != tm.getDay()) {
-//                    stDate = Utils.adddays(stDate, 1);
-//                    refDate = tm;
-//                }
-                r.add(new Route(dateFmt.format(stDate), from, to,  rt));
+            for(int i=-1; i < 2; i ++ ) {
+                Date stDate = dateFmt.parse("" + date);
+                stDate = Utils.adddays(stDate, i);
+                ArrayList<HashMap<String, Object>> routes = Utils.parseCursor(SQLHelper.getRoutes(db, from, to, Integer.parseInt(dateFmt.format(stDate))));
+                Log.d("SVC", "route " + stDate + " " + from + " to " +to );
+                for (HashMap<String, Object> rt : routes) {
+                    r.add(new Route(dateFmt.format(stDate), from, to, rt));
+                }
             }
         } catch(Exception e ) {
             Log.d("SVC", "error during getRoutes " + e.getMessage());
         }
-        finally {
-//            if (db != null) {
-//                try {db.close(); } catch(Exception e) {}
-//            }
-        }
+
         return r;
     }
     public class DepartureVisionData {
