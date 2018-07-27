@@ -162,10 +162,8 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Date now = new Date();
-        SystemService.Route rt = mData.get(position);
-
         SystemService.Route route = mData.get(position);
-        SystemService.DepartureVisionData dv = departureVision.get(route.block_id);
+
 
         String train_header = mData.get(position).route_name + " #" + route.block_id;
         holder.train_name.setText(train_header);
@@ -186,23 +184,33 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
 
         boolean canceled = false;
         boolean oldEntry = false;
-        SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss");
+        //SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss");
+
         SimpleDateFormat printFormat = new SimpleDateFormat("hh:mm a");
+        SystemService.DepartureVisionData dv = departureVision.get(route.block_id);
         if( dv !=null ) {
+            // we need to check for time.
+            boolean current_train = false;
             Log.d("REC", "got departure vision train:" + dv.block_id + " track:" + dv.track + " status:" + dv.status);
             if( !dv.track.isEmpty()) {
-                holder.track_number.setVisibility(View.VISIBLE);
-                holder.track_number.setText(dv.track);
-                holder.track_number.setBackgroundResource(resid_round_green);
                 try {
-                    Date tm = Utils.makeDate(Utils.getTodayYYYYMMDD(null), dv.time, "yyyyMMdd HH:mm");
-                    long diff = now.getTime() - tm.getTime();
-                    if ( diff > 2 * 1000 * 60) { // more than 5 minutes
-                        // check the creation time
-                        long cdiff = now.getTime() - dv.createTime.getTime();
-                        if( cdiff > 2 * 1000* 60) {
-                            holder.track_number.setBackgroundResource(resid_round_gray);
-                            oldEntry = true;
+                    Date tm = Utils.makeDate(Utils.getTodayYYYYMMDD(null), dv.time, "yyyyMMdd HH:mm"); // always today's date for this
+                    long diff = route.departure_time_as_date.getTime() - tm.getTime();
+                    // more than an hour old must be a previous day
+                    if( diff > -( 60 * 1000 * 60 )) {
+                        current_train = true;
+                        holder.track_number.setVisibility(View.VISIBLE);
+                        holder.track_number.setText(dv.track);
+                        holder.track_number.setBackgroundResource(resid_round_green);
+
+
+                        if (diff > 2 * 1000 * 60) { // more than 5 minutes
+                            // check the creation time
+                            long cdiff = now.getTime() - dv.createTime.getTime();
+                            if (cdiff > 2 * 1000 * 60) {
+                                holder.track_number.setBackgroundResource(resid_round_gray);
+                                oldEntry = true;
+                            }
                         }
                     }
                 } catch (ParseException e) {
@@ -210,7 +218,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                 }
             }
 
-            if( !dv.status.isEmpty()) {
+            if( !dv.status.isEmpty() && current_train) {
                 if (!oldEntry) {
                     holder.train_live_layout.setVisibility(View.VISIBLE);
                     holder.train_live_header.setVisibility(View.VISIBLE);
