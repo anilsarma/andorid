@@ -23,7 +23,7 @@ public class FragmentAlertWeb extends Fragment implements ServiceConnected {
         try {
             View view = inflater.inflate(R.layout.fragment_alert_web, container, false);
             WebView webview = (WebView)view.findViewById(R.id.web_view);
-            //webview.getSettings().setJavaScriptEnabled(true);
+            webview.getSettings().setJavaScriptEnabled(true);
             webview.getSettings().setSupportZoom(true);
             webview.getSettings().setBuiltInZoomControls(true);
             return view;
