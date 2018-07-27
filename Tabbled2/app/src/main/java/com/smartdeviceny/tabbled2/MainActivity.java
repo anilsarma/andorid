@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar initToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("NJ Transit Schedule");
+        //getSupportActionBar().setTitle("NJ Transit Schedule");
         return toolbar;
     }
 
