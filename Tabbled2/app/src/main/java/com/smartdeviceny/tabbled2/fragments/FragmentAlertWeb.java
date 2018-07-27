@@ -37,9 +37,10 @@ public class FragmentAlertWeb extends Fragment implements ServiceConnected {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         WebView web = getActivity().findViewById(R.id.web_view);
         web.loadUrl("https://www.njtransit.com/sa/sa_servlet.srv?hdnPageAction=TravelAlertsTo");
-        web.getSettings().setBuiltInZoomControls(true);
-        web.getSettings().setLoadWithOverviewMode(true);
-        web.getSettings().setUseWideViewPort(true);
+        web.getSettings().setSupportZoom(true);
+//        web.getSettings().setBuiltInZoomControls(true);
+//        web.getSettings().setLoadWithOverviewMode(true);
+//        web.getSettings().setUseWideViewPort(true);
 
         SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.alert_swipe_view);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

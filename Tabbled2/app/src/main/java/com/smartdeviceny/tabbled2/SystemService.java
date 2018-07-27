@@ -481,15 +481,39 @@ public class SystemService extends Service {
         public String block_id;
         public String route_name;
         public String trip_id;
-        public String date;
 
-        public Route(String date, HashMap<String, Object> data) {
+        public String date;
+        public String header;
+        public String from;
+        public String to;
+
+        public Date date_as_date;
+        public Date departure_time_as_date;
+        public Date arrival_time_as_date;
+
+        public Route(String date, String from, String to, HashMap<String, Object> data) {
             departture_time = data.get("departure_time").toString();
             arrival_time = data.get("destination_time").toString();
             block_id = data.get("block_id").toString();
             route_name = data.get("route_long_name").toString();
             trip_id = data.get("trip_id").toString();
-            this.date  = "" + date;
+            this.from = from;
+            this.to = to;
+
+            try {
+                // remember hours are more than 24 hrs here to represent the next day.
+                this.departure_time_as_date = dateTim24HrFmt.parse(date + " " + departture_time);
+                this.arrival_time_as_date = dateTim24HrFmt.parse(date + " " + arrival_time);
+
+                this.date = dateFmt.format(departure_time_as_date);
+                this.date_as_date = dateFmt.parse(this.date);
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            this.date  = "" + this.date;
+            this.header = this.date + " " + from + " => " + to;
+
         }
 
 
@@ -505,6 +529,9 @@ public class SystemService extends Service {
             return printFormat.format(getDate(time));
         }
     }
+    final DateFormat dateTim24HrFmt = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+    final DateFormat time24HFmt = new SimpleDateFormat("HH:mm:ss");
+    final DateFormat dateFmt = new SimpleDateFormat("yyyyMMdd");
     // this is a syncronous call
     public ArrayList<Route>  getRoutes(String from, String to, @Nullable Integer date ) {
         ArrayList<Route> r = new ArrayList<>();
@@ -520,20 +547,31 @@ public class SystemService extends Service {
                 db = sql.getReadableDatabase();
             }
             ArrayList<HashMap<String, Object>> rotues = Utils.parseCursor(SQLHelper.getRoutes(db, from, to, date));
+
+            Date stDate = dateFmt.parse("" + date);
+            Date refDate = time24HFmt.parse("00:00:00");
             for (HashMap<String, Object> rt : rotues) {
-                r.add(new Route("" + date, rt));
+//                String departture_time = rt.get("departure_time").toString();
+//                Date tm = time24HFmt.parse(departture_time);
+//                Log.d("SVC", " route " + departture_time + " "  + refDate + " " + tm);
+//                if ( refDate.getDay() != tm.getDay()) {
+//                    stDate = Utils.adddays(stDate, 1);
+//                    refDate = tm;
+//                }
+                r.add(new Route(dateFmt.format(stDate), from, to,  rt));
             }
         } catch(Exception e ) {
             Log.d("SVC", "error during getRoutes " + e.getMessage());
         }
         finally {
-            if (db != null) {
-                try {db.close(); } catch(Exception e) {}
-            }
+//            if (db != null) {
+//                try {db.close(); } catch(Exception e) {}
+//            }
         }
         return r;
     }
     public class DepartureVisionData {
+        public String header="";
         public String time="";
         public String to="";
         public String track="";
@@ -554,6 +592,8 @@ public class SystemService extends Service {
             status = data.get("status").toString();
             block_id = data.get("train").toString();
             station = data.get("station").toString();
+
+            header  = " " + createTime + " "  + to;
             createTime = new Date();
         }
 
@@ -569,6 +609,7 @@ public class SystemService extends Service {
             obj.block_id = "" + this.block_id;
             obj.station = "" + this.station;
             obj.createTime = this.createTime;
+
             return obj;
         }
     }

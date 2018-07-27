@@ -3,13 +3,12 @@ package com.smartdeviceny.tabbled2.fragments;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.res.TypedArrayUtils;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +16,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.Toast;
 
 import com.smartdeviceny.tabbled2.MainActivity;
@@ -27,19 +25,33 @@ import com.smartdeviceny.tabbled2.adapters.RecycleSheduleAdaptor;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
 import com.smartdeviceny.tabbled2.utils.Utils;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
-public class FragmentSchedule extends Fragment implements ServiceConnected {
+public class FragmentRouteSchedule extends Fragment implements ServiceConnected {
     RecycleSheduleAdaptor adapter;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.fragment_njt_schedule, container, false);
+        View  view =  inflater.inflate(R.layout.fragment_njt_schedule, container, false);
+        RecyclerView recyclerView = view.findViewById(R.id.schedule_vision_scroll_view);
+       // View tmp = inflater.inflate(R.layout.route_section_header, null, null);
+
+        int height = view.getMeasuredHeight();
+        height = (int)(getResources().getDimensionPixelSize(R.dimen.recycler_section_header_height )*2.5);
+        RecyclerRouteDecoration sectionItemDecoration =new RecyclerRouteDecoration(height,true, getSectionCallback());
+        //getResources().getDimensionPixelSize(R.dimen.recycler_section_header_height),true, getSectionCallback());
+        recyclerView.addItemDecoration(sectionItemDecoration);
         return view;
-        //return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    String getConfig(SharedPreferences config, String name, String defaultValue) {
+        return config.getString(name, defaultValue);
     }
 
     @Override
@@ -47,14 +59,16 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
         RecyclerView recyclerView = getActivity().findViewById(R.id.schedule_vision_scroll_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
-
+        SharedPreferences config = getActivity().getPreferences(Context.MODE_PRIVATE);
         ArrayList<SystemService.Route> routes = new ArrayList<>();
 
         if( ((MainActivity)this.getActivity()).systemService  == null ) {
             Log.d("FRAG", "System Service i null ");
         }
         else {
-            routes = ((MainActivity)this.getActivity()).systemService.getRoutes("New York Penn Station", "New Brunswick", null);
+            String startStation = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
+            String stopStation = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
+            routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null);
         }
         Log.d("FRAG", "onViewCreated");
         adapter = new RecycleSheduleAdaptor(getActivity(), routes);
@@ -123,15 +137,22 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
             Log.d("FRAG", "System Service i null ");
         }
         else {
-            routes = ((MainActivity)this.getActivity()).systemService.getRoutes("New York Penn Station", "New Brunswick", null);
-            ((MainActivity)getActivity()).systemService.getDepartureVision("NY", 30000);
+            SharedPreferences config = getActivity().getPreferences(Context.MODE_PRIVATE);
+            String startStation = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
+            String stopStation = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
+
+            String departureVisionCode = "NY"; // lookup value
+
+            routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null);
+            ((MainActivity)getActivity()).systemService.getDepartureVision(departureVisionCode, 30000);
+            Log.d("FRAG", "updated routes start:" + startStation + " stop:"  + stopStation);
         }
         adapter.updateRoutes(routes);
         adapter.notifyDataSetChanged();
         onDepartureVisionUpdated(systemService); // inital paint.
         // we do not want to do this all the time just when we reconnect.
         recyclerView.scrollToPosition(getPosition(routes));
-        Log.d("FRAG", "updated routes");
+        Log.d("FRAG", "updated routes ");
     }
     int getPosition(ArrayList<SystemService.Route> routes) {
         int index = -1;
@@ -152,6 +173,9 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
     boolean notifyUser( SystemService.DepartureVisionData dv) throws ParseException
     {
         if (dv == null) {
+            return false;
+        }
+        if(true) {
             return false;
         }
         long diff = Utils.makeDate(Utils.getTodayYYYYMMDD(null),  dv.time, "yyyyMMdd HH:mm").getTime() - new Date().getTime();
@@ -176,6 +200,27 @@ public class FragmentSchedule extends Fragment implements ServiceConnected {
             //notification = true;
         }
         return  false;
+    }
 
+    final DateFormat printableDateFmt = new SimpleDateFormat("EEE, MMM d, yyyy");
+    private RecyclerRouteDecoration.SectionCallback getSectionCallback() {
+        return new RecyclerRouteDecoration.SectionCallback() {
+            @Override
+            public boolean isSection(int position) {
+                adapter.mData.size();
+                // header from the last and current is different we we are a header.
+                return position == 0  || !adapter.mData.get(position).header.equals(adapter.mData.get(position - 1).header);
+            }
+
+            @Override
+            public CharSequence getSectionHeader(int position) {
+                return adapter.mData.get(position).from + " \u279F " + adapter.mData.get(position).to;
+            }
+
+            @Override
+            public CharSequence getSectionDate(int position) {
+                return printableDateFmt.format(adapter.mData.get(position).departure_time_as_date);
+            }
+        };
     }
 }

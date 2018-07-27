@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.TabLayout;
@@ -20,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.smartdeviceny.tabbled2.adapters.FragmentPagerMainPageAdaptor;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
@@ -29,10 +32,34 @@ public class MainActivity extends AppCompatActivity {
     boolean mIsBound = false;
     public SystemService systemService;
     ProgressDialog progressDialog =null;
+    int tabSelected = -1;
+
+    void setupConfigDefaults(SharedPreferences config, String name, String defaultValue) {
+        String value = config.getString(name, "");
+        if( value.isEmpty()) {
+            SharedPreferences.Editor editor  = config.edit();
+            editor.putString(name, defaultValue);
+            editor.commit();
+        }
+    }
+    String getConfig(SharedPreferences config, String name, String defaultValue) {
+        return config.getString(name, defaultValue);
+    }
+    void setConfig(SharedPreferences config, String name, String value) {
+        SharedPreferences.Editor editor  = config.edit();
+        editor.putString(name, value);
+        editor.commit();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences config = getPreferences(Context.MODE_PRIVATE);
+        setupConfigDefaults(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
+        setupConfigDefaults(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
+        setupConfigDefaults(config, getString(R.string.CONFIG_DEFAULT_ROUTE), getString(R.string.CONFIG_DEFAULT_ROUTE));
+
         startService(new Intent(MainActivity.this, SystemService.class));
         setContentView(R.layout.activity_main);
         initToolbar();
@@ -46,17 +73,33 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new  TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-
+                tabSelected = tab.getPosition();
+                Log.d("MAIN", "Tab selected" + tabSelected);
+                // need a model based design.
+                if ( tabSelected == 1 ) {
+//                    MenuItem item = findViewById(R.id.menu_reverse);
+//                    if(item != null ) {
+//                        item.setVisible(true);
+//                    }
+                }
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-
+                if ( tabSelected == 1 ) {
+//                    MenuItem item = findViewById(R.id.menu_reverse);
+//                    if(item != null ) {
+//                        item.setVisible(false);
+//                    }
+                }
+                tabSelected = -1;
+                Log.d("MAIN", "Tab un-selected" + tabSelected);
             }
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-
+                Log.d("MAIN", "Tab selected" + tabSelected);
+                onTabSelected(tab);
             }
         });
     }
@@ -132,10 +175,33 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(systemService!=null) {
-            // TODO:: let the fragment do the acutal polling.
-            systemService.getDepartureVision("NY", 30000);
+        switch (item.getItemId()) {
+            case R.id.menu_Refresh:
+                if(systemService!=null) {
+                    systemService.getDepartureVision("NY", 30000);
+                }
+                return true;
+            case R.id.menu_reverse: {
+                // swap the routes
+                if(tabSelected == 1 ) {
+                    SharedPreferences config = getPreferences(Context.MODE_PRIVATE);
+                    String start = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
+                    String stop = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
+                    setConfig(config, getString(R.string.CONFIG_START_STATION), stop);
+                    setConfig(config, getString(R.string.CONFIG_STOP_STATION), start);
+
+                    for(Fragment f:getSupportFragmentManager().getFragments()) {
+                        ServiceConnected frag = (ServiceConnected) f;
+                        if (frag != null) {
+                            frag.onSystemServiceConnected(systemService); // TODO: implement a reoute refresh here.
+                        }
+                    }
+                }
+            }
+
         }
+
+
         return super.onOptionsItemSelected(item);
     }
 

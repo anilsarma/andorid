@@ -19,6 +19,7 @@ import com.smartdeviceny.tabbled2.utils.Utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +70,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         }
     }
     private LayoutInflater mInflater;
-    private List<SystemService.Route> mData;
+    public List<SystemService.Route> mData ;
     int resid_delayed;
     int resid_normal;
     int resid_selected;
@@ -98,7 +99,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         //@android:color/holo_green_dark
 
     }
-    HashMap<String, SystemService.DepartureVisionData> departureVision = new HashMap<>();
+    public HashMap<String, SystemService.DepartureVisionData> departureVision = new HashMap<>();
 
     public void updateDepartureVision(@Nullable HashMap<String, SystemService.DepartureVisionData> departureVision) {
         HashMap<String, SystemService.DepartureVisionData> tmp = new HashMap<>();

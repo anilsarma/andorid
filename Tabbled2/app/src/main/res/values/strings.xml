@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">Prototype</string>
     <string name="appbar_scrolling_view_behavior">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
+
+
+    <string name="CONFIG_DEFAULT_START_STATION">New York Penn Station</string>
+    <string name="CONFIG_DEFAULT_STOP_STATION">New Brunswick</string>
+    <string name="CONFIG_DEFAULT_ROUTE">New Brunswick</string>
+
+    <string name="CONFIG_START_STATION">CONFIG_START_STATION</string>
+    <string name="CONFIG_STOP_STATION">CONFIG_STOP_STATION</string>
+    <string name="CONFIG_ROUTE">CONFIG_ROUTE</string>
 </resources>
