@@ -34,6 +34,30 @@ public class FragmentAlertWeb extends Fragment implements ServiceConnected {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        WebView web = getActivity().findViewById(R.id.web_view);
+        web.loadUrl("https://www.njtransit.com/sa/sa_servlet.srv?hdnPageAction=TravelAlertsTo");
+        web.getSettings().setBuiltInZoomControls(true);
+        web.getSettings().setLoadWithOverviewMode(true);
+        web.getSettings().setUseWideViewPort(true);
+
+        SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.alert_swipe_view);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.alert_swipe_view);
+                WebView web = getActivity().findViewById(R.id.web_view);
+                web.getSettings().setJavaScriptEnabled(false);
+
+                web.reload();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
     public void onTimerEvent(SystemService systemService) {
 
     }
@@ -48,17 +72,4 @@ public class FragmentAlertWeb extends Fragment implements ServiceConnected {
 
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-        WebView web = getActivity().findViewById(R.id.web_view);
-        web.loadUrl("https://www.njtransit.com/sa/sa_servlet.srv?hdnPageAction=TravelAlertsTo");
-        web.getSettings().setBuiltInZoomControls(true);
-        web.getSettings().setLoadWithOverviewMode(true);
-        web.getSettings().setUseWideViewPort(true);
-
-        super.onViewCreated(view, savedInstanceState);
-        //Toast.makeText(getActivity().getApplicationContext(), "OnViewCreated", Toast.LENGTH_LONG).show();
-
-    }
 }

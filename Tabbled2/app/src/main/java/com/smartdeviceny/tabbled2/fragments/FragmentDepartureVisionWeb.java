@@ -16,20 +16,40 @@ import com.smartdeviceny.tabbled2.SystemService;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
 
 public class FragmentDepartureVisionWeb extends Fragment implements ServiceConnected {
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         try {
-            View view = inflater.inflate(R.layout.fragment_departure_vision_web, container, false);
-            //WebView webview = (WebView)view.findViewById(R.id.nj_map_view_layout);
-            //webview.getSettings().setJavaScriptEnabled(true);
-            return view;
-        }catch (Exception e) {
+            return inflater.inflate(R.layout.fragment_departure_vision_web, container, false);
+        } catch (Exception e) {
             return null;
         }
-        //return super.onCreateView(inflater, container, savedInstanceState);
     }
+
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        WebView web = getActivity().findViewById(R.id.depart_vision_web_view);
+        web.loadUrl("http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=NY");
+        web.getSettings().setBuiltInZoomControls(true);
+        web.getSettings().setLoadWithOverviewMode(true);
+        web.getSettings().setUseWideViewPort(true);
+
+        SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.departure_vision_swipe_view);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.departure_vision_swipe_view);
+                WebView web = getActivity().findViewById(R.id.depart_vision_web_view);
+                web.getSettings().setJavaScriptEnabled(false);
+
+                web.reload();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+        super.onViewCreated(view, savedInstanceState);
+    }
+
 
     @Override
     public void onTimerEvent(SystemService systemService) {
@@ -43,19 +63,6 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
 
     @Override
     public void onDepartureVisionUpdated(SystemService systemService) {
-
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        WebView web = getActivity().findViewById(R.id.nj_map_view_layout);
-        web.loadUrl("http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=NY");
-        web.getSettings().setBuiltInZoomControls(true);
-        web.getSettings().setLoadWithOverviewMode(true);
-        web.getSettings().setUseWideViewPort(true);
-
-        super.onViewCreated(view, savedInstanceState);
-        //Toast.makeText(getActivity().getApplicationContext(), "OnViewCreated", Toast.LENGTH_LONG).show();
 
     }
 }
