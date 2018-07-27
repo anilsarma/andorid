@@ -3,6 +3,7 @@ package com.smartdeviceny.tabbled2.adapters;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -143,6 +144,13 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.template_schedule_entry, parent, false);
+        view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                return false;
+            }
+        });
         return new ViewHolder(view);
         //return null;
     }

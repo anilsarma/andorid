@@ -513,7 +513,12 @@ public class SystemService extends Service {
             if (date == null ) {
                 date = Integer.parseInt(Utils.getLocaDate(0));
             }
-            db = sql.getReadableDatabase();
+            try {
+                db = sql.getReadableDatabase();
+            } catch (Exception e) {
+                sql.opendatabase();
+                db = sql.getReadableDatabase();
+            }
             ArrayList<HashMap<String, Object>> rotues = Utils.parseCursor(SQLHelper.getRoutes(db, from, to, date));
             for (HashMap<String, Object> rt : rotues) {
                 r.add(new Route("" + date, rt));
