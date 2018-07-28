@@ -73,4 +73,8 @@ public class FragmentAlertWeb extends Fragment implements ServiceConnected {
 
     }
 
+    @Override
+    public void configChanged(SystemService systemService) {
+
+    }
 }

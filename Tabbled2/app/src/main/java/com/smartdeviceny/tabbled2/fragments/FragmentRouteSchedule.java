@@ -223,4 +223,9 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
             }
         };
     }
+
+    @Override
+    public void configChanged(SystemService systemService) {
+        onSystemServiceConnected(systemService);
+    }
 }

@@ -4,6 +4,7 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -408,5 +409,14 @@ public class Utils {
         DateFormat dateTimeFormat = new SimpleDateFormat(format);
         Date tm = dateTimeFormat.parse("" + yyyymmdd + " "  + time);
         return tm;
+    }
+
+    public static String getConfig(SharedPreferences config, String name, String defaultValue) {
+        return config.getString(name, defaultValue);
+    }
+    public static  void setConfig(SharedPreferences config, String name, String value) {
+        SharedPreferences.Editor editor  = config.edit();
+        editor.putString(name, value);
+        editor.commit();
     }
 }

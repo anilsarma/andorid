@@ -65,4 +65,9 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
     public void onDepartureVisionUpdated(SystemService systemService) {
 
     }
+
+    @Override
+    public void configChanged(SystemService systemService) {
+
+    }
 }

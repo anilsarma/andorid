@@ -88,14 +88,14 @@ public class SystemService extends Service {
         super.onDestroy();
     }
 
-    boolean checkForUpdate() {
+    public boolean checkForUpdate() {
         if (checkingVersion) {
             return false; // already running.
         }
         _checkRemoteDBUpdate();
         return checkingVersion;
     }
-    boolean isUpdateRunning() {
+    public boolean isUpdateRunning() {
         return checkingVersion;
     }
     void _checkRemoteDBUpdate() {
@@ -392,6 +392,10 @@ public class SystemService extends Service {
         return scheduled;
     }
     public void getDepartureVision(String station, @Nullable Integer check_lastime) {
+        _getDepartureVision(station, check_lastime);
+    }
+
+    public void _getDepartureVision(String station, @Nullable  Integer check_lastime) {
         String url = "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+ station;
         Date last = updateDapartureVisionCheck(station);
         synchronized (dvPendingRequests) {
@@ -401,23 +405,8 @@ public class SystemService extends Service {
             }
             dvPendingRequests.add(url);
         }
-
-
-        _getDepartureVision(station, check_lastime);
-    }
-
-    public void _getDepartureVision(String station, @Nullable  Integer check_lastime) {
-        String url = "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+ station;
-
         if ( check_lastime == null ) {
             check_lastime = new Integer(10000);
-        }
-        if ( check_lastime == null ) {
-            check_lastime = new Integer(10000);
-        }
-        Date last = null;
-        synchronized (lastRequestTime) {
-            last = lastApiCallTime.get(station);
         }
         if (check_lastime > 0 && last!=null) {
             Date now = new Date();
@@ -547,7 +536,7 @@ public class SystemService extends Service {
                 db = sql.getReadableDatabase();
             }
 
-            for(int i=-1; i < 2; i ++ ) {
+            for(int i=-2; i < 4; i ++ ) {
                 Date stDate = dateFmt.parse("" + date);
                 stDate = Utils.adddays(stDate, i);
                 ArrayList<HashMap<String, Object>> routes = Utils.parseCursor(SQLHelper.getRoutes(db, from, to, Integer.parseInt(dateFmt.format(stDate))));
@@ -612,7 +601,21 @@ public class SystemService extends Service {
         return  status_by_trip;
     }
 
-
+    public String[] get_values( String sqls, String key ) {
+        if(sql != null ) {
+            return SQLHelper.get_values(sql.getReadableDatabase(), sqls, key);
+        }
+        ArrayList<String> njtr = new ArrayList<>();
+        return njtr.toArray(new String[]{});
+    }
+    public String[] getRouteStations(String route_name) {
+        Log.d("SVC", "getRouteStations " + route_name + " SQL:" + sql);
+        if (sql != null) {
+            return SQLHelper.getRouteStations(sql.getReadableDatabase(), route_name);
+        }
+        ArrayList<String> njtr = new ArrayList<>();
+        return njtr.toArray(new String[]{});
+    }
 
     public class LocalBcstReceiver extends BroadcastReceiver {
         @Override

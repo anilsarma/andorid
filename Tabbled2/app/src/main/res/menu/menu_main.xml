@@ -19,6 +19,7 @@
         android:id="@+id/menu_Settings"
         android:titleCondensed="Settings"
         android:title="Settings"
+        android:visible="false"
         android:icon="@android:drawable/ic_menu_manage"
         app:showAsAction="always">
     </item>

@@ -31,7 +31,7 @@ import com.smartdeviceny.tabbled2.utils.Utils;
 public class MainActivity extends AppCompatActivity {
     boolean mIsBound = false;
     public SystemService systemService;
-    ProgressDialog progressDialog =null;
+    public ProgressDialog progressDialog =null;
     int tabSelected = -1;
 
     void setupConfigDefaults(SharedPreferences config, String name, String defaultValue) {
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_reverse: {
                 // swap the routes
-                if(tabSelected == 1 ) {
+                if(tabSelected == 1|| tabSelected == 3 ) {
                     SharedPreferences config = getPreferences(Context.MODE_PRIVATE);
                     String start = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
                     String stop = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
@@ -193,11 +193,17 @@ public class MainActivity extends AppCompatActivity {
                     for(Fragment f:getSupportFragmentManager().getFragments()) {
                         ServiceConnected frag = (ServiceConnected) f;
                         if (frag != null) {
-                            frag.onSystemServiceConnected(systemService); // TODO: implement a reoute refresh here.
+                            frag.configChanged(systemService); // TODO: implement a reoute refresh here.
                         }
                     }
                 }
             }
+            break;
+            case R.id.menu_Settings: {
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
+            }
+            break;
 
         }
 
@@ -242,8 +248,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void showUpdateProgressDialog(Context context) {
+    public void showUpdateProgressDialog(Context context) {
         progressDialog = new ProgressDialog(context);
+        
         progressDialog.setMessage("Checking for NJ Transit schedule updates");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
