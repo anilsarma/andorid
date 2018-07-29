@@ -242,10 +242,13 @@ public class SystemService extends Service {
         }
         SQLiteDatabase db = sql.getWritableDatabase();
         if( SqlUtils.check_if_user_pref_exists(db)) {
+            Log.d("SVC", "checking if database is ready.");
             if(SqlUtils.check_if_table_exists(db, "routes") && SqlUtils.check_if_table_exists(db, "trips") ) {
+                Log.d("SVC", "database is ready.");
                 return true;
             }
         }
+        Log.d("SVC", "database is not ready.");
         return  false;
     }
 
@@ -546,9 +549,8 @@ public class SystemService extends Service {
                 }
             }
         } catch(Exception e ) {
-            Log.d("SVC", "error during getRoutes " + e.getMessage());
+            Log.w("SVC", "warn during getRoutes " + e.getMessage());
         }
-
         return r;
     }
     public class DepartureVisionData {

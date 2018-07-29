@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -121,7 +122,34 @@ public class MainActivity extends AppCompatActivity {
         // bug in noughat... crap
         Utils.scheduleJob(this.getApplicationContext(), DepartureVisionJobService.class, 15*1000, false);
     }
+    public void doCheckIsDatabaseReady(Context context) {
+        if (systemService!= null ) {
+            systemService.checkForUpdate();
+            if ( progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+            if( !systemService.isDatabaseReady()) {
+                showUpdateProgressDialog(context, "System getting ready.");
+            }
 
+        } else {
+            Log.d("MAIN", "system service not init " + systemService );
+        }
+    }
+
+    public void doCheckForUpdate(Context context) {
+        if (systemService!= null ) {
+            systemService.checkForUpdate();
+            if ( progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+            if( systemService.isUpdateRunning()) {
+                showUpdateProgressDialog(context, "Checking for Latest NJ Transit Train Schedules");
+            }
+        } else {
+            Log.d("MAIN", "system service not init " + systemService );
+        }
+    }
     @Override
     protected void onStop() {
         super.onStop();
@@ -131,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-
         super.onDestroy();
     }
 
@@ -143,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
                 progressDialog = null;
             }
         }
+        doCheckIsDatabaseReady(this);
         super.onPostResume();
     }
 
@@ -214,6 +242,8 @@ public class MainActivity extends AppCompatActivity {
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             systemService = ((RemoteBinder)service).getService();
+            doCheckIsDatabaseReady(MainActivity.this);
+
             Log.d("MAIN", "SystemService connected, calling onSystemServiceConnected on fragments");
             for(Fragment f:getSupportFragmentManager().getFragments()) {
                 ServiceConnected frag = (ServiceConnected) f;
@@ -221,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
                     frag.onSystemServiceConnected(systemService);
                 }
             }
+
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -248,10 +279,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void showUpdateProgressDialog(Context context) {
+    public void showUpdateProgressDialog(Context context, @Nullable  String msg) {
         progressDialog = new ProgressDialog(context);
-        
-        progressDialog.setMessage("Checking for NJ Transit schedule updates");
+        if(msg == null) {
+            msg = "Checking for NJ Transit schedule updates";
+        }
+        progressDialog.setMessage(msg);
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
     }
@@ -265,6 +298,14 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("receiver", "Database is ready we can do all the good stuff");
                 if(progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
+                }
+                for(Fragment f:getSupportFragmentManager().getFragments()) {
+                    ServiceConnected frag = (ServiceConnected) f;
+                    if (frag != null) {
+                        if(systemService != null ) {
+                            frag.configChanged(systemService);
+                        }
+                    }
                 }
             } else if (intent.getAction().equals(NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE)) {
                 Log.d("receiver", NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);

@@ -1,9 +1,7 @@
 package com.smartdeviceny.tabbled2.fragments;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.smartdeviceny.tabbled2.MainActivity;
@@ -72,21 +69,7 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
         sqlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SystemService systemService=null;
-                if( ((MainActivity)getActivity()).systemService != null ) {
-                    systemService = ((MainActivity) getActivity()).systemService;
-                }
-                if (systemService!= null ) {
-                    systemService.checkForUpdate();
-                    if ( getMainActivity().progressDialog != null && getMainActivity().progressDialog.isShowing()) {
-                        getMainActivity().progressDialog.dismiss();
-                    }
-                    if( systemService.isUpdateRunning()) {
-                        getMainActivity().showUpdateProgressDialog(v.getContext());
-                    }
-                } else {
-                    Log.d("BTNDNLD", "system service not init " + systemService );
-                }
+                ((MainActivity)getActivity()).doCheckForUpdate(getActivity());
             }
         });
 
