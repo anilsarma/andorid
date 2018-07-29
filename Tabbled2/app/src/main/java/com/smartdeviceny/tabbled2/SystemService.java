@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -17,6 +18,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.smartdeviceny.tabbled2.utils.Config;
 import com.smartdeviceny.tabbled2.utils.DownloadFile;
 import com.smartdeviceny.tabbled2.utils.SQLHelper;
 import com.smartdeviceny.tabbled2.utils.SQLiteLocalDatabase;
@@ -546,9 +548,12 @@ public class SystemService extends Service {
     final DateFormat time24HFmt = new SimpleDateFormat("HH:mm:ss");
     final DateFormat dateFmt = new SimpleDateFormat("yyyyMMdd");
     // this is a syncronous call
-    public ArrayList<Route>  getRoutes(String from, String to, @Nullable Integer date ) {
+    public ArrayList<Route>  getRoutes(String from, String to, @Nullable Integer date, @Nullable Integer delta) {
         ArrayList<Route> r = new ArrayList<>();
         SQLiteDatabase db = null;
+        if (delta == null) {
+            delta= new Integer(2);
+        }
         try {
             if (date == null ) {
                 date = Integer.parseInt(Utils.getLocaDate(0));
@@ -560,8 +565,6 @@ public class SystemService extends Service {
                 db = sql.getReadableDatabase();
             }
 
-            int delta = 1;
-            try { delta = Integer.parseInt(getString(R.string.CONFIG_DELTA_DAYS)); } catch (Exception e){ }
             delta = Math.max(1, delta);
             for(int i=-delta; i < delta; i ++ ) {
                 Date stDate = dateFmt.parse("" + date);

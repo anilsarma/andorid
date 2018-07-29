@@ -23,6 +23,7 @@ import com.smartdeviceny.tabbled2.R;
 import com.smartdeviceny.tabbled2.SystemService;
 import com.smartdeviceny.tabbled2.adapters.RecycleSheduleAdaptor;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
+import com.smartdeviceny.tabbled2.utils.Config;
 import com.smartdeviceny.tabbled2.utils.Utils;
 
 import java.text.DateFormat;
@@ -68,7 +69,9 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         else {
             String startStation = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
             String stopStation = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
-            routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null);
+            int delta = -1;
+            try {delta = Integer.parseInt(Config.getConfig(config, getString(R.string.CONFIG_DELTA_DAYS), "" + delta)); } catch (Exception e){ }
+            routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null, delta);
         }
         Log.d("FRAG", "onViewCreated");
         adapter = new RecycleSheduleAdaptor(getActivity(), routes);
@@ -142,8 +145,10 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
             String stopStation = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
 
             String departureVisionCode = "NY"; // lookup value
+            int delta = -1;
+            try {delta = Integer.parseInt(Config.getConfig(config, getString(R.string.CONFIG_DELTA_DAYS), "" + delta)); } catch (Exception e){ }
+            routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null, delta);
 
-            routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null);
             ((MainActivity)getActivity()).systemService.getDepartureVision(departureVisionCode, 30000);
             Log.d("FRAG", "updated routes start:" + startStation + " stop:"  + stopStation);
         }

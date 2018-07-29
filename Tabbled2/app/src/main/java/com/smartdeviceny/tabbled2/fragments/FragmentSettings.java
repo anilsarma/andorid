@@ -108,6 +108,8 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
                     try {
                         SharedPreferences config = getActivity().getPreferences(Context.MODE_PRIVATE);
                         Config.setConfig(config, getString(R.string.CONFIG_DELTA_DAYS), value);
+                        Toast.makeText(getActivity(), "set delta days to value " + value, Toast.LENGTH_LONG).show();
+                        ((MainActivity)getActivity()).doConfigChanged();
                     }catch(Exception e) {
                         Toast.makeText(getActivity(), "Failed to set value " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
@@ -195,7 +197,10 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
 
                 MainActivity m = (MainActivity)getActivity();
                 if(m.systemService != null ){
-                    ArrayList<SystemService.Route> rts = m.systemService.getRoutes(start, stop, null);
+                    int delta = -1;
+                    try {delta = Integer.parseInt(Config.getConfig(config, getString(R.string.CONFIG_DELTA_DAYS), "" + delta)); } catch (Exception e){ }
+
+                    ArrayList<SystemService.Route> rts = m.systemService.getRoutes(start, stop, null, delta);
                     if(rts.isEmpty()) {
                         Toast.makeText(getActivity(),"No direct trains found for " + start + " to " + stop + " config not updated", Toast.LENGTH_LONG).show();
                     }else {

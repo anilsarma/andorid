@@ -275,6 +275,16 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.show();
     }
 
+    public void doConfigChanged() {
+        for(Fragment f:getSupportFragmentManager().getFragments()) {
+            ServiceConnected frag = (ServiceConnected) f;
+            if (frag != null) {
+                if(systemService != null ) {
+                    frag.configChanged(systemService);
+                }
+            }
+        }
+    }
     public class LocalBcstReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -285,14 +295,7 @@ public class MainActivity extends AppCompatActivity {
                 if(progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
                 }
-                for(Fragment f:getSupportFragmentManager().getFragments()) {
-                    ServiceConnected frag = (ServiceConnected) f;
-                    if (frag != null) {
-                        if(systemService != null ) {
-                            frag.configChanged(systemService);
-                        }
-                    }
-                }
+                doConfigChanged();
             } else if (intent.getAction().equals(NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE)) {
                 Log.d("MAIN", NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);
                 if(progressDialog != null && progressDialog.isShowing()) {
