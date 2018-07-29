@@ -8,6 +8,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -296,6 +297,7 @@ System.out.println("output " + date + " stop:" + start_stop_id + " end:"+ stop_s
         String startStations[] = SQLHelper.get_values( db, sql_stations, "stop_name");
         Set<String> u = new TreeSet<>();
 
+        Log.d("SQL", "getRouteStations for " + route_name + " got:" + startStations.length);
         for (int i = 0; i < startStations.length; i++) {
             u.add(Utils.capitalize(startStations[i]));
         }

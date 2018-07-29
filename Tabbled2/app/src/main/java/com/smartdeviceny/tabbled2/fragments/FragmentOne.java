@@ -34,4 +34,9 @@ public class FragmentOne extends Fragment implements ServiceConnected{
     public void onSystemServiceConnected(SystemService systemService) {
 
     }
+
+    @Override
+    public void configChanged(SystemService systemService) {
+
+    }
 }

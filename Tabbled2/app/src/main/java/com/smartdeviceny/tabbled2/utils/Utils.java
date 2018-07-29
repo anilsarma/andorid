@@ -4,6 +4,7 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -96,7 +97,8 @@ public class Utils {
         return dateFormat.format(date);
     }
     static public Date adddays(Date date, int days) {
-        if (days > 0 ) {
+        //if (days > 0 )
+        {
             Calendar c = Calendar.getInstance();
             c.setTime(date);
             c.add(Calendar.DATE, days);
@@ -390,7 +392,13 @@ public class Utils {
 
     static public void delete(File file) {
         if(file != null ) {
-            try {file.getAbsoluteFile().delete();} catch (Exception e){}
+            try {
+                if(file.getAbsoluteFile().delete() ) {
+                    Log.d("DEL", "deleted " + file.getAbsolutePath());
+                } else {
+                    Log.e("DEL", "delete failed " + file.getAbsolutePath());
+                }
+            } catch (Exception e){}
         }
     }
 
@@ -401,5 +409,14 @@ public class Utils {
         DateFormat dateTimeFormat = new SimpleDateFormat(format);
         Date tm = dateTimeFormat.parse("" + yyyymmdd + " "  + time);
         return tm;
+    }
+
+    public static String getConfig(SharedPreferences config, String name, String defaultValue) {
+        return config.getString(name, defaultValue);
+    }
+    public static  void setConfig(SharedPreferences config, String name, String value) {
+        SharedPreferences.Editor editor  = config.edit();
+        editor.putString(name, value);
+        editor.commit();
     }
 }

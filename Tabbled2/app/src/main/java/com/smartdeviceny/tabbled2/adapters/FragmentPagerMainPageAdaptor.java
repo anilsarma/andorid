@@ -5,9 +5,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.smartdeviceny.tabbled2.fragments.FragmentAlertWeb;
 import com.smartdeviceny.tabbled2.fragments.FragmentDepartureVisionWeb;
-import com.smartdeviceny.tabbled2.fragments.FragmentOne;
-import com.smartdeviceny.tabbled2.fragments.FragmentSchedule;
+import com.smartdeviceny.tabbled2.fragments.FragmentRouteSchedule;
+import com.smartdeviceny.tabbled2.fragments.FragmentSettings;
 
 public class FragmentPagerMainPageAdaptor extends FragmentPagerAdapter {
     public FragmentPagerMainPageAdaptor(FragmentManager fm) {
@@ -19,8 +20,9 @@ public class FragmentPagerMainPageAdaptor extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch(position) {
             case 0: return new FragmentDepartureVisionWeb();
-            case 1: return new FragmentSchedule();
-            case 2: return new FragmentOne();
+            case 1: return new FragmentRouteSchedule();
+            case 2: return new FragmentAlertWeb();
+            case 3: return new FragmentSettings();
         }
       return null;
     }
@@ -32,12 +34,13 @@ public class FragmentPagerMainPageAdaptor extends FragmentPagerAdapter {
             case 0: return "Vision";
             case 1: return "Schedule";
             case 2: return "Alerts";
+            case 3: return "Settings";
         }
         return "";
     }
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 }

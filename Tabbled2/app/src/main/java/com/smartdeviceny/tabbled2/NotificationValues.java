@@ -8,4 +8,5 @@ public interface NotificationValues {
     String BROADCAT_SEND_DEPARTURE_VISION_PING = "send-departure-vision-pings";
 
 
+    int AVTIVITY_SETINGS =1;
 }

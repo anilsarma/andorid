@@ -15,41 +15,48 @@ import com.smartdeviceny.tabbled2.R;
 import com.smartdeviceny.tabbled2.SystemService;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
 
-public class FragmentDepartureVisionWeb extends Fragment implements ServiceConnected {
+public class FragmentAlertWeb extends Fragment implements ServiceConnected {
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         try {
-            return inflater.inflate(R.layout.fragment_departure_vision_web, container, false);
-        } catch (Exception e) {
+            View view = inflater.inflate(R.layout.fragment_alert_web, container, false);
+            WebView webview = (WebView)view.findViewById(R.id.web_view);
+            webview.getSettings().setJavaScriptEnabled(true);
+            webview.getSettings().setSupportZoom(true);
+            webview.getSettings().setBuiltInZoomControls(true);
+            return view;
+        }catch (Exception e) {
             return null;
         }
+        //return super.onCreateView(inflater, container, savedInstanceState);
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        WebView web = getActivity().findViewById(R.id.depart_vision_web_view);
-        web.loadUrl("http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=NY");
-        web.getSettings().setBuiltInZoomControls(true);
-        web.getSettings().setLoadWithOverviewMode(true);
-        web.getSettings().setUseWideViewPort(true);
+        WebView web = getActivity().findViewById(R.id.web_view);
+        web.loadUrl("https://www.njtransit.com/sa/sa_servlet.srv?hdnPageAction=TravelAlertsTo");
+        web.getSettings().setSupportZoom(true);
+//        web.getSettings().setBuiltInZoomControls(true);
+//        web.getSettings().setLoadWithOverviewMode(true);
+//        web.getSettings().setUseWideViewPort(true);
 
-        SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.departure_vision_swipe_view);
+        SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.alert_swipe_view);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.departure_vision_swipe_view);
-                WebView web = getActivity().findViewById(R.id.depart_vision_web_view);
+                SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.alert_swipe_view);
+                WebView web = getActivity().findViewById(R.id.web_view);
                 web.getSettings().setJavaScriptEnabled(false);
 
                 web.reload();
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+
         super.onViewCreated(view, savedInstanceState);
     }
-
 
     @Override
     public void onTimerEvent(SystemService systemService) {
