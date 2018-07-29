@@ -108,13 +108,18 @@ public class SqlUtils {
 
     static public String getStationCode(SQLiteDatabase db, String name)
     {
-        String sql = "select station_code from stops where station_name like '%" + name + "%'";
-        Cursor c = db.rawQuery(sql, null);
-        ArrayList<HashMap<String, Object>> result = Utils.parseCursor(c);
-        if (result.isEmpty()){
-            return "";
+        try {
+            String sql = "select station_code from stops where station_name like '%" + name + "%'";
+            Cursor c = db.rawQuery(sql, null);
+            ArrayList<HashMap<String, Object>> result = Utils.parseCursor(c);
+            if (result.isEmpty()) {
+                return "";
+            }
+            return result.get(0).get("station_code").toString();
+        } catch(Exception e ) {
+            e.printStackTrace();;
         }
-        return result.get(0).get("station_code").toString();
+        return "";
     }
 
 
