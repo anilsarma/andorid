@@ -10,4 +10,12 @@
     <string name="CONFIG_START_STATION">CONFIG_START_STATION</string>
     <string name="CONFIG_STOP_STATION">CONFIG_STOP_STATION</string>
     <string name="CONFIG_ROUTE">CONFIG_ROUTE</string>
+
+
+    <string-array name="SettingDeltaDays">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
 </resources>
