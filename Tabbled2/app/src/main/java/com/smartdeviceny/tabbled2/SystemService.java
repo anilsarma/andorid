@@ -647,6 +647,17 @@ public class SystemService extends Service {
         ArrayList<String> njtr = new ArrayList<>();
         return njtr.toArray(new String[]{});
     }
+    public  String getStationCode(String station) {
+        if(sql == null ) {
+            return "NY";
+        }
+        String value = SqlUtils.getStationCode(sql.getReadableDatabase(), "station");
+        if( value == null || value.isEmpty() ) {
+            return "NY";
+        }
+        return value;
+
+    }
 
     public class LocalBcstReceiver extends BroadcastReceiver {
         @Override

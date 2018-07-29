@@ -69,6 +69,11 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         else {
             String startStation = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
             String stopStation = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
+            SystemService systemService = ((MainActivity)getActivity()).systemService;
+            if(systemService != null) {
+                String station_code = systemService.getStationCode(startStation);
+                Utils.setConfig(config, getString(R.string.CONFIG_DV_STATION), station_code);
+            }
             int delta = -1;
             try {delta = Integer.parseInt(Config.getConfig(config, getString(R.string.CONFIG_DELTA_DAYS), "" + delta)); } catch (Exception e){ }
             routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null, delta);
@@ -85,13 +90,15 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
                 SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.fragment_njt_schedule);
                 swipeRefreshLayout.setRefreshing(false);
                 if( ((MainActivity)getActivity()).systemService  != null ) {
-                    ((MainActivity)getActivity()).systemService.getDepartureVision("NY", 0);
+                    ((MainActivity)getActivity()).systemService.getDepartureVision(((MainActivity)getActivity()).getStationCode(), 0);
                 }
             }
         });
         super.onViewCreated(view, savedInstanceState);
         //Toast.makeText(getActivity().getApplicationContext(), "OnViewCreated", Toast.LENGTH_LONG).show();
     }
+
+
 
     @Override
     public void onTimerEvent(SystemService systemService) {
@@ -117,7 +124,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
             adapter.notifyDataSetChanged();
             recyclerView.invalidate();
         }
-        ((MainActivity)getActivity()).systemService.updateDapartureVisionCheck("NY");
+        ((MainActivity)getActivity()).systemService.updateDapartureVisionCheck(((MainActivity)getActivity()).getStationCode());
         for(SystemService.DepartureVisionData dv:data.values()) {
            try {
                if(notifyUser(dv) ) {
@@ -144,7 +151,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
             String startStation = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
             String stopStation = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
 
-            String departureVisionCode = "NY"; // lookup value
+            String departureVisionCode = Config.getConfig(config, getString(R.string.CONFIG_DV_STATION), getString(R.string.CONFIG_DEFAULT_DV_STATION));
             int delta = -1;
             try {delta = Integer.parseInt(Config.getConfig(config, getString(R.string.CONFIG_DELTA_DAYS), "" + delta)); } catch (Exception e){ }
             routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null, delta);
@@ -204,6 +211,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         return  false;
     }
 
+
     final DateFormat printableDateFmt = new SimpleDateFormat("EEE, MMM d, yyyy");
     private RecyclerRouteDecoration.SectionCallback getSectionCallback() {
         return new RecyclerRouteDecoration.SectionCallback() {
@@ -228,6 +236,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
 
     @Override
     public void configChanged(SystemService systemService) {
+        //
         onSystemServiceConnected(systemService);
     }
 }

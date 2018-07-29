@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
+import com.smartdeviceny.tabbled2.MainActivity;
 import com.smartdeviceny.tabbled2.R;
 import com.smartdeviceny.tabbled2.SystemService;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
@@ -30,7 +31,7 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         WebView web = getActivity().findViewById(R.id.depart_vision_web_view);
-        web.loadUrl("http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=NY");
+        web.loadUrl("http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=" + ((MainActivity)getActivity()).getStationCode());
         web.getSettings().setBuiltInZoomControls(true);
         web.getSettings().setLoadWithOverviewMode(true);
         web.getSettings().setUseWideViewPort(true);

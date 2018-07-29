@@ -192,7 +192,10 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_Refresh:
                 if(systemService!=null) {
-                    systemService.getDepartureVision("NY", 30000);
+                    SharedPreferences config = getPreferences(MODE_PRIVATE);
+                    String departureVisionCode = Config.getConfig(config, getString(R.string.CONFIG_DV_STATION), getString(R.string.CONFIG_DEFAULT_DV_STATION));
+
+                    systemService.getDepartureVision(departureVisionCode, 30000);
                 }
                 return true;
             case R.id.menu_reverse: {
@@ -284,6 +287,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+    public String getStationCode() {
+        SharedPreferences config = getPreferences(Context.MODE_PRIVATE);
+        return Config.getConfig(config, getString(R.string.CONFIG_DV_STATION), getString(R.string.CONFIG_DEFAULT_DV_STATION));
     }
     public class LocalBcstReceiver extends BroadcastReceiver {
         @Override
