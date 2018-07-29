@@ -7,6 +7,8 @@ public interface NotificationValues {
     String BROADCAT_PERIODIC_TIMER = "periodic-timer";
     String BROADCAT_SEND_DEPARTURE_VISION_PING = "send-departure-vision-pings";
 
+    String BROADCAT_CHECK_FOR_UPDATE = "check-for-njts-update";
+
 
     int AVTIVITY_SETINGS =1;
 }

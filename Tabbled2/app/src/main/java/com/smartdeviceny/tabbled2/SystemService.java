@@ -68,6 +68,7 @@ public class SystemService extends Service {
         super.onCreate();
         IntentFilter filter = new IntentFilter();
         filter.addAction(NotificationValues.BROADCAT_SEND_DEPARTURE_VISION_PING);
+        filter.addAction(NotificationValues.BROADCAT_CHECK_FOR_UPDATE);
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
 
         setupDb();
@@ -270,7 +271,7 @@ public class SystemService extends Service {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("NJTS Schedule Upgraded")
+                        .setContentTitle("NJ Transit Schedule Upgraded")
                         .setTicker("NT Transit Schedule.")
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setContentText(msg);
@@ -624,6 +625,8 @@ public class SystemService extends Service {
             Log.d("MAIN", "onReceive " + intent.getAction());
             if (intent.getAction().equals(NotificationValues.BROADCAT_SEND_DEPARTURE_VISION_PING )) {
                 SystemService.this.sendDepartureVisionPings();
+            } else if (intent.getAction().equals(NotificationValues.BROADCAT_CHECK_FOR_UPDATE )) {
+                SystemService.this.checkForUpdate();
             }
             else {
                 Log.d("receiver", "got omething not sure what " + intent.getAction());

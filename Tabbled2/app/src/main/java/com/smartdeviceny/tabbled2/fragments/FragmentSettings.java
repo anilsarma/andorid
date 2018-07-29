@@ -41,9 +41,9 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.settings, container, false);
-        routes_adapter  = new ArrayAdapter<CharSequence>(getActivity(), android.R.layout.simple_spinner_item);
-        start_adapter  = new ArrayAdapter<CharSequence>(getActivity(), android.R.layout.simple_spinner_item);
-        stop_adapter  = new ArrayAdapter<CharSequence>(getActivity(), android.R.layout.simple_spinner_item);
+        routes_adapter  = new ArrayAdapter<>(getActivity(), R.layout.spinner_item);
+        start_adapter  = new ArrayAdapter<>(getActivity(), R.layout.spinner_item);
+        stop_adapter  = new ArrayAdapter<>(getActivity(), R.layout.spinner_item);
 
         routes_adapter.setDropDownViewResource(R.layout.template_spinner_drop_down);
         start_adapter.setDropDownViewResource(R.layout.template_spinner_drop_down);
