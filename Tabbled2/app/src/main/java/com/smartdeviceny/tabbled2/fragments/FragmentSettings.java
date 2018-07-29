@@ -45,6 +45,11 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
         start_adapter  = new ArrayAdapter<CharSequence>(getActivity(), android.R.layout.simple_spinner_item);
         stop_adapter  = new ArrayAdapter<CharSequence>(getActivity(), android.R.layout.simple_spinner_item);
 
+        routes_adapter.setDropDownViewResource(R.layout.template_spinner_drop_down);
+        start_adapter.setDropDownViewResource(R.layout.template_spinner_drop_down);
+        stop_adapter.setDropDownViewResource(R.layout.template_spinner_drop_down);
+
+
         route_spinner = view.findViewById(R.id.routes_spinner);
         route_spinner.setAdapter(routes_adapter);
 
