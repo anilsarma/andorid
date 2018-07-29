@@ -3,6 +3,7 @@ package com.smartdeviceny.tabbled2;
 import android.app.DownloadManager;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,14 +11,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
 import com.smartdeviceny.tabbled2.utils.DownloadFile;
 import com.smartdeviceny.tabbled2.utils.SQLHelper;
 import com.smartdeviceny.tabbled2.utils.SQLiteLocalDatabase;
@@ -74,6 +73,20 @@ public class SystemService extends Service {
         setupDb();
         sendDatabaseReady();
         checkForUpdate();
+
+//        NotificationManager notificationManager =
+//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        String channelId = getString(R.string.default_notification_channel_id);
+//        CharSequence channelName = "Upgrades";
+//        int importance = NotificationManager.IMPORTANCE_LOW;
+//        NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, importance);
+//        notificationChannel.enableLights(true);
+//        notificationChannel.setLightColor(Color.RED);
+//        notificationChannel.enableVibration(true);
+//        notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+//        notificationManager.createNotificationChannel(notificationChannel);
+
         //Nyquist criteria
     }
 
@@ -91,6 +104,7 @@ public class SystemService extends Service {
 
     public boolean checkForUpdate() {
         if (checkingVersion) {
+            Log.d("SVC", "update already running");
             return false; // already running.
         }
         _checkRemoteDBUpdate();
@@ -100,7 +114,7 @@ public class SystemService extends Service {
         return checkingVersion;
     }
     void _checkRemoteDBUpdate() {
-        Log.d("SVC", "checking Schedule status");
+        Log.d("SVC", "checking for updated schedule db");
         File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
         sql = UtilsDBVerCheck.getSQLDatabase(getApplicationContext(), f);
         checkingVersion=true;
@@ -135,11 +149,14 @@ public class SystemService extends Service {
             checkingVersion = false;
             Log.d("DBSVC", "system schedule db is uptodate " + version_str);
             sendCheckcomplete();
+
+            notify_user_of_upgrade("No Update Required.");
             return;
         }
         final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
             @Override
             public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
+                notify_user_of_upgrade("Download Complete");
                 checkingVersion=false;
                 File dbFilePath = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
                 File tmpFilename=null;
@@ -261,7 +278,7 @@ public class SystemService extends Service {
             }
         }
     }
-    private void notify_user_of_upgrade(String new_version) {
+    private void notify_user_of_upgrade(@NonNull String new_version) {
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         //int icon = R.mipmap.ic_launcher;
         //long when = System.currentTimeMillis();
@@ -272,19 +289,22 @@ public class SystemService extends Service {
 //        notification.defaults |= Notification.DEFAULT_SOUND; // Sound
         String msg = "NJT Schedule upgraded to version " + new_version;
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
+                new NotificationCompat.Builder(this) //, getString(R.string.default_notification_channel_id))
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("NJ Transit Schedule Upgraded")
-                        .setTicker("NT Transit Schedule.")
-                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setContentTitle("NJ Transit Schedule")
+                        //.setTicker("NT Transit Schedule.")
+                      //  .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setContentText(msg);
-
+        Intent targetIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(contentIntent);
         Notification notification = mBuilder.build();
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        //notification.defaults |= Notification.DEFAULT_SOUND;
 
-        Log.d("SVC", "database schedule upgraded " + msg );
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        notification.defaults |= Notification.DEFAULT_SOUND;
         mNotificationManager.notify(1, notification);
+        Log.d("SVC", "notification database schedule upgraded " + msg  + " "  + getString(R.string.default_notification_channel_id));
+
     }
 
     ArrayList<HashMap<String, Object>> parseDepartureVision(String station, Document doc) {
@@ -381,7 +401,7 @@ public class SystemService extends Service {
             for(String station:lastRequestTime.keySet()) {
                 Date dt = lastRequestTime.get(station);
                 if( (now.getTime() - dt.getTime())< (10 * 1000 * 60 ) ) { // in minutes TODO:: make this configurable by user.
-                    Log.d("SVC", "scheduling request for DV:" + station );
+                    //Log.d("SVC", "scheduling request for DV:" + station );
                     try {
                         _getDepartureVision(station, 30000);
                     } catch(Exception e) {
@@ -540,7 +560,10 @@ public class SystemService extends Service {
                 db = sql.getReadableDatabase();
             }
 
-            for(int i=-2; i < 4; i ++ ) {
+            int delta = 1;
+            try { delta = Integer.parseInt(getString(R.string.CONFIG_DELTA_DAYS)); } catch (Exception e){ }
+            delta = Math.max(1, delta);
+            for(int i=-delta; i < delta; i ++ ) {
                 Date stDate = dateFmt.parse("" + date);
                 stDate = Utils.adddays(stDate, i);
                 ArrayList<HashMap<String, Object>> routes = Utils.parseCursor(SQLHelper.getRoutes(db, from, to, Integer.parseInt(dateFmt.format(stDate))));
@@ -603,7 +626,9 @@ public class SystemService extends Service {
     public HashMap<String, DepartureVisionData>getCachedDepartureVisionStatus_byTrip() {
         return  status_by_trip;
     }
-
+    public String getDBVersion() {
+        return UtilsDBVerCheck.getDBVersion(sql);
+    }
     public String[] get_values( String sqls, String key ) {
         if(sql != null ) {
             return SQLHelper.get_values(sql.getReadableDatabase(), sqls, key);
@@ -624,7 +649,7 @@ public class SystemService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
-            Log.d("MAIN", "onReceive " + intent.getAction());
+            //Log.d("MAIN", "onReceive " + intent.getAction());
             if (intent.getAction().equals(NotificationValues.BROADCAT_SEND_DEPARTURE_VISION_PING )) {
                 SystemService.this.sendDepartureVisionPings();
             } else if (intent.getAction().equals(NotificationValues.BROADCAT_CHECK_FOR_UPDATE )) {

@@ -27,6 +27,7 @@ import android.view.View;
 
 import com.smartdeviceny.tabbled2.adapters.FragmentPagerMainPageAdaptor;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
+import com.smartdeviceny.tabbled2.utils.Config;
 import com.smartdeviceny.tabbled2.utils.Utils;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,33 +36,18 @@ public class MainActivity extends AppCompatActivity {
     public ProgressDialog progressDialog =null;
     int tabSelected = -1;
 
-    void setupConfigDefaults(SharedPreferences config, String name, String defaultValue) {
-        String value = config.getString(name, "");
-        if( value.isEmpty()) {
-            SharedPreferences.Editor editor  = config.edit();
-            editor.putString(name, defaultValue);
-            editor.commit();
-        }
-    }
-    String getConfig(SharedPreferences config, String name, String defaultValue) {
-        return config.getString(name, defaultValue);
-    }
-    void setConfig(SharedPreferences config, String name, String value) {
-        SharedPreferences.Editor editor  = config.edit();
-        editor.putString(name, value);
-        editor.commit();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         SharedPreferences config = getPreferences(Context.MODE_PRIVATE);
-        setupConfigDefaults(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
-        setupConfigDefaults(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
-        setupConfigDefaults(config, getString(R.string.CONFIG_DEFAULT_ROUTE), getString(R.string.CONFIG_DEFAULT_ROUTE));
+        //setupConfigDefaults(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
+        //setupConfigDefaults(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
+        //setupConfigDefaults(config, getString(R.string.CONFIG_DEFAULT_ROUTE), getString(R.string.CONFIG_DEFAULT_ROUTE));
 
-        startService(new Intent(MainActivity.this, SystemService.class));
+        startService(new Intent(this, PowerStartService.class));
+        startService(new Intent(this, SystemService.class));
         setContentView(R.layout.activity_main);
         initToolbar();
 
@@ -213,10 +199,10 @@ public class MainActivity extends AppCompatActivity {
                 // swap the routes
                 if(tabSelected == 1|| tabSelected == 3 ) {
                     SharedPreferences config = getPreferences(Context.MODE_PRIVATE);
-                    String start = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
-                    String stop = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
-                    setConfig(config, getString(R.string.CONFIG_START_STATION), stop);
-                    setConfig(config, getString(R.string.CONFIG_STOP_STATION), start);
+                    String start = Config.getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
+                    String stop = Config.getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
+                    Config.setConfig(config, getString(R.string.CONFIG_START_STATION), stop);
+                    Config.setConfig(config, getString(R.string.CONFIG_STOP_STATION), start);
 
                     for(Fragment f:getSupportFragmentManager().getFragments()) {
                         ServiceConnected frag = (ServiceConnected) f;
@@ -293,9 +279,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
-            Log.d("MAIN", "onReceive " + intent.getAction());
+            //Log.d("MAIN", "onReceive " + intent.getAction());
             if (intent.getAction().equals(NotificationValues.BROADCAT_DATABASE_READY )) {
-                Log.d("receiver", "Database is ready we can do all the good stuff");
+                Log.d("MAIN", "Database is ready we can do all the good stuff");
                 if(progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
                 }
@@ -308,12 +294,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             } else if (intent.getAction().equals(NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE)) {
-                Log.d("receiver", NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);
+                Log.d("MAIN", NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);
                 if(progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
                 }
             } else if (intent.getAction().equals(NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED )) {
-                Log.d("DVA", NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
+                Log.d("MAIN", NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
                 boolean hasfrag = false;
                 for(Fragment f:getSupportFragmentManager().getFragments()) {
                     ServiceConnected frag = (ServiceConnected) f;
@@ -325,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             } else if (intent.getAction().equals(NotificationValues.BROADCAT_PERIODIC_TIMER )) {
-                Log.d("DVA", NotificationValues.BROADCAT_PERIODIC_TIMER);
+                Log.d("MAIN", NotificationValues.BROADCAT_PERIODIC_TIMER);
                 boolean hasfrag = false;
                 for(Fragment f:getSupportFragmentManager().getFragments()) {
                     ServiceConnected frag = (ServiceConnected) f;
@@ -337,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }  else {
-                Log.d("receiver", "got omething not sure what " + intent.getAction());
+                Log.d("MAIN", "got omething not sure what " + intent.getAction());
             }
         }
     }

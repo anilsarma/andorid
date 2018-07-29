@@ -62,4 +62,17 @@ public class UtilsDBVerCheck {
         }
         return false;
     }
+
+    static public String getDBVersion(SQLiteLocalDatabase sql) {
+        try {
+            if(sql == null) {
+                return "";
+            }
+            return SqlUtils.get_user_pref_value(sql.getWritableDatabase(), "version", "");
+        } catch(Exception e) {
+            Log.e("DBU", "matchDBVersion failed" + e.getMessage());
+        }
+        return "";
+
+    }
 }

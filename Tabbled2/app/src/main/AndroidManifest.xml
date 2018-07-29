@@ -9,6 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id"/>
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,15 +24,17 @@
         </activity>
 
         <service android:enabled="true" android:name=".SystemService" />
+        <service android:enabled="true" android:name=".PowerStartService"/>
+        <service android:enabled="true" android:name=".UpdateCheckerJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
         <!-- just trigger events -->
-        <receiver android:name="PowerStartServiceReceiver"
+        <receiver android:name=".PowerStartServiceReceiver"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
             >
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-                <action android:name="android.intent.action.BOOT_COMPLETED"
-                />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 

@@ -12,26 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <LinearLayout
-            android:background="@drawable/route_background"
-            android:padding="20sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:text="Settings"
-                android:textColor="@android:color/white"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:padding="5sp"
-                android:paddingBottom="30sp"
-                android:textSize="25sp"
-                android:textStyle="normal"
-                android:fontFamily="sans-serif-light"
-                android:gravity="center"
-                />
-        </LinearLayout>
 
         <LinearLayout
             android:background="@drawable/route_background"
@@ -135,12 +115,6 @@
                     android:text="Cancel" />
             </LinearLayout>
 
-            <LinearLayout
-                android:paddingTop="32sp"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            </LinearLayout>
         </LinearLayout>
         <LinearLayout
             android:padding="20sp"
@@ -161,18 +135,27 @@
                 android:fontFamily="sans-serif-light"
                 android:gravity="center"
                 />
-            <Button
-                android:layout_weight="0"
-                android:id="@+id/button_crrent_version"
-                android:layout_width="match_parent"
+            <TextView
+                android:text="NJ Tranit Schedule"
+                android:id="@+id/text_db_version"
+                android:textColor="@android:color/holo_green_dark"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Schedule Version" />
+                android:padding="5sp"
+                android:paddingBottom="10sp"
+                android:textSize="10sp"
+                android:textStyle="normal"
+
+                android:fontFamily="sans-serif-light"
+                android:gravity="center"
+                />
             <Button
                 android:layout_weight="0"
                 android:id="@+id/button_schedule_update"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Update" />
+                android:text="Check" />
         </LinearLayout>
         <LinearLayout
             android:padding="20sp"
@@ -203,24 +186,18 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textStyle="normal"
                 />
-
-            <Spinner
-                android:id="@+id/setting_delta_days"
+            <EditText
+                android:id="@+id/edit_text_delta_days"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
+                android:hint="Delta Days"
+                android:inputType="number"
+                android:text="2"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimary"
                 android:padding="5sp"
                 android:background="@android:color/white"
-                android:visibility="visible"
-                android:drawSelectorOnTop="true"
-                android:entries="@array/SettingDeltaDays"
                 />
-            <Button
-                android:layout_weight="0"
-                android:id="@+id/button_service_update"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Update" />
         </LinearLayout>
 
     </LinearLayout>

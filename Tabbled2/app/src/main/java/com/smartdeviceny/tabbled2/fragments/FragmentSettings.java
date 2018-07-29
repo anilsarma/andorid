@@ -5,7 +5,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +16,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.smartdeviceny.tabbled2.MainActivity;
 import com.smartdeviceny.tabbled2.R;
 import com.smartdeviceny.tabbled2.SystemService;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
+import com.smartdeviceny.tabbled2.utils.Config;
 import com.smartdeviceny.tabbled2.utils.Utils;
 
 import java.util.ArrayList;
@@ -33,10 +39,14 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
     Spinner route_spinner;
     Spinner start_spinner;
     Spinner stop_spinner;
+    TextView text_view_db_version;
+    EditText text_edit_delta_days;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        SharedPreferences config = null;
+        try { config = getActivity().getPreferences(Context.MODE_PRIVATE);} catch (Exception e) { }
         View view =  inflater.inflate(R.layout.settings, container, false);
         routes_adapter  = new ArrayAdapter<>(getActivity(), R.layout.spinner_item);
         start_adapter  = new ArrayAdapter<>(getActivity(), R.layout.spinner_item);
@@ -78,6 +88,37 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
             }
         });
 
+        text_view_db_version = view.findViewById(R.id.text_db_version);
+        text_view_db_version.setText("N/A");
+
+        text_edit_delta_days = view.findViewById(R.id.edit_text_delta_days);
+        if ( config != null){
+            text_edit_delta_days.setText(Config.getConfig(config, getString(R.string.CONFIG_DELTA_DAYS), getString(R.string.CONFIG_DEFAULT_DELTA_DAYS)));
+        }
+        text_edit_delta_days.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String value = charSequence.toString();
+                if(!value.isEmpty()){
+                    try {
+                        SharedPreferences config = getActivity().getPreferences(Context.MODE_PRIVATE);
+                        Config.setConfig(config, getString(R.string.CONFIG_DELTA_DAYS), value);
+                    }catch(Exception e) {
+                        Toast.makeText(getActivity(), "Failed to set value " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         return view;
         //return super.onCreateView(inflater, container, savedInstanceState);
@@ -107,6 +148,11 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
         SharedPreferences config = getActivity().getPreferences(Context.MODE_PRIVATE);
         systemService.get_values("select * from routes", "route_long_name");
         String values[] = systemService.get_values( "select * from routes", "route_long_name");
+
+        text_view_db_version.setText("version " + systemService.getDBVersion());
+        //text_view_db_version.setTextColor(0x0000FF);
+
+
         routes_adapter.clear();
         for(String rt: values ) {
             rt = Utils.capitalize(rt);

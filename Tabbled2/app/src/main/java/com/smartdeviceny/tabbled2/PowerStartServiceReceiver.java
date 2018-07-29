@@ -11,6 +11,11 @@ import android.util.Log;
 public class PowerStartServiceReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        schdeulJob(context.getApplicationContext());
+    }
+
+
+    public static void schdeulJob(Context context) {
         Log.d("PWR", "Scheduling test job.");
         // schedule a job for upgrade check
         long ms_frequency = 20 * 60 * 1000;
@@ -18,8 +23,8 @@ public class PowerStartServiceReceiver extends BroadcastReceiver {
         JobInfo.Builder builder = new JobInfo.Builder(2, serviceComponent);
         builder.setPeriodic(ms_frequency);
         builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED); // require unmetered network wifi
-        builder.setRequiresDeviceIdle(true); // device should be idle
-        builder.setRequiresCharging(true);
+        //builder.setRequiresDeviceIdle(true); // device should be idle
+        //builder.setRequiresCharging(true);
         JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
         if(jobScheduler.schedule(builder.build()) <= 0) {
             Log.e("PWR", "error: Some error while scheduling the job");

@@ -181,18 +181,15 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         long diff = Utils.makeDate(Utils.getTodayYYYYMMDD(null),  dv.time, "yyyyMMdd HH:mm").getTime() - new Date().getTime();
         if (diff > 0 ) {  // other checks needed.
             NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(getActivity().getApplicationContext())
-                            .setSmallIcon(R.mipmap.ic_launcher)
+                    new NotificationCompat.Builder(getActivity(), "FRAG_SVC")
+                           // .setSmallIcon(R.mipmap.ic_launcher)
                             .setTicker("NJS")
                             .setContentTitle("Train " + dv.block_id + " Track# " + dv.track  )
                             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                             .setContentText( Utils.formatToLocalTime(Utils.parseLocalTime(dv.time)) + " departure in " +  Math.abs(diff) + "(mins)" );
-            // NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
+            NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
             Notification notify = mBuilder.build();
-
             notify.flags|= Notification.FLAG_AUTO_CANCEL;
-            final NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(1, notify);
 
             Toast.makeText(getActivity().getApplicationContext(), (String) "sent notification ", Toast.LENGTH_SHORT).show();
