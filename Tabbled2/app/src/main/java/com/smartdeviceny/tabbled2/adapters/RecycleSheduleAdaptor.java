@@ -103,6 +103,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
     public void updateDepartureVision(@Nullable HashMap<String, SystemService.DepartureVisionData> departureVision) {
         HashMap<String, SystemService.DepartureVisionData> tmp = new HashMap<>();
         HashMap<String, SystemService.DepartureVisionData> track = new HashMap<>();
+        // build a list of entries with track info save them into tmp.
         for( String key:this.departureVision.keySet()) {
             SystemService.DepartureVisionData data = this.departureVision.get(key);
             if ( data.track.isEmpty() && data.status.isEmpty()) {
@@ -120,7 +121,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             SystemService.DepartureVisionData old = tmp.get(key);
             if(old != null ) {
                 data = data.clone();
-                if( data.track.isEmpty() && !old.track.isEmpty()) {
+                if( data.track.isEmpty() && !old.track.isEmpty() && old.station.equals(data.station)) {
                     data.track = old.track;
                     data.stale = true;
                 }
@@ -135,8 +136,12 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             }
         }
         this.departureVision = tmp;
+        Log.d("REC", "DV Size:" + departureVision.size());
+        for(SystemService.DepartureVisionData dv:this.departureVision.values()) {
+            Log.d("REC", "Entry " + dv.block_id + "  track:" + dv.track + " status:" + dv.status + " " + dv.station + " " +  dv.time);
+        }
     }
-    public void clearData() { this.mRoutes.clear(); this.departureVision.clear(); }
+    public void clearData() { this.mRoutes.clear(); /*this.departureVision.clear();*/ }
     public void updateRoutes( List<SystemService.Route> routes) {
         this.mRoutes = routes;
     }
@@ -188,7 +193,6 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
 
         boolean canceled = false;
         boolean oldEntry = false;
-        //SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss");
 
         SimpleDateFormat printFormat = new SimpleDateFormat("hh:mm a");
         SystemService.DepartureVisionData dv = departureVision.get(route.block_id);

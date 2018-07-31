@@ -2,7 +2,7 @@ package com.smartdeviceny.tabbled2.utils;
 
 import android.content.SharedPreferences;
 
-public class Config {
+public class ConfigUtils {
 
     static public void setupConfigDefaults(SharedPreferences config, String name, String defaultValue) {
         String value = config.getString(name, "");

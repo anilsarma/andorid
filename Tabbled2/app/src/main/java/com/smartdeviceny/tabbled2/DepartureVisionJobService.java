@@ -8,6 +8,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.smartdeviceny.tabbled2.utils.Utils;
+import com.smartdeviceny.tabbled2.values.Config;
+import com.smartdeviceny.tabbled2.values.ConfigDefault;
 import com.smartdeviceny.tabbled2.values.NotificationValues;
 
 public class DepartureVisionJobService extends JobService {
@@ -26,7 +28,7 @@ public class DepartureVisionJobService extends JobService {
         } catch(Exception e) {
           e.printStackTrace();
         } finally {
-            String time = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.CONFIG_POLLING_TIME), getString(R.string.CONFIG_DEFAULT_POLLING_TIME));
+            String time = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(Config.POLLING_TIME, ConfigDefault.POLLING_TIME);
             int int_time = 30000;
             try { int_time = Integer.parseInt(time); } catch(Exception e) {}
             int_time = Math.max(10000, int_time);

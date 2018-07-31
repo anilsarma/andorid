@@ -417,7 +417,7 @@ public class SystemService extends Service {
             Date last = lastApiCallTime.get(station);
             // for now we will allow only a single polling.
             if (lastRequestTime.keySet().size() > 1) {
-                status_by_trip.clear();
+                //status_by_trip.clear();
                 lastRequestTime.clear();
             }
             lastRequestTime.put(station, new Date());
@@ -426,7 +426,7 @@ public class SystemService extends Service {
     }
     public void clearDVCache() {
         synchronized (lastRequestTime) {
-            status_by_trip.clear();
+            //status_by_trip.clear();
             lastRequestTime.clear();
         }
         synchronized (dvPendingRequests) {
@@ -766,7 +766,7 @@ public class SystemService extends Service {
 
     public void addFavorite(String block_id) {
         if(config !=null) {
-            //favorites = config.getStringSet(Config.FAVORITES, favorites);
+            //favorites = config.getStringSet(ConfigUtils.FAVORITES, favorites);
             favorites.add(block_id);
             SharedPreferences.Editor editor = config.edit();
             editor.putStringSet(Config.FAVORITES, favorites);
@@ -780,7 +780,7 @@ public class SystemService extends Service {
 
     public void removeFavorite(String block_id) {
         if(config !=null) {
-            //favorites = config.getStringSet(Config.FAVORITES, favorites);
+            //favorites = config.getStringSet(ConfigUtils.FAVORITES, favorites);
             favorites.remove(block_id);
             SharedPreferences.Editor editor = config.edit();
             editor.putStringSet(Config.FAVORITES, favorites);

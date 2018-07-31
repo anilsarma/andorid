@@ -4,19 +4,6 @@
     <string name="default_notification_channel_id">Channel ID</string>
 
 
-    <string name="CONFIG_DEFAULT_START_STATION">New York Penn Station</string>
-    <string name="CONFIG_DEFAULT_STOP_STATION">New Brunswick</string>
-    <string name="CONFIG_DEFAULT_ROUTE">Northeast Corridor</string>
-    <string name="CONFIG_DEFAULT_DELTA_DAYS">1</string>
-    <string name="CONFIG_DEFAULT_DV_STATION">NY</string>
-    <string name="CONFIG_DEFAULT_POLLING_TIME">30000</string>
-
-    <string name="CONFIG_START_STATION">CONFIG_START_STATION</string>
-    <string name="CONFIG_STOP_STATION">CONFIG_STOP_STATION</string>
-    <string name="CONFIG_ROUTE">CONFIG_ROUTE</string>
-    <string name="CONFIG_DELTA_DAYS">CONFIG_DELTA_DAYS</string>
-    <string name="CONFIG_DV_STATION">CONFIG_DV_STATION</string>
-    <string name="CONFIG_POLLING_TIME">CONFIG_POLLING_TIME</string>
 
 
     <string-array name="SettingDeltaDays">

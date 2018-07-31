@@ -24,8 +24,10 @@ import com.smartdeviceny.tabbled2.R;
 import com.smartdeviceny.tabbled2.SystemService;
 import com.smartdeviceny.tabbled2.adapters.RecycleSheduleAdaptor;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
-import com.smartdeviceny.tabbled2.utils.Config;
+import com.smartdeviceny.tabbled2.utils.ConfigUtils;
 import com.smartdeviceny.tabbled2.utils.Utils;
+import com.smartdeviceny.tabbled2.values.Config;
+import com.smartdeviceny.tabbled2.values.ConfigDefault;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -43,10 +45,9 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View  view =  inflater.inflate(R.layout.fragment_njt_schedule, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.schedule_vision_scroll_view);
-       // View tmp = inflater.inflate(R.layout.route_section_header, null, null);
+        // get the departure vision data.
 
-        int height = view.getMeasuredHeight();
-        height = (int)(getResources().getDimensionPixelSize(R.dimen.recycler_section_header_height )*2.5);
+        int height  = (int)(getResources().getDimensionPixelSize(R.dimen.recycler_section_header_height )*2.5); // TODO:: move this to config or something.
         RecyclerRouteDecoration sectionItemDecoration =new RecyclerRouteDecoration(height,true, getSectionCallback());
         //getResources().getDimensionPixelSize(R.dimen.recycler_section_header_height),true, getSectionCallback());
         recyclerView.addItemDecoration(sectionItemDecoration);
@@ -65,23 +66,28 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         ArrayList<SystemService.Route> routes = new ArrayList<>();
 
-        if( ((MainActivity)this.getActivity()).systemService  == null ) {
-            Log.d("FRAG", "System Service i null ");
-        }
-        else {
-            String startStation = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
-            String stopStation = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
-            SystemService systemService = ((MainActivity)getActivity()).systemService;
-            if(systemService != null) {
-                String station_code = systemService.getStationCode(startStation);
-                Utils.setConfig(config, getString(R.string.CONFIG_DV_STATION), station_code);
-            }
-            int delta = -1;
-            try {delta = Integer.parseInt(Config.getConfig(config, getString(R.string.CONFIG_DELTA_DAYS), "" + delta)); } catch (Exception e){ }
-            routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null, delta);
-        }
-        //Log.d("FRAG", "onViewCreated");
+//        if( ((MainActivity)this.getActivity()).systemService  == null ) {
+//            Log.d("FRAGRT", "System Service i null ");
+//        }
+//        else {
+//            String startStation = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
+//            String stopStation = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
+//            SystemService systemService = ((MainActivity)getActivity()).systemService;
+//            if(systemService != null) {
+//                String station_code = systemService.getStationCode(startStation);
+//                Utils.setConfig(config, getString(R.string.CONFIG_DV_STATION), station_code);
+//            }
+//            int delta = -1;
+//            try {delta = Integer.parseInt(ConfigUtils.getConfig(config, getString(R.string.CONFIG_DELTA_DAYS), "" + delta)); } catch (Exception e){ }
+//            routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null, delta);
+//        }
+        //Log.d("FRAGRT", "onViewCreated");
         adapter = new RecycleSheduleAdaptor(getActivity(), routes);
+        SystemService systemService = ((MainActivity)getActivity()).systemService;
+        if( systemService !=null ) {
+            refreshRouteAdaptor(systemService); //
+        }
+
         //adapter.setClickListener(getc);
         recyclerView.setAdapter(adapter);
 
@@ -122,10 +128,9 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         adapter.notifyDataSetChanged();
         RecyclerView recyclerView = getActivity().findViewById(R.id.schedule_vision_scroll_view);
         if(recyclerView !=null) {
-            //Toast.makeText(getActivity().getApplicationContext(), (String) "invalidate ", Toast.LENGTH_SHORT).show();
-            adapter.notifyDataSetChanged();
             recyclerView.invalidate();
         }
+
         ((MainActivity)getActivity()).systemService.updateDapartureVisionCheck(((MainActivity)getActivity()).getStationCode());
         for(SystemService.DepartureVisionData dv:data.values()) {
            try {
@@ -138,34 +143,34 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         }
     }
 
+
     @Override
     public void onSystemServiceConnected(SystemService systemService) {
+        refreshRouteAdaptor(systemService);
+    }
+
+    public void refreshRouteAdaptor(SystemService systemService) {
+
         RecyclerView recyclerView = getActivity().findViewById(R.id.schedule_vision_scroll_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        ArrayList<SystemService.Route> routes = new ArrayList<>();
 
-        if( ((MainActivity)this.getActivity()).systemService  == null ) {
-            Log.d("FRAG", "System Service i null ");
-        }
-        else {
-            //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-            String startStation = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
-            String stopStation = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
+        String startStation = getConfig(config, Config.START_STATION,  ConfigDefault.START_STATION);
+        String stopStation = getConfig(config, Config.STOP_STATION, ConfigDefault.STOP_STATION);
+        String departureVisionCode = ConfigUtils.getConfig(config, Config.DV_STATION, ConfigDefault.DV_STATION);
 
-            String departureVisionCode = Config.getConfig(config, getString(R.string.CONFIG_DV_STATION), getString(R.string.CONFIG_DEFAULT_DV_STATION));
-            int delta = -1;
-            try {delta = Integer.parseInt(Config.getConfig(config, getString(R.string.CONFIG_DELTA_DAYS), "" + delta)); } catch (Exception e){ }
-            routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null, delta);
+        int delta = -1;
+        try {delta = Integer.parseInt(ConfigUtils.getConfig(config, Config.DELTA_DAYS, "" + delta)); } catch (Exception e){ }
+        ArrayList<SystemService.Route> routes = systemService.getRoutes(startStation, stopStation, null, delta);
 
-            ((MainActivity)getActivity()).systemService.getDepartureVision(departureVisionCode, 30000);
-            //Log.d("FRAG", "updated routes start:" + startStation + " stop:"  + stopStation);
-        }
+        systemService.getDepartureVision(departureVisionCode, 30000);
+        //Log.d("FRAGRT", "updated routes start:" + startStation + " stop:"  + stopStation);
+
         adapter.updateRoutes(routes);
         adapter.notifyDataSetChanged();
         onDepartureVisionUpdated(systemService); // inital paint.
         // we do not want to do this all the time just when we reconnect.
         recyclerView.scrollToPosition(getPosition(routes));
-        Log.d("FRAG", "updated routes ");
+        Log.d("FRAGRT", "updated routes ");
     }
     int getPosition(ArrayList<SystemService.Route> routes) {
         int index = -1;
@@ -237,6 +242,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
 
     @Override
     public void configChanged(SystemService systemService) {
+        Log.d("FRAGRT", "Route Schedule, onConfig Changed");
         if(adapter != null ) {
             adapter.clearData();
         }
