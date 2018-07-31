@@ -197,13 +197,15 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             builder.setPositiveButton("OK",null);
             builder.setView(stopLayout);
             AlertDialog dialog=builder.create();
-            dialog.show();
 
             final Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             LinearLayout.LayoutParams positiveButtonLL = (LinearLayout.LayoutParams) positiveButton.getLayoutParams();
             positiveButtonLL.gravity = Gravity.CENTER;
+            positiveButtonLL.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+            positiveButtonLL.width = LinearLayout.LayoutParams.MATCH_PARENT;
 
             positiveButton.setLayoutParams(positiveButtonLL);
+            dialog.show();
         }
     }
 

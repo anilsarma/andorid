@@ -11,7 +11,6 @@ import com.smartdeviceny.tabbled2.R;
 import com.smartdeviceny.tabbled2.utils.Utils;
 
 import java.util.HashMap;
-import java.util.List;
 
 public class StopViewAdaptor extends ArrayAdapter {
     Context context;
