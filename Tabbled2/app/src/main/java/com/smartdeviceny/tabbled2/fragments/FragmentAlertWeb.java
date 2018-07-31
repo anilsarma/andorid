@@ -49,7 +49,7 @@ public class FragmentAlertWeb extends Fragment implements ServiceConnected {
                 SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.alert_swipe_view);
                 WebView web = getActivity().findViewById(R.id.web_view);
                 web.getSettings().setJavaScriptEnabled(false);
-
+                
                 web.reload();
                 swipeRefreshLayout.setRefreshing(false);
             }

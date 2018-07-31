@@ -10,21 +10,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.smartdeviceny.tabbled2.utils.Config;
 import com.smartdeviceny.tabbled2.utils.DownloadFile;
 import com.smartdeviceny.tabbled2.utils.SQLHelper;
 import com.smartdeviceny.tabbled2.utils.SQLiteLocalDatabase;
 import com.smartdeviceny.tabbled2.utils.SqlUtils;
 import com.smartdeviceny.tabbled2.utils.Utils;
 import com.smartdeviceny.tabbled2.utils.UtilsDBVerCheck;
+import com.smartdeviceny.tabbled2.values.Config;
+import com.smartdeviceny.tabbled2.values.NotificationValues;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -38,13 +42,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SystemService extends Service {
 
     boolean           checkingVersion;
     DownloadFile downloader;
     SQLiteLocalDatabase sql;
+    SharedPreferences config;
+    HashSet<String>   favorites = new HashSet<>();
 
     DownloadFile.Callback callback = new DownloadFile.Callback() {
         @Override
@@ -65,6 +73,14 @@ public class SystemService extends Service {
 
     @Override
     public void onCreate() {
+        config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        Set<String> tmp  = config.getStringSet(Config.FAVORITES, favorites);
+        for(String f:tmp) {
+            tmp.add(f);
+        }
+        for(String f:favorites) {
+            Log.d("SVC", "read current fav " + f);
+        }
         downloader = new DownloadFile(this.getApplicationContext(),  callback);
         super.onCreate();
         IntentFilter filter = new IntentFilter();
@@ -74,7 +90,7 @@ public class SystemService extends Service {
 
         setupDb();
         sendDatabaseReady();
-        checkForUpdate();
+        //checkForUpdate();
 
 //        NotificationManager notificationManager =
 //                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -89,7 +105,6 @@ public class SystemService extends Service {
 //        notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
 //        notificationManager.createNotificationChannel(notificationChannel);
 
-        //Nyquist criteria
     }
 
     @Override
@@ -272,7 +287,8 @@ public class SystemService extends Service {
         return  false;
     }
 
-    private void setupDb() {
+    private void
+    setupDb() {
         if(sql == null ) {
             File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
             if(f.exists()) {
@@ -295,7 +311,7 @@ public class SystemService extends Service {
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("NJ Transit Schedule")
                         //.setTicker("NT Transit Schedule.")
-                      //  .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        //  .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setContentText(msg);
         Intent targetIntent = new Intent(this, MainActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -324,7 +340,7 @@ public class SystemService extends Service {
                 List<Node> header_elements = header.childNodes();
                 Element h = (Element) header_elements.get(0);
                 header_string = h.child(0).html().toString() + " " + h.child(1).html().toString().replace("&nbsp; &nbsp; Select a train to view station stops", "");
-                System.out.println(header_string);
+                //System.out.println(header_string);
             }
 
 
@@ -381,16 +397,41 @@ public class SystemService extends Service {
     }
     HashMap<String, ArrayList<HashMap<String, Object>>> status = new HashMap<>();
     HashMap<String, DepartureVisionData> status_by_trip = new HashMap<>();
-    ArrayList<String> dvPendingRequests = new ArrayList<>();
+    HashMap<String, Long> dvPendingRequests = new HashMap<>();
     HashMap<String, Date> lastRequestTime = new HashMap<>();
     HashMap<String, Date> lastApiCallTime = new HashMap<>();
-    public Date updateDapartureVisionCheck(String station)
+    public void updateDapartureVisionCheck(String station)
     {
-        Log.d("SVC", "updateDapartureVisionCheck for DV:" + station );
+        Log.d("SVC", "updateDapartureVisionCheck(async) for DV:" + station );
+        new AsyncTask<String, String, Date>() {
+            @Override
+            protected Date doInBackground(String... station) {
+                return _updateDapartureVisionCheck(station[0]);
+
+            }
+        }.execute(station);
+    }
+
+    protected Date _updateDapartureVisionCheck(String station) {
+        Log.d("SVC", "_updateDapartureVisionCheck for DV:" + station );
         synchronized (lastRequestTime) {
             Date last = lastApiCallTime.get(station);
+            // for now we will allow only a single polling.
+            if (lastRequestTime.keySet().size() > 1) {
+                status_by_trip.clear();
+                lastRequestTime.clear();
+            }
             lastRequestTime.put(station, new Date());
             return last;
+        }
+    }
+    public void clearDVCache() {
+        synchronized (lastRequestTime) {
+            status_by_trip.clear();
+            lastRequestTime.clear();
+        }
+        synchronized (dvPendingRequests) {
+            dvPendingRequests.clear();
         }
     }
     // the idea here is that this will be periodically triggered
@@ -399,37 +440,90 @@ public class SystemService extends Service {
     {
         Date now = new Date();
         boolean scheduled = false;
+        ArrayList<String> reqs = new ArrayList<>();
         synchronized (lastRequestTime) {
             for(String station:lastRequestTime.keySet()) {
                 Date dt = lastRequestTime.get(station);
                 if( (now.getTime() - dt.getTime())< (10 * 1000 * 60 ) ) { // in minutes TODO:: make this configurable by user.
                     //Log.d("SVC", "scheduling request for DV:" + station );
-                    try {
-                        _getDepartureVision(station, 30000);
-                    } catch(Exception e) {
-                        // don't really care.
-                    }
-                    scheduled = true;
+                    reqs.add(station);
                 } else {
                     Log.d("SVC", "Request expired DV:" + station + " Time:" + dt + " now:" + now + " diff:" + (now.getTime() - dt.getTime())/1000  + " secs");
                 }
             }
         }
+
+        for(String station:reqs) {
+            try {
+                scheduled = true;
+                Log.d("SVC", "sending ping request for DV:" + station );
+                _getDepartureVision(station, 30000);
+            } catch(Exception e) {
+                // don't really care.
+            }
+        }
         return scheduled;
     }
     public void getDepartureVision(String station, @Nullable Integer check_lastime) {
-        _getDepartureVision(station, check_lastime);
+        //_getDepartureVision(station, check_lastime);
+
+        // make this call async
+        class Param {
+            public String station;
+            public Integer check_lastime;
+
+            Param( String station, @Nullable Integer check_lastime) {
+                this.station = station;
+                this.check_lastime = check_lastime;
+            }
+        }
+        new AsyncTask<Param, Integer, String>( ) {
+
+            @Override
+            protected String doInBackground(Param ... param) {
+                _getDepartureVision(param[0].station, param[0].check_lastime);
+                return "";
+            }
+        }.execute(new Param(station, check_lastime));
     }
 
     public void _getDepartureVision(String station, @Nullable  Integer check_lastime) {
         String url = "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+ station;
-        Date last = updateDapartureVisionCheck(station);
+        Date last = _updateDapartureVisionCheck(station);
         synchronized (dvPendingRequests) {
-            if (dvPendingRequests.contains(url)) {
-                Log.d("SVC", "pending request found for  DV:" + station );
-                return;
+            Long rid = dvPendingRequests.get(url);
+            if (rid != null ) {
+                // check if we have something pending.
+                boolean found = true;
+                if(rid != 0 ) {
+                    DownloadManager dm=(DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
+                    Cursor c = dm.query( new DownloadManager.Query().setFilterById(rid) );
+                    if( c.moveToFirst() ){
+                        int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                        switch(status)
+                        {
+                            case DownloadManager.STATUS_PAUSED:
+                                break;
+                            case DownloadManager.STATUS_PENDING:
+                                break;
+                            case DownloadManager.STATUS_RUNNING:
+                                break;
+                            case DownloadManager.STATUS_SUCCESSFUL:
+                                found = false;
+                                break;
+                            case DownloadManager.STATUS_FAILED:
+                                found = false;
+                                break;
+                        }
+                    }
+                }
+                if(!found) {
+                    Log.d("SVC", "pending request found for  DV:" + station + " " + url);
+                    return;
+                }
+
             }
-            dvPendingRequests.add(url);
+            dvPendingRequests.put(url, new Long(0));
         }
         if ( check_lastime == null ) {
             check_lastime = new Integer(10000);
@@ -448,14 +542,15 @@ public class SystemService extends Service {
         }
         // check if we have a recent download, less than 1 minute old
         final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
+            String code = station;
             @Override
             public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
                 try {
-
                     //Log.d("DV", "File Content\n" + Utils.getEntireFileContent(file));
+                    Log.d("SVC", "DV download complete for " + url);
                     Document doc = Jsoup.parse(file, null, "http://dv.njtransit.com");
-                    ArrayList<HashMap<String, Object>> result = parseDepartureVision(station, doc);
-                    status.put(station, result);
+                    ArrayList<HashMap<String, Object>> result = parseDepartureVision(code, doc);
+                    status.put(code, result);
                     for(HashMap<String, Object> dv:result) {
                         DepartureVisionData dd = new DepartureVisionData(dv);
                         status_by_trip.put(dd.block_id, dd);
@@ -485,12 +580,17 @@ public class SystemService extends Service {
             }
         });
 
-        d.downloadFile(url, "njts_departure_vision_" + station.toLowerCase() + ".html",
+        long id = d.downloadFile(url, "njts_departure_vision_" + station.toLowerCase() + ".html",
                 "NJ Transit DepartureVision",
                 DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "text/html");
 
+        synchronized (dvPendingRequests) {
+            dvPendingRequests.put(url, new Long(id));
+        }
+
     }
     public class Route {
+        public String station_code;
         public String departture_time;
         public String arrival_time;
         public String block_id;
@@ -501,12 +601,14 @@ public class SystemService extends Service {
         public String header;
         public String from;
         public String to;
+        public boolean favorite=false;
 
         public Date date_as_date;
         public Date departure_time_as_date;
         public Date arrival_time_as_date;
 
-        public Route(String date, String from, String to, HashMap<String, Object> data) {
+        public Route(String station_code, String date, String from, String to, HashMap<String, Object> data) {
+            this.station_code = station_code;
             departture_time = data.get("departure_time").toString();
             arrival_time = data.get("destination_time").toString();
             block_id = data.get("block_id").toString();
@@ -514,7 +616,9 @@ public class SystemService extends Service {
             trip_id = data.get("trip_id").toString();
             this.from = from;
             this.to = to;
-
+            if(favorites !=null) {
+                this.favorite = favorites.contains(this.block_id);
+            }
             try {
                 // remember hours are more than 24 hrs here to represent the next day.
                 this.departure_time_as_date = dateTim24HrFmt.parse(date + " " + departture_time);
@@ -547,7 +651,8 @@ public class SystemService extends Service {
     final DateFormat dateTim24HrFmt = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
     final DateFormat time24HFmt = new SimpleDateFormat("HH:mm:ss");
     final DateFormat dateFmt = new SimpleDateFormat("yyyyMMdd");
-    // this is a syncronous call
+
+    // this is a syncronous call TODO: make async implementation.
     public ArrayList<Route>  getRoutes(String from, String to, @Nullable Integer date, @Nullable Integer delta) {
         ArrayList<Route> r = new ArrayList<>();
         SQLiteDatabase db = null;
@@ -565,6 +670,7 @@ public class SystemService extends Service {
                 db = sql.getReadableDatabase();
             }
 
+            String station_code = getStationCode(from);
             delta = Math.max(1, delta);
             for(int i=-delta; i < delta; i ++ ) {
                 Date stDate = dateFmt.parse("" + date);
@@ -572,7 +678,7 @@ public class SystemService extends Service {
                 ArrayList<HashMap<String, Object>> routes = Utils.parseCursor(SQLHelper.getRoutes(db, from, to, Integer.parseInt(dateFmt.format(stDate))));
                 Log.d("SVC", "route " + stDate + " " + from + " to " +to );
                 for (HashMap<String, Object> rt : routes) {
-                    r.add(new Route(dateFmt.format(stDate), from, to, rt));
+                    r.add(new Route(station_code, dateFmt.format(stDate), from, to, rt));
                 }
             }
         } catch(Exception e ) {
@@ -651,14 +757,41 @@ public class SystemService extends Service {
         if(sql == null ) {
             return "NY";
         }
-        String value = SqlUtils.getStationCode(sql.getReadableDatabase(), "station");
+        String value = SqlUtils.getStationCode(sql.getReadableDatabase(), station);
+        Log.d("SVC", "looking up station code " + station + "=" + value);
         if( value == null || value.isEmpty() ) {
             return "NY";
         }
         return value;
-
     }
 
+    public void addFavorite(String block_id) {
+        if(config !=null) {
+            //favorites = config.getStringSet(Config.FAVORITES, favorites);
+            favorites.add(block_id);
+            SharedPreferences.Editor editor = config.edit();
+            editor.putStringSet(Config.FAVORITES, favorites);
+            editor.apply();
+
+            for(String f:favorites) {
+                Log.d("SVC", "current fav " + f);
+            }
+        }
+    }
+
+    public void removeFavorite(String block_id) {
+        if(config !=null) {
+            //favorites = config.getStringSet(Config.FAVORITES, favorites);
+            favorites.remove(block_id);
+            SharedPreferences.Editor editor = config.edit();
+            editor.putStringSet(Config.FAVORITES, favorites);
+            editor.apply();
+
+            for(String f:favorites) {
+                Log.d("SVC", "rm current fav " + f);
+            }
+        }
+    }
     public class LocalBcstReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {

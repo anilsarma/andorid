@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -32,10 +33,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 public class FragmentRouteSchedule extends Fragment implements ServiceConnected {
     RecycleSheduleAdaptor adapter;
+    SharedPreferences config;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -60,7 +62,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         RecyclerView recyclerView = getActivity().findViewById(R.id.schedule_vision_scroll_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
-        SharedPreferences config = getActivity().getPreferences(Context.MODE_PRIVATE);
+        config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         ArrayList<SystemService.Route> routes = new ArrayList<>();
 
         if( ((MainActivity)this.getActivity()).systemService  == null ) {
@@ -78,7 +80,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
             try {delta = Integer.parseInt(Config.getConfig(config, getString(R.string.CONFIG_DELTA_DAYS), "" + delta)); } catch (Exception e){ }
             routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null, delta);
         }
-        Log.d("FRAG", "onViewCreated");
+        //Log.d("FRAG", "onViewCreated");
         adapter = new RecycleSheduleAdaptor(getActivity(), routes);
         //adapter.setClickListener(getc);
         recyclerView.setAdapter(adapter);
@@ -134,7 +136,6 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
 
            }
         }
-
     }
 
     @Override
@@ -147,7 +148,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
             Log.d("FRAG", "System Service i null ");
         }
         else {
-            SharedPreferences config = getActivity().getPreferences(Context.MODE_PRIVATE);
+            //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
             String startStation = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
             String stopStation = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
 
@@ -157,7 +158,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
             routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null, delta);
 
             ((MainActivity)getActivity()).systemService.getDepartureVision(departureVisionCode, 30000);
-            Log.d("FRAG", "updated routes start:" + startStation + " stop:"  + stopStation);
+            //Log.d("FRAG", "updated routes start:" + startStation + " stop:"  + stopStation);
         }
         adapter.updateRoutes(routes);
         adapter.notifyDataSetChanged();
@@ -217,26 +218,29 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         return new RecyclerRouteDecoration.SectionCallback() {
             @Override
             public boolean isSection(int position) {
-                adapter.mData.size();
+                adapter.mRoutes.size();
                 // header from the last and current is different we we are a header.
-                return position == 0  || !adapter.mData.get(position).header.equals(adapter.mData.get(position - 1).header);
+                return position == 0  || !adapter.mRoutes.get(position).header.equals(adapter.mRoutes.get(position - 1).header);
             }
 
             @Override
             public CharSequence getSectionHeader(int position) {
-                return adapter.mData.get(position).from + " \u279F " + adapter.mData.get(position).to;
+                return adapter.mRoutes.get(position).from + " \u279F " + adapter.mRoutes.get(position).to;
             }
 
             @Override
             public CharSequence getSectionDate(int position) {
-                return printableDateFmt.format(adapter.mData.get(position).departure_time_as_date);
+                return printableDateFmt.format(adapter.mRoutes.get(position).departure_time_as_date);
             }
         };
     }
 
     @Override
     public void configChanged(SystemService systemService) {
-        //
+        if(adapter != null ) {
+            adapter.clearData();
+        }
         onSystemServiceConnected(systemService);
+
     }
 }

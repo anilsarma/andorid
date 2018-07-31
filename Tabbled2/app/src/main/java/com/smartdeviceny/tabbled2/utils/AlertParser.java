@@ -56,7 +56,7 @@ public class AlertParser {
                         }
                     }
                     if (dt.after(now)) {
-                        System.out.println(title + " " + descrition);
+                        //System.out.println(title + " " + descrition);
                         //alerts.add( new Record(dt, descrition));
                     }
                 }

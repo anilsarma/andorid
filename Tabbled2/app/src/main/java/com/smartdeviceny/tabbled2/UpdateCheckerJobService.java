@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.smartdeviceny.tabbled2.utils.Utils;
+import com.smartdeviceny.tabbled2.values.NotificationValues;
 
 public class UpdateCheckerJobService extends JobService {
 

@@ -9,9 +9,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -23,25 +23,25 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.smartdeviceny.tabbled2.adapters.FragmentPagerMainPageAdaptor;
 import com.smartdeviceny.tabbled2.adapters.ServiceConnected;
 import com.smartdeviceny.tabbled2.utils.Config;
 import com.smartdeviceny.tabbled2.utils.Utils;
+import com.smartdeviceny.tabbled2.values.NotificationValues;
 
 public class MainActivity extends AppCompatActivity {
     boolean mIsBound = false;
     public SystemService systemService;
     public ProgressDialog progressDialog =null;
     int tabSelected = -1;
-
+    SharedPreferences config;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        SharedPreferences config = getPreferences(Context.MODE_PRIVATE);
+        config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //setupConfigDefaults(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
         //setupConfigDefaults(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
         //setupConfigDefaults(config, getString(R.string.CONFIG_DEFAULT_ROUTE), getString(R.string.CONFIG_DEFAULT_ROUTE));
@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
             filter.addAction(NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);
             filter.addAction(NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
             filter.addAction(NotificationValues.BROADCAT_PERIODIC_TIMER);
+            filter.addAction(NotificationValues.BROADCAT_NOTIFY_CONFIG_CHANGED);
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void doCheckIsDatabaseReady(Context context) {
         if (systemService!= null ) {
-            systemService.checkForUpdate();
+            //systemService.checkForUpdate();
             if ( progressDialog != null && progressDialog.isShowing()) {
                 progressDialog.dismiss();
             }
@@ -192,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_Refresh:
                 if(systemService!=null) {
-                    SharedPreferences config = getPreferences(MODE_PRIVATE);
+                    //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     String departureVisionCode = Config.getConfig(config, getString(R.string.CONFIG_DV_STATION), getString(R.string.CONFIG_DEFAULT_DV_STATION));
 
                     systemService.getDepartureVision(departureVisionCode, 30000);
@@ -200,32 +201,47 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_reverse: {
                 // swap the routes
-                if(tabSelected == 1|| tabSelected == 3 ) {
-                    SharedPreferences config = getPreferences(Context.MODE_PRIVATE);
+                if(tabSelected==0 || tabSelected == 1|| tabSelected == 3 ) {
+                    //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     String start = Config.getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
                     String stop = Config.getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
                     Config.setConfig(config, getString(R.string.CONFIG_START_STATION), stop);
                     Config.setConfig(config, getString(R.string.CONFIG_STOP_STATION), start);
+                    String station_code = systemService.getStationCode(stop);// since we are swaping ..
+                    Utils.setConfig(config, getString(R.string.CONFIG_DV_STATION), station_code);
 
-                    for(Fragment f:getSupportFragmentManager().getFragments()) {
-                        ServiceConnected frag = (ServiceConnected) f;
-                        if (frag != null) {
-                            frag.configChanged(systemService); // TODO: implement a reoute refresh here.
-                        }
+                    //for(Fragment f:getSupportFragmentManager().getFragments())
+                    if(systemService!=null) {
+                        systemService.clearDVCache();
+                        systemService.getDepartureVision(station_code, 10000);
                     }
+                    {
+                        // we will handle this in a different context.
+                        sendNotifyConfigChanged();
+//                        ServiceConnected frag = (ServiceConnected) getSupportFragmentManager().getFragments().get(1);
+//                        if (frag != null) {
+//                            frag.configChanged(systemService);
+//                        }
+                    }
+
                 }
             }
             break;
             case R.id.menu_Settings: {
-                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-                startActivity(intent);
+
             }
             break;
-
         }
 
-
         return super.onOptionsItemSelected(item);
+    }
+
+    public void updateFavorite( boolean status, String block_id) {
+        if( status ) {
+            systemService.addFavorite(block_id);
+        } else {
+            systemService.removeFavorite(block_id);
+        }
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -288,9 +304,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    private void sendNotifyConfigChanged() {
+        Intent intent = new Intent(NotificationValues.BROADCAT_NOTIFY_CONFIG_CHANGED);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        Log.d("MAIN", "sending BROADCAT_NOTIFY_CONFIG_CHANGED");
+
+    }
     public String getStationCode() {
-        SharedPreferences config = getPreferences(Context.MODE_PRIVATE);
-        return Config.getConfig(config, getString(R.string.CONFIG_DV_STATION), getString(R.string.CONFIG_DEFAULT_DV_STATION));
+
+        return Config.getConfig(config, getString(R.string.CONFIG_DV_STATION), getString(R.string.CONFIG_DEFAULT_DV_STATION) );
     }
     public class LocalBcstReceiver extends BroadcastReceiver {
         @Override
@@ -326,13 +348,22 @@ public class MainActivity extends AppCompatActivity {
                 for(Fragment f:getSupportFragmentManager().getFragments()) {
                     ServiceConnected frag = (ServiceConnected) f;
                     if (frag != null) {
-                        hasfrag = true;
                         if(systemService != null ) {
                             frag.onTimerEvent(systemService);
                         }
                     }
                 }
-            }  else {
+            } else if (intent.getAction().equals(NotificationValues.BROADCAT_NOTIFY_CONFIG_CHANGED )) {
+                Log.d("MAIN", NotificationValues.BROADCAT_NOTIFY_CONFIG_CHANGED);
+                for(Fragment f:getSupportFragmentManager().getFragments()) {
+                    ServiceConnected frag = (ServiceConnected) f;
+                    if (frag != null) {
+                        if(systemService != null ) {
+                            frag.configChanged(systemService);
+                        }
+                    }
+                }
+            } else {
                 Log.d("MAIN", "got omething not sure what " + intent.getAction());
             }
         }

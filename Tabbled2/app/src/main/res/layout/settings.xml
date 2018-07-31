@@ -177,7 +177,7 @@
                 android:gravity="center"
                 />
             <TextView
-                android:text="Delta Days For Schedules"
+                android:text="Days +/- For Schedules"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="5sp"
@@ -188,6 +188,28 @@
                 />
             <EditText
                 android:id="@+id/edit_text_delta_days"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Delta Days"
+                android:inputType="number"
+                android:text="2"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimary"
+                android:padding="5sp"
+                android:background="@android:color/white"
+                />
+            <TextView
+                android:text="Background Polling Frequency (Seconds)"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5sp"
+                android:textSize="15sp"
+                android:textColor="@android:color/white"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="normal"
+                />
+            <EditText
+                android:id="@+id/edit_text_polling_frequency"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Delta Days"

@@ -19,9 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettingsActivity">
 
-        </activity>
 
         <service android:enabled="true" android:name=".SystemService" />
         <service android:enabled="true" android:name=".PowerStartService"/>

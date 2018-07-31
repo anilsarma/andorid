@@ -29,9 +29,9 @@ public class SQLiteLocalDatabase extends SQLiteOpenHelper {
             databaseDir = dbDir;
         }
         databaseFullPath = databaseDir + File.separator + getDatabaseName();
-        System.out.println("checking for file " + databaseFullPath);
+        //System.out.println("checking for file " + databaseFullPath);
         if (checkdatabase(new File(databaseFullPath))) {
-            System.out.println(databaseFullPath + "length " + new File(databaseFullPath).length());
+            //System.out.println(databaseFullPath + "length " + new File(databaseFullPath).length());
             opendatabase();
         } else {
             try {

@@ -3,6 +3,7 @@ package com.smartdeviceny.tabbled2.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -41,12 +42,12 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
     Spinner stop_spinner;
     TextView text_view_db_version;
     EditText text_edit_delta_days;
-
+    EditText edit_text_polling_frequency;
+    SharedPreferences config;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        SharedPreferences config = null;
-        try { config = getActivity().getPreferences(Context.MODE_PRIVATE);} catch (Exception e) { }
+        try { config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());} catch (Exception e) { }
         View view =  inflater.inflate(R.layout.settings, container, false);
         routes_adapter  = new ArrayAdapter<>(getActivity(), R.layout.spinner_item);
         start_adapter  = new ArrayAdapter<>(getActivity(), R.layout.spinner_item);
@@ -106,22 +107,53 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
                 String value = charSequence.toString();
                 if(!value.isEmpty()){
                     try {
-                        SharedPreferences config = getActivity().getPreferences(Context.MODE_PRIVATE);
+                        //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
                         Config.setConfig(config, getString(R.string.CONFIG_DELTA_DAYS), value);
-                        Toast.makeText(getActivity(), "set delta days to value " + value, Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getActivity(), "set delta days to value " + value, Toast.LENGTH_LONG).show();
                         ((MainActivity)getActivity()).doConfigChanged();
                     }catch(Exception e) {
                         Toast.makeText(getActivity(), "Failed to set value " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 }
             }
-
             @Override
             public void afterTextChanged(Editable editable) {
 
             }
         });
+        edit_text_polling_frequency = view.findViewById(R.id.edit_text_polling_frequency);
+        edit_text_polling_frequency.setText("10");
+        try {
+            String time = config.getString(getString(R.string.CONFIG_POLLING_TIME), getString(R.string.CONFIG_DEFAULT_POLLING_TIME));
+            int int_time= Integer.parseInt(time)/1000;
+            edit_text_polling_frequency.setText("" + int_time);
+        } catch(Exception e) {}
+        edit_text_polling_frequency.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String value = charSequence.toString();
+                if(!value.isEmpty()){
+                    try {
+                        //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+                        int v = Integer.parseInt(value);
+                        v = Math.abs(v) * 1000;
+                        Config.setConfig(config, getString(R.string.CONFIG_POLLING_TIME), "" + v);
+                        ((MainActivity)getActivity()).doConfigChanged();
+                    }catch(Exception e) {
+                        Toast.makeText(getActivity(), "Failed to set value " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
         return view;
         //return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -147,7 +179,7 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
     }
 
     void initData(SystemService systemService ) {
-        SharedPreferences config = getActivity().getPreferences(Context.MODE_PRIVATE);
+        config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         systemService.get_values("select * from routes", "route_long_name");
         String values[] = systemService.get_values( "select * from routes", "route_long_name");
 
@@ -215,7 +247,7 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
     }
 
     void updateStartStop(SystemService systemService, String route_name ) {
-        SharedPreferences config = getActivity().getPreferences(Context.MODE_PRIVATE);
+       // SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         String [] values = systemService.getRouteStations(route_name);
 
         start_adapter.clear();
@@ -256,6 +288,10 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
 
     @Override
     public void configChanged(SystemService systemService) {
+        if(text_view_db_version != null ) {
+            text_view_db_version.setText("version " + systemService.getDBVersion());
+        }
+
         if( route_spinner!=null) {
             if (route_spinner.getSelectedItem() != null) {
                 updateStartStop(systemService, route_spinner.getSelectedItem().toString());

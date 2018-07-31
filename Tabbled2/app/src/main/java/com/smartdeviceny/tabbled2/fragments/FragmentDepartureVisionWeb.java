@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,7 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
         web.getSettings().setBuiltInZoomControls(true);
         web.getSettings().setLoadWithOverviewMode(true);
         web.getSettings().setUseWideViewPort(true);
+        web.getSettings().setJavaScriptEnabled(false);
 
         SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.departure_vision_swipe_view);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -42,8 +44,6 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
             public void onRefresh() {
                 SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.departure_vision_swipe_view);
                 WebView web = getActivity().findViewById(R.id.depart_vision_web_view);
-                web.getSettings().setJavaScriptEnabled(false);
-
                 web.reload();
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -69,6 +69,9 @@ public class FragmentDepartureVisionWeb extends Fragment implements ServiceConne
 
     @Override
     public void configChanged(SystemService systemService) {
-
+        WebView web = getActivity().findViewById(R.id.depart_vision_web_view);
+        if(web != null) {
+            web.loadUrl("http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=" + ((MainActivity) getActivity()).getStationCode());
+        }
     }
 }

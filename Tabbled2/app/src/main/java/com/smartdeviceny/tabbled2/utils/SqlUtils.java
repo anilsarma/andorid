@@ -65,7 +65,7 @@ public class SqlUtils {
         }
         String sql = "INSERT INTO " + table_name  + "(" + cols + ") VALUES(" + values + ")";
         //String sql_truncate = "db.execSQL("delete from "+ TABLE_NAME);
-        System.out.println("insert begin " + table_name);
+       // System.out.println("insert begin " + table_name);
         try {
 
             SQLiteStatement pstmt = db.compileStatement(sql);
@@ -90,7 +90,7 @@ public class SqlUtils {
                 pstmt.clearBindings();
             }
             db.setTransactionSuccessful();
-            System.out.println("insert end " + table_name);
+            //System.out.println("insert end " + table_name);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -109,7 +109,7 @@ public class SqlUtils {
     static public String getStationCode(SQLiteDatabase db, String name)
     {
         try {
-            String sql = "select station_code from stops where station_name like '%" + name + "%'";
+            String sql = "select station_code from station_codes where station_name like '%" + name + "%'";
             Cursor c = db.rawQuery(sql, null);
             ArrayList<HashMap<String, Object>> result = Utils.parseCursor(c);
             if (result.isEmpty()) {
@@ -145,7 +145,7 @@ public class SqlUtils {
     static public String[] get_values(SQLiteDatabase db, String sql, String key )
     {
         ArrayList<HashMap<String, Object>> data = SQLHelper.query(db, sql);
-        System.out.println(data);
+        //System.out.println(data);
         ArrayList<String> njtr = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
             String d = (String)data.get(i).get(key).toString();
@@ -159,7 +159,7 @@ public class SqlUtils {
         int stop_stop_id = (int)get_station(db, to).get("stop_id");
         //and departure_time > '18:10:00' and departure_time < '20:00:00'
         //date = 20171102;
-        System.out.println("output " + date + " stop:" + start_stop_id + " end:"+ stop_stop_id);
+        //System.out.println("output " + date + " stop:" + start_stop_id + " end:"+ stop_stop_id);
         String sql_start = "select * from stop_times st, trips t where stop_id in (  {start_station}) and  st.trip_id in ( select st.trip_id from stop_times st, stop_times st2 where st.trip_id = st2.trip_id and st.stop_id = {start_station} and st.arrival_time < st2.arrival_time and st2.stop_id={stop_station})and st.trip_id in ( select trip_id from trips where service_id in ( select service_id from calendar_dates where date = '{travel_date}') ) and st.trip_id = t.trip_id order by departure_time";
         // for travel time.
         String sql_destination = "select trip_id, shape_dist_traveled, arrival_time as destination_time, stop_id as destination_stop from (select * from stop_times where trip_id in (select st.trip_id from stop_times st, trips t where stop_id in (  {start_station})  and  st.trip_id in ( select st.trip_id from stop_times st, stop_times st2 where st.trip_id = st2.trip_id and st.stop_id = {start_station} and st.arrival_time < st2.arrival_time and st2.stop_id={stop_station})and st.trip_id in ( select trip_id from trips where service_id in ( select service_id from calendar_dates where date = '{travel_date}') ) and st.trip_id = t.trip_id order by departure_time) and stop_id ={stop_station}  order by stop_sequence asc)   group by trip_id";
@@ -186,13 +186,13 @@ public class SqlUtils {
         String sql_stations = "select * from stops where stop_id in (select  distinct stop_id from stop_times where trip_id in ( select distinct trip_id from trips where route_id  = {route_id} ) );";
 
         String sql_route = "select * from routes where route_long_name like '%{route_name}%';".replace("{route_name}", route_name);
-        System.out.println("SQL:" + sql_route);
+        //System.out.println("SQL:" + sql_route);
         String route_id[]  = SQLHelper.get_values(db,sql_route, "route_id");
         if( route_id.length ==0) {
             return  new String[]{};
         }
         sql_stations = sql_stations.replace("{route_id}", "" + route_id[0] );
-        System.out.println("SQL:" + sql_stations );
+        //System.out.println("SQL:" + sql_stations );
         String startStations[] = SQLHelper.get_values( db, sql_stations, "stop_name");
         Set<String> u = new TreeSet<>();
         for (int i = 0; i < startStations.length; i++) {
