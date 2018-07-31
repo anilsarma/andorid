@@ -75,9 +75,8 @@ public class SystemService extends Service {
     public void onCreate() {
         config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         Set<String> tmp  = config.getStringSet(Config.FAVORITES, favorites);
-        for(String f:tmp) {
-            tmp.add(f);
-        }
+        favorites = new HashSet<>(tmp);
+
         for(String f:favorites) {
             Log.d("SVC", "read current fav " + f);
         }
