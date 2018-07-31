@@ -764,6 +764,24 @@ public class SystemService extends Service {
         return value;
     }
 
+    public ArrayList<HashMap<String, Object>> getTripStops(String trip_id) {
+        SQLiteDatabase db = null;
+        ArrayList<HashMap<String, Object>> tripStops  = new ArrayList<>();
+        try {
+            db = sql.getReadableDatabase();
+        } catch (Exception e) {
+            sql.opendatabase();
+            db = sql.getReadableDatabase();
+        }
+        try {
+            tripStops = Utils.parseCursor(SQLHelper.getTripStops(db, trip_id));
+        } catch (Exception e) {
+
+        }
+        return tripStops;
+
+    }
+
     public void addFavorite(String block_id) {
         if(config !=null) {
             //favorites = config.getStringSet(ConfigUtils.FAVORITES, favorites);

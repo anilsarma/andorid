@@ -66,22 +66,6 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         ArrayList<SystemService.Route> routes = new ArrayList<>();
 
-//        if( ((MainActivity)this.getActivity()).systemService  == null ) {
-//            Log.d("FRAGRT", "System Service i null ");
-//        }
-//        else {
-//            String startStation = getConfig(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
-//            String stopStation = getConfig(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
-//            SystemService systemService = ((MainActivity)getActivity()).systemService;
-//            if(systemService != null) {
-//                String station_code = systemService.getStationCode(startStation);
-//                Utils.setConfig(config, getString(R.string.CONFIG_DV_STATION), station_code);
-//            }
-//            int delta = -1;
-//            try {delta = Integer.parseInt(ConfigUtils.getConfig(config, getString(R.string.CONFIG_DELTA_DAYS), "" + delta)); } catch (Exception e){ }
-//            routes = ((MainActivity)this.getActivity()).systemService.getRoutes(startStation, stopStation, null, delta);
-//        }
-        //Log.d("FRAGRT", "onViewCreated");
         adapter = new RecycleSheduleAdaptor(getActivity(), routes);
         SystemService systemService = ((MainActivity)getActivity()).systemService;
         if( systemService !=null ) {

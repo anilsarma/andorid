@@ -55,24 +55,7 @@ public class SQLHelper extends SQLiteOpenHelper {
 
     }
 
-    public void update_tables(SQLiteDatabase db, boolean force) {
 
-        String tables[] = {"trips", "stops", "routes", "calendar_dates", "stop_times"}; // , "shapes"};
-        for (int i = 0; i < tables.length; i++) {
-            //System.out.println("workiing " + tables[i]);
-            ArrayList<HashMap<String, Object>> df = read_csv( tables[i] + ".txt");
-            if ( force ) {
-                try {
-                    db.execSQL("delete from " + tables[i]);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            insert(db, tables[i], df);
-            //System.out.println("done " + tables[i]);
-        }
-    }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
@@ -305,4 +288,12 @@ public class SQLHelper extends SQLiteOpenHelper {
         startStations = u.toArray(new String[0]);
         return startStations;
     }
+   static public  Cursor getTripStops(SQLiteDatabase db, String trip_id) {
+
+        String sql = "select st.*, sp.stop_lat, sp.stop_lon, sp.stop_name from stop_times st, stops sp where sp.stop_id = st.stop_id and st.trip_id = {trip_id} order by stop_sequence";
+        sql = sql.replace("{trip_id}", trip_id);
+        Cursor cursor = db.rawQuery(sql, null);
+        return cursor;
+    }
+
 }

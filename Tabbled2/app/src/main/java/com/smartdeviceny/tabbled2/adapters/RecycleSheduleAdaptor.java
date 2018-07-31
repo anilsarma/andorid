@@ -1,15 +1,20 @@
 package com.smartdeviceny.tabbled2.adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.smartdeviceny.tabbled2.MainActivity;
@@ -19,6 +24,7 @@ import com.smartdeviceny.tabbled2.utils.Utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +43,8 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         TextView arrival_time;
         LinearLayout train_live_layout;
         LinearLayout train_status_layout;
+        LinearLayout details_line_layout;
+        TextView  age;
 
         SystemService.Route route; // will be updated when visible
         int                 position;
@@ -55,9 +63,11 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             departure_time = itemView.findViewById(R.id.departure_time);
             duration = itemView.findViewById(R.id.duration);
             arrival_time = itemView.findViewById(R.id.arrival_time);
+            age = itemView.findViewById(R.id.age);
 
             train_live_layout = itemView.findViewById(R.id.train_live_layout);
             train_status_layout = itemView.findViewById(R.id.train_status_layout);
+            details_line_layout = itemView.findViewById(R.id.details_line_layout);
 
             //myTextView = itemView.findViewById(R.id.tvAnimalName);
             //itemView.setOnClickListener(this);
@@ -158,9 +168,44 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             }
             return false;
         });
+        view.setOnClickListener(view13 -> showDetailDailog(holder));
+        Button button = view.findViewById(R.id.detail_button);
+        view.setOnClickListener(view12 -> {
+            showDetailDailog(holder);
+        });
         return holder;
     }
 
+    void showDetailDailog(ViewHolder holder) {
+        SystemService systemService = ((MainActivity)mInflater.getContext()).systemService;
+        if(systemService!=null && holder.route != null ) {
+            ArrayList<HashMap<String, Object>> stops = systemService.getTripStops(holder.route.trip_id);
+
+            for(HashMap<String, Object> e:stops) {
+                Log.d("REC", " " + Utils.capitalize(e.get("stop_name").toString()) + " " + e.get("arrival_time") + " " + e.get("departure_time"));
+            }
+            //((MainActivity) mInflater.getContext()).getLayoutInflater().inflate()
+            //TableLayout stopLayout = (TableLayout)((MainActivity) mInflater.getContext()).getLayoutInflater().inflate(R.layout.stop_entry_layout, null);
+            ListView stopLayout = (ListView)((MainActivity) mInflater.getContext()).getLayoutInflater().inflate(R.layout.stop_entry_layout, null);
+
+            Object data[] = stops.toArray();
+            StopViewAdaptor adapter=new StopViewAdaptor(mInflater.getContext(), data );
+
+            stopLayout.setAdapter(adapter);
+            AlertDialog.Builder builder=new AlertDialog.Builder(mInflater.getContext());
+            builder.setCancelable(true);
+            builder.setPositiveButton("OK",null);
+            builder.setView(stopLayout);
+            AlertDialog dialog=builder.create();
+            dialog.show();
+
+            final Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            LinearLayout.LayoutParams positiveButtonLL = (LinearLayout.LayoutParams) positiveButton.getLayoutParams();
+            positiveButtonLL.gravity = Gravity.CENTER;
+
+            positiveButton.setLayoutParams(positiveButtonLL);
+        }
+    }
 
 
     // binds the data to the TextView in each row
@@ -185,6 +230,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         holder.train_live_details.setVisibility(View.GONE);
 
         holder.detail_button.setVisibility(View.GONE);
+        holder.details_line_layout.setVisibility(View.GONE);
 
         holder.itemView.setBackgroundResource(resid_normal);
         if (route.favorite) {
@@ -250,7 +296,12 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                     holder.train_live_layout.setVisibility(View.VISIBLE);
                     holder.train_live_header.setVisibility(View.VISIBLE);
                     holder.train_live_details.setVisibility(View.VISIBLE);
+                    long sec = (now.getTime() - dv.createTime.getTime())/1000;
                     holder.train_live_details.setText(dv.status);
+                    holder.age.setText("updated " + printFormat.format(dv.createTime));
+                    holder.details_line_layout.setVisibility(View.VISIBLE);
+                    //holder.detail_button.setVisibility(View.VISIBLE);
+                    //holder.age.setTextColor(red);
                 }
                 String s = dv.status.toUpperCase();
                 if (s.contains("CANCEL") || s.contains("DELAY")) {
