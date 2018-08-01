@@ -419,4 +419,13 @@ public class Utils {
         editor.putString(name, value);
         editor.commit();
     }
+
+    public static void cleanFiles(File dir, String prefix) {
+        for(File f:dir.listFiles()) {
+            if( f.getName().startsWith(prefix)) {
+                //Log.d("UTIL", "will remove " + f.getAbsolutePath());
+                try {f.getAbsoluteFile().delete();}catch (Exception e) {}
+            }
+        }
+    }
 }

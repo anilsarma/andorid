@@ -144,6 +144,7 @@ public class SystemService extends Service {
                 String version_str = Utils.getFileContent(file);
                 _checkRemoteDBZipUpdate(version_str);
                 Utils.delete(file);
+                Utils.cleanFiles(file.getParentFile(), "version");
                 return true;
             }
 
@@ -192,6 +193,7 @@ public class SystemService extends Service {
                         sql.close();
                         sql = null;
                         Utils.delete(dbFilePath);
+                        Utils.cleanFiles(file.getParentFile(), "rail_data_db");
                         Log.d("SQL", "renamed file " + tmpFilename.getAbsolutePath() + " to " + dbFilePath.getAbsolutePath());
                     }
 
@@ -564,6 +566,7 @@ public class SystemService extends Service {
                     }
                 }
                 Utils.delete(file);
+                Utils.cleanFiles(file.getParentFile(), "njts_departure_vision_" + station.toLowerCase());
                 return true;
             }
 
