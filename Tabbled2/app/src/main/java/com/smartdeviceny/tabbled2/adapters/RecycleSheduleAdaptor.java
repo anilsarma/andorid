@@ -147,9 +147,9 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         }
         this.departureVision = tmp;
         Log.d("REC", "DV Size:" + departureVision.size());
-        for(SystemService.DepartureVisionData dv:this.departureVision.values()) {
-            Log.d("REC", "Entry " + dv.block_id + "  track:" + dv.track + " status:" + dv.status + " " + dv.station + " " +  dv.time);
-        }
+        //for(SystemService.DepartureVisionData dv:this.departureVision.values()) {
+        //    Log.d("REC", "Entry " + dv.block_id + "  track:" + dv.track + " status:" + dv.status + " " + dv.station + " " +  dv.time);
+        //}
     }
     public void clearData() { this.mRoutes.clear(); /*this.departureVision.clear();*/ }
     public void updateRoutes( List<SystemService.Route> routes) {
@@ -180,10 +180,19 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         SystemService systemService = ((MainActivity)mInflater.getContext()).systemService;
         if(systemService!=null && holder.route != null ) {
             ArrayList<HashMap<String, Object>> stops = systemService.getTripStops(holder.route.trip_id);
-
-            for(HashMap<String, Object> e:stops) {
-                Log.d("REC", " " + Utils.capitalize(e.get("stop_name").toString()) + " " + e.get("arrival_time") + " " + e.get("departure_time"));
+            ArrayList<HashMap<String, Object>> tmp = new ArrayList<>();
+            HashMap<String, Object> header = new HashMap<>();
+            header.put("arrival_time", "Time");
+            header.put("stop_name", "");
+            tmp.add(header);
+            for(HashMap<String, Object> o : stops) {
+                tmp.add(o);
             }
+            stops = tmp;
+            //for(HashMap<String, Object> e:stops) {
+            //    Log.d("REC", " " + Utils.capitalize(e.get("stop_name").toString()) + " " + e.get("arrival_time") + " " + e.get("departure_time"));
+            //}
+            //}
             //((MainActivity) mInflater.getContext()).getLayoutInflater().inflate()
             //TableLayout stopLayout = (TableLayout)((MainActivity) mInflater.getContext()).getLayoutInflater().inflate(R.layout.stop_entry_layout, null);
             ListView stopLayout = (ListView)((MainActivity) mInflater.getContext()).getLayoutInflater().inflate(R.layout.stop_entry_layout, null);
@@ -194,17 +203,17 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             stopLayout.setAdapter(adapter);
             AlertDialog.Builder builder=new AlertDialog.Builder(mInflater.getContext());
             builder.setCancelable(true);
-            builder.setPositiveButton("OK",null);
+            //builder.setPositiveButton("OK",null);
             builder.setView(stopLayout);
             AlertDialog dialog=builder.create();
-
-            final Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            LinearLayout.LayoutParams positiveButtonLL = (LinearLayout.LayoutParams) positiveButton.getLayoutParams();
-            positiveButtonLL.gravity = Gravity.CENTER;
-            positiveButtonLL.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-            positiveButtonLL.width = LinearLayout.LayoutParams.MATCH_PARENT;
-
-            positiveButton.setLayoutParams(positiveButtonLL);
+//
+//            final Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+//            LinearLayout.LayoutParams positiveButtonLL = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//            positiveButtonLL.gravity = Gravity.CENTER;
+//            positiveButtonLL.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+//            positiveButtonLL.width = LinearLayout.LayoutParams.MATCH_PARENT;
+//
+//            positiveButton.setLayoutParams(positiveButtonLL);
             dialog.show();
         }
     }
@@ -266,7 +275,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             } catch (Exception e) {
                e.printStackTrace();
            }
-            Log.d("REC", "got departure vision train:" + dv.block_id + " track:" + dv.track + " status:" + dv.status + " code:" + dv.station + " rtcode:" + route.station_code);
+            //Log.d("REC", "got departure vision train:" + dv.block_id + " track:" + dv.track + " status:" + dv.status + " code:" + dv.station + " rtcode:" + route.station_code);
             if( !dv.track.isEmpty()) {
                 try {
                     Date tm = Utils.makeDate(Utils.getTodayYYYYMMDD(null), dv.time, "yyyyMMdd HH:mm"); // always today's date for this
@@ -277,7 +286,9 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                         holder.track_number.setVisibility(View.VISIBLE);
                         holder.track_number.setText(dv.track);
                         holder.track_number.setBackgroundResource(resid_round_green);
-
+                        holder.train_live_details.setText(dv.status);
+                        holder.age.setText("updated " + printFormat.format(dv.createTime));
+                        holder.details_line_layout.setVisibility(View.VISIBLE);
 
                         if (diff > 2 * 1000 * 60) { // more than 5 minutes
                             // check the creation time
@@ -285,6 +296,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                             if (cdiff > 2 * 1000 * 60) {
                                 holder.track_number.setBackgroundResource(resid_round_gray);
                                 oldEntry = true;
+                                holder.details_line_layout.setVisibility(View.GONE);
                             }
                         }
                     }

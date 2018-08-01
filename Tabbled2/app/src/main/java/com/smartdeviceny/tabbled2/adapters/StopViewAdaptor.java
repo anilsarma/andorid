@@ -10,6 +10,8 @@ import android.widget.TextView;
 import com.smartdeviceny.tabbled2.R;
 import com.smartdeviceny.tabbled2.utils.Utils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 public class StopViewAdaptor extends ArrayAdapter {
@@ -31,7 +33,15 @@ public class StopViewAdaptor extends ArrayAdapter {
         }
         HashMap<String, Object> p = (HashMap<String, Object>)data[position];
         View tablerow = view.findViewById(R.id.stop_entry_row);
-        ((TextView) view.findViewById(R.id.arrival_time)).setText(p.get("arrival_time").toString());
+        DateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+        DateFormat printFormat = new SimpleDateFormat("hh:mm a");
+        String time = p.get("arrival_time").toString();
+        try {
+            time = printFormat.format(dateFormat.parse(p.get("arrival_time").toString()));
+        } catch(Exception e) {
+
+        }
+        ((TextView) view.findViewById(R.id.arrival_time)).setText(time);
         ((TextView) view.findViewById(R.id.stop_name)).setText(Utils.capitalize(p.get("stop_name").toString()));
         if( position%2==0) {
             tablerow.setBackgroundResource(R.drawable.stop_background_even);
