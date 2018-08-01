@@ -3,10 +3,15 @@ package com.smartdeviceny.njts;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.smartdeviceny.njts.values.NotificationValues;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class UpdateCheckerJobService extends JobService {
 
@@ -18,7 +23,17 @@ public class UpdateCheckerJobService extends JobService {
     public boolean onStartJob(JobParameters jobParameters) {
         Log.d("UPDJOB", "onStartJob - periodic job.");
         try {
-            sendCheckForUpdate();
+            // we should do this in the background on wifi only.
+            SharedPreferences config  = PreferenceManager.getDefaultSharedPreferences(this);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+            Date now = new Date();
+            String last = config.getString("LAST_TIME", formatter.format(now));
+            Date lasttime = formatter.parse(last);
+            long diff = now.getTime()- lasttime.getTime();
+            Log.d("UPDJOB", "Time diffence :"  + (diff/(1000 * 60)) + " minutes");
+            if( diff  > (1000* 60 * 60 * 6 )) { // 6 hrs.
+                sendCheckForUpdate();
+            }
         } catch(Exception e) {
           e.printStackTrace();
         } finally {

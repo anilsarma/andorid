@@ -6,7 +6,7 @@ android {
         applicationId "com.smartdeviceny.njts"
         minSdkVersion 24
         targetSdkVersion 27
-        versionCode 7
+        versionCode 8
         versionName "2.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

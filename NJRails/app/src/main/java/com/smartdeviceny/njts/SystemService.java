@@ -89,21 +89,6 @@ public class SystemService extends Service {
 
         setupDb();
         sendDatabaseReady();
-        //checkForUpdate();
-
-//        NotificationManager notificationManager =
-//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//        String channelId = getString(R.string.default_notification_channel_id);
-//        CharSequence channelName = "Upgrades";
-//        int importance = NotificationManager.IMPORTANCE_LOW;
-//        NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, importance);
-//        notificationChannel.enableLights(true);
-//        notificationChannel.setLightColor(Color.RED);
-//        notificationChannel.enableVibration(true);
-//        notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
-//        notificationManager.createNotificationChannel(notificationChannel);
-
     }
 
     @Override
@@ -129,6 +114,8 @@ public class SystemService extends Service {
     public boolean isUpdateRunning() {
         return checkingVersion;
     }
+
+
     void _checkRemoteDBUpdate() {
         Log.d("SVC", "checking for updated schedule db");
         File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
@@ -193,7 +180,7 @@ public class SystemService extends Service {
                         sql.close();
                         sql = null;
                         Utils.delete(dbFilePath);
-                        Utils.cleanFiles(file.getParentFile(), "rail_data_db");
+                        //Utils.cleanFiles(file.getParentFile(), "rail_data_db");
                         Log.d("SQL", "renamed file " + tmpFilename.getAbsolutePath() + " to " + dbFilePath.getAbsolutePath());
                     }
 
@@ -295,6 +282,20 @@ public class SystemService extends Service {
             if(f.exists()) {
                 sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
             }
+            if( sql != null ) {
+                // check for a valid database.
+                String db = UtilsDBVerCheck.getDBVersion(sql);
+                if( db.isEmpty()) {
+                    checkForUpdate();
+                }
+            }
+            else {
+                // we don't have a  db get it.
+                checkForUpdate();
+            }
+
+            /// if sql
+
         }
     }
     private void notify_user_of_upgrade(@NonNull String new_version) {
