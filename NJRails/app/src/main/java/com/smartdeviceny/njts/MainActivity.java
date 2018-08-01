@@ -1,393 +1,355 @@
 package com.smartdeviceny.njts;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.NotificationCompat;
+import android.os.IBinder;
+import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
-import com.smartdeviceny.njts.R;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveClient;
-import com.google.android.gms.drive.DriveResourceClient;
-import com.google.android.gms.drive.MetadataBuffer;
-import com.google.android.gms.drive.query.Filters;
-import com.google.android.gms.drive.query.Query;
-import com.google.android.gms.drive.query.SearchableField;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.smartdeviceny.njts.adapters.FragmentPagerMainPageAdaptor;
+import com.smartdeviceny.njts.adapters.ServiceConnected;
+import com.smartdeviceny.njts.utils.ConfigUtils;
+import com.smartdeviceny.njts.utils.Utils;
+import com.smartdeviceny.njts.values.Config;
+import com.smartdeviceny.njts.values.ConfigDefault;
+import com.smartdeviceny.njts.values.NotificationValues;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+public class MainActivity extends AppCompatActivity {
+    boolean mIsBound = false;
+    public SystemService systemService;
+    public ProgressDialog progressDialog =null;
+    int tabSelected = -1;
+    SharedPreferences config;
 
-
-public class MainActivity extends FragmentActivity {
-    protected  static final boolean FORCE_DOWNLOAD=false;
-    protected static final int REQUEST_CODE_SIGN_IN = 0;
-    protected static final int REQUEST_CODE_OPEN_ITEM = 1;
-    private static final String TAG = "MainActivity";
-    DriveClient mDriveClient;
-    DriveResourceClient mDriveResourceClient;
-    // When requested, this adapter returns a DemoObjectFragment,
-    // representing an object in the collection.
-    DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
-    ViewPager mViewPager;
-    SQLHelper dbHelper;
-
-    public void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_pager);
-        if (dbHelper == null) {
-            dbHelper = new SQLHelper(getApplicationContext());
-        }
-        SQLiteDatabase db= dbHelper.getWritableDatabase();
-        boolean dbNotReady = false;
-        try {
-            if (SQLHelper.check_table(db, "trips") == 0) {
-                dbNotReady = true;
+        config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        //setupConfigDefaults(config, getString(R.string.CONFIG_START_STATION), getString(R.string.CONFIG_DEFAULT_START_STATION));
+        //setupConfigDefaults(config, getString(R.string.CONFIG_STOP_STATION), getString(R.string.CONFIG_DEFAULT_STOP_STATION));
+        //setupConfigDefaults(config, getString(R.string.CONFIG_DEFAULT_ROUTE), getString(R.string.CONFIG_DEFAULT_ROUTE));
+
+        startService(new Intent(this, PowerStartService.class));
+        startService(new Intent(this, SystemService.class));
+        setContentView(R.layout.activity_main);
+        initToolbar();
+
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
+        ViewPager viewPager = findViewById(R.id.view_pager);
+        FragmentPagerMainPageAdaptor adapter = new FragmentPagerMainPageAdaptor(getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
+
+        tabLayout.addOnTabSelectedListener(new  TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                tabSelected = tab.getPosition();
+                Log.d("MAIN", "Tab selected " + tabSelected);
+
             }
-        } catch (Exception e) {
-            dbNotReady=true;
-        }
-        mDemoCollectionPagerAdapter =  new DemoCollectionPagerAdapter(getSupportFragmentManager());
-        mViewPager =  findViewById(R.id.pager);
-        mViewPager.setAdapter(mDemoCollectionPagerAdapter);
-        if (dbNotReady) {
-            mDemoCollectionPagerAdapter.setCount(1);
-            mDemoCollectionPagerAdapter.notifyDataSetChanged();
-        }
 
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                tabSelected = -1;
+                Log.d("MAIN", "Tab un-selected " + tabSelected);
+            }
 
-
-
-//        Intent intent = getIntent();
-//        Bundle extras = intent.getExtras();
-//        if (extras != null ) {
-//            Boolean value = extras.getBoolean("UPGRADE");
-//            if (value!=null && value) {
-//                //Toast.makeText(MainActivity.this.getApplicationContext(), "Got upgrade intent " + intent, Toast.LENGTH_LONG).show();
-//            }
-//        }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                Log.d("MAIN", "Tab selected" + tabSelected);
+                onTabSelected(tab);
+            }
+        });
     }
 
-    void checkDB() {
-        if (dbHelper == null) {
-            dbHelper = new SQLHelper(getApplicationContext());
-        }
-        SQLiteDatabase db= dbHelper.getWritableDatabase();
-        RailHelper.create_tables(db);
-        System.out.println("Tables" + SQLHelper.check_table(db, "trips"));
-        if ( SQLHelper.check_table(db, "trips")<100 ) {
-            try {
-
-                new TaskUpgradeDB(getApplicationContext(), new ITaskUpgradeComplete() {
-                    @Override
-                    public void onUpgradeTaskComplete() {
-                        //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        //startActivity(intent);
-
-//                        Intent i = getBaseContext().getPackageManager()
-//                                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-//                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                        startActivity(i);
-                        mDemoCollectionPagerAdapter.setCount(5);
-                        mDemoCollectionPagerAdapter.notifyDataSetChanged();
-
-                    }
-                }).execute("");
-            } catch (Exception ee) {
-                ee.printStackTrace();
-            }
-        }
-    }
     @Override
     protected void onStart() {
         super.onStart();
-        final DownloadNJTGitHubFile github = new DownloadNJTGitHubFile(getApplicationContext(), "", "", null);
-        File version_upgrade = github.getCacheDir("version_upgrade.txt");
-        long diffms = (System.currentTimeMillis() - version_upgrade.lastModified());
-
-        long hours =  0;
-        long minutes = 30;
-        long seconds = 5;
-        //showCustomNotification(null, null);
-        if (diffms < (( (hours *60 + minutes) *60  + seconds) *1000) ) {
-            if (!FORCE_DOWNLOAD) {
-                //Toast.makeText(getApplicationContext(), "Skipping check Modified time is" + diffms, Toast.LENGTH_LONG).show();
-                return;
-            }
-        }
-
-        //Toast.makeText(MainActivity.this.getApplicationContext(), "Modified time is" + diffms,Toast.LENGTH_LONG).show();
-        new DownloadNJTGitHubFile(getApplicationContext(), "version.txt", "version_upgrade.txt", new IGitHubDownloadComple() {
-            @Override
-            public void onDownloadComplete(String filename, File folder, File destination) {
-                // download the zip file nao
-                MainActivity.this.downloadZipFile();
-            }
-
-            @Override
-            public void onFailed(String filename) {
-
-            }
-        }).execute("");
-        //checkDB();
-
-    }
-
-
-
-    private void showCustomNotification(String from, String to){
-        String ns = Context.NOTIFICATION_SERVICE;
-        final NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
-
-        //int icon = R.mipmap.ic_launcher;
-        //long when = System.currentTimeMillis();
-//        Notification notification = new Notification(icon, getString(R.string.app_name), when);
-//        notification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
-//        notification.defaults |= Notification.DEFAULT_LIGHTS; // LED
-//        notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
-//        notification.defaults |= Notification.DEFAULT_SOUND; // Sound
-        String msg = "upgrade";
-        if (from != null  && to != null ) {
-            msg = "schedule upgrade required from '" + from + "' to '" + to + "'";
-        }
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.app_njs_icon)
-                        .setContentTitle("NJTS Schedule Upgrade Required")
-                        .setTicker("Upgrade (Open to see the info).")
-                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                        .setContentText(msg);
-        // NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        Intent intent_upgrade = new Intent(this, MainActivity.class);
-        intent_upgrade.putExtra("UPGRADE", true ); //If you wan to send data also
-        PendingIntent pIntentUpgrade = PendingIntent.getActivity(this, 1000, intent_upgrade, 0);
-        PendingIntent pIntentIgnore = PendingIntent.getActivity(this, 1001, new Intent(this, MainActivity.class), 0);
-        // disable the actions for now.
-        //mBuilder.addAction(R.mipmap.ic_launcher, "Upgrade", pIntentUpgrade)
-        //        .addAction(R.mipmap.ic_launcher, "Ignore", pIntentIgnore)
-                //.addAction(R.mipmap.ic_launcher, "Later", pIntent);
-        ;
-        Notification notification = mBuilder.build();
-
-        notification.flags|= Notification.FLAG_AUTO_CANCEL;
-        //notification.defaults |= Notification.DEFAULT_SOUND;
-
-        mNotificationManager.notify(R.integer.NOTIFICATION_ROUTE_STATUS, notification);
-    }
-
-    // called multiple times ...
-    void downloadZipFile()
-    {
-        System.out.println("in downloadZipFile");
-        if (dbHelper == null) {
-            dbHelper = new SQLHelper(getApplicationContext());
-        }
-        //using this just as a ulitiy functon
-        final DownloadNJTGitHubFile utilsNJGitHub = new DownloadNJTGitHubFile(getApplicationContext(), "", "", null);
-        final File version = utilsNJGitHub.getCacheDir("version.txt");
-        File version_upgrade = utilsNJGitHub.getCacheDir("version_upgrade.txt");
-        File rail_data = utilsNJGitHub.getCacheDir("rail_data.zip");
-
-        boolean download=true;
-
-        final String upgrade_version_str = utilsNJGitHub.readFile(version_upgrade);
-        final String version_str = utilsNJGitHub.readFile(version);
+        doBindService();
         try {
-            if (version_str.equals(upgrade_version_str)) {
-                download = false;
-            }
-            if(upgrade_version_str.isEmpty()) {
-                download = false;
-            }
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(NotificationValues.BROADCAT_DATABASE_READY);
+            filter.addAction(NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);
+            filter.addAction(NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
+            filter.addAction(NotificationValues.BROADCAT_PERIODIC_TIMER);
+            filter.addAction(NotificationValues.BROADCAT_NOTIFY_CONFIG_CHANGED);
+            LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch(Exception e) {
-        }
-        if(FORCE_DOWNLOAD) {
-            download = true;
-        }
-
-        final File download_complete = utilsNJGitHub.getCacheDir("download_complete.txt");
-        if (download) {
-            showCustomNotification(version_str, upgrade_version_str);
-            if (rail_data.exists()) {
-                rail_data.delete();
+        // bug in noughat... crap
+        Utils.scheduleJob(this.getApplicationContext(), DepartureVisionJobService.class, 15*1000, false);
+    }
+    public void doCheckIsDatabaseReady(Context context) {
+        if (systemService!= null ) {
+            //systemService.checkForUpdate();
+            if ( progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
             }
-        }
-
-        // check if the rail_data in archive is good.
-        if (rail_data.exists()) {
-            if (download_complete.exists()) {
-                String s = utilsNJGitHub.readFile(download_complete);
-                if (!s.equals(upgrade_version_str)) {
-                    rail_data.delete();
-                    download = true;
-                }
+            if( !systemService.isDatabaseReady()) {
+                showUpdateProgressDialog(context, "System getting ready.");
             }
-            else {
-                // download did not complete
-                rail_data.delete();
-                download = true;
-            }
-        }
 
-        // if the rail data file exists, mean that we have successfuly downloaded the rail data file.
-        if (rail_data.exists()) {
-            //Toast.makeText(MainActivity.this.getApplicationContext(), "no download required of rail_data.zip version:" + version_str + " remote:" + upgrade_version_str, Toast.LENGTH_LONG).show();
-            // download_complete
-            File destination = utilsNJGitHub.getCacheDir("rail_data.zip");
-            File dir = utilsNJGitHub.getCacheDir("nj_rails_cache");
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-            utilsNJGitHub.removeFiles(dir);
-
-            try {
-                if (download) {
-                    ArrayList<File> o = utilsNJGitHub.unzipfile(destination, dir);
-                    String s = "" + o.size();
-                    for (String f : dir.list()) {
-                        s += " " + f;
-                    }
-                    //Toast.makeText(MainActivity.this.getApplicationContext(), "unzipped " + s, Toast.LENGTH_LONG).show();
-
-                    try {
-                        utilsNJGitHub.writeFile(download_complete, upgrade_version_str);
-
-                        SQLiteDatabase db= dbHelper.getWritableDatabase();
-                        dbHelper.useAsset=false;
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "NJT downloading Schedule", Toast.LENGTH_LONG).show();
-                        dbHelper.update_tables(db, true);
-                        utilsNJGitHub.writeFile(version, upgrade_version_str);
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "NJT Schedule upgrade complete.", Toast.LENGTH_LONG).show();
-                    }
-                    catch (Exception e)
-                    {
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "NJT Schedule download/upgrade failed.", Toast.LENGTH_LONG).show();
-                    }
-                }
-
-            }
-            catch (IOException e)
-            {
-                Toast.makeText(MainActivity.this.getApplicationContext(), "unzipped failed " + e, Toast.LENGTH_LONG).show();
-            }
-        }
-        else {
-            //Toast.makeText(MainActivity.this.getApplicationContext(), "Starting download of rail_data.zip", Toast.LENGTH_LONG).show();
-            new DownloadNJTGitHubFile(getApplicationContext(), "rail_data.zip", "rail_data.zip", new IGitHubDownloadComple() {
-                @Override
-                public void onDownloadComplete(String filename, File folder, File destination) {
-                    Toast.makeText(MainActivity.this.getApplicationContext(), "Download Complete, upgrading rail_data.zip", Toast.LENGTH_LONG).show();
-                    try {
-                        utilsNJGitHub.writeFile(download_complete, upgrade_version_str);
-
-                        /*unzip the file */
-                        File dir = utilsNJGitHub.getCacheDir("nj_rails_cache");
-                        if (!dir.exists()) {
-                            dir.mkdir();
-                        }
-
-                        ArrayList<File> o = utilsNJGitHub.unzipfile(destination, dir);
-                        //Toast.makeText(MainActivity.this.getApplicationContext(), "total unzipped rail_data.zip " + o.size(), Toast.LENGTH_LONG).show();
-
-                        SQLiteDatabase db= dbHelper.getWritableDatabase();
-                        dbHelper.useAsset=false;
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "NJTS downloading Schedule", Toast.LENGTH_LONG).show();
-                        dbHelper.update_tables(db, true);
-                        utilsNJGitHub.writeFile(version, upgrade_version_str);
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "NJTS Schedule download complete.", Toast.LENGTH_LONG).show();
-                    }
-                    catch (Exception e)
-                    {
-                        Toast.makeText(MainActivity.this.getApplicationContext(), "NJTS Schedule download failed.", Toast.LENGTH_LONG).show();
-                    }
-                }
-                @Override
-                public void onFailed(String filename) {
-
-                }
-            }).execute("");
+        } else {
+            Log.d("MAIN", "system service not init " + systemService );
         }
     }
 
-
-    private GoogleSignInClient buildGoogleSignInClient() {
-        Scope publicFolder = new Scope("1yc6JGDvqO9BzVa7oAfjFO53pgiTJr9me");
-        //publicFolder = Drive.SCOPE_FILE;
-        GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestScopes(publicFolder).build();
-        return GoogleSignIn.getClient(this, signInOptions);
+    public void doCheckForUpdate(Context context) {
+        if (systemService!= null ) {
+            systemService.checkForUpdate();
+            if ( progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+            if( systemService.isUpdateRunning()) {
+                showUpdateProgressDialog(context, "Checking for Latest NJ Transit Train Schedules");
+            }
+        } else {
+            Log.d("MAIN", "system service not init " + systemService );
+        }
     }
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQUEST_CODE_SIGN_IN:
-                if (resultCode != RESULT_OK) {
-                    // Sign-in may fail or be cancelled by the user. For this sample, sign-in is
-                    // required and is fatal. For apps where sign-in is optional, handle
-                    // appropriately
-                    Log.e(TAG, "Sign-in failed.");
-                    finish();
-                    return;
-                }
+    protected void onStop() {
+        super.onStop();
+        doUnbindService();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+    }
 
-                Task<GoogleSignInAccount> getAccountTask =   GoogleSignIn.getSignedInAccountFromIntent(data);
-                if (getAccountTask.isSuccessful()) {
-                    initializeDriveClient(getAccountTask.getResult());
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
-                    Query query = new Query.Builder().addFilter(Filters.eq(SearchableField.TITLE, "public")).build();
-
-                    Task<MetadataBuffer> buffer = mDriveResourceClient.query(query);
-                    buffer.addOnSuccessListener(new OnSuccessListener<MetadataBuffer>() {
-                        @Override
-                        public void onSuccess(MetadataBuffer metadata) {
-                            //Toast.makeText(getApplicationContext(), "file good" + metadata.getCount() + " " , Toast.LENGTH_LONG).show();
-                        }
-                    }) .addOnFailureListener(this, new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            // Handle failure...
-                            // [START_EXCLUDE]
-                            Log.e(TAG, "Error retrieving files", e);
-                            Toast.makeText(getApplicationContext(), "fill fialed", Toast.LENGTH_LONG).show();
-                            finish();
-                            // [END_EXCLUDE]
-                        }
-                    });
-
-
-                } else {
-                    Log.e(TAG, "Sign-in failed.");
-                    finish();
-                }
-                break;
-            case REQUEST_CODE_OPEN_ITEM:
-
-                break;
+    @Override
+    protected void onPostResume() {
+        if(progressDialog !=null && progressDialog.isShowing()) {
+            if(systemService != null && !systemService.isUpdateRunning()) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
         }
-        super.onActivityResult(requestCode, resultCode, data);
+        doCheckIsDatabaseReady(this);
+        super.onPostResume();
     }
 
-    private void initializeDriveClient(GoogleSignInAccount signInAccount) {
-        mDriveClient = Drive.getDriveClient(getApplicationContext(), signInAccount);
-        mDriveResourceClient = Drive.getDriveResourceClient(getApplicationContext(), signInAccount);
-        //    onDriveClientReady();
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    private Toolbar initToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //getSupportActionBar().setTitle("NJ Transit Schedule");
+        return toolbar;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        Log.d("MA", "menu created");
+        // RecyclerView rv;
+        //rv.
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_Refresh:
+                if(systemService!=null) {
+                    //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    String departureVisionCode = ConfigUtils.getConfig(config, Config.DV_STATION, ConfigDefault.DV_STATION);
+                    systemService.getDepartureVision(departureVisionCode, 5000);
+                }
+                return true;
+            case R.id.menu_reverse: {
+                // swap the routes
+                if(tabSelected==0 || tabSelected == 1|| tabSelected == 3 ) {
+                    //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    String start = ConfigUtils.getConfig(config, Config.START_STATION, ConfigDefault.START_STATION);
+                    String stop = ConfigUtils.getConfig(config, Config.STOP_STATION, ConfigDefault.STOP_STATION);
+                    ConfigUtils.setConfig(config, Config.START_STATION, stop);
+                    ConfigUtils.setConfig(config, Config.STOP_STATION, start);
+                    String station_code = systemService.getStationCode(stop);// since we are swaping ..
+                    Utils.setConfig(config, Config.DV_STATION, station_code);
+
+                    //for(Fragment f:getSupportFragmentManager().getFragments())
+                    if(systemService!=null) {
+                        systemService.clearDVCache();
+                        systemService.getDepartureVision(station_code, 10000);
+                    }
+                    {
+                        // we will handle this in a different context.
+                        sendNotifyConfigChanged();
+//                        ServiceConnected frag = (ServiceConnected) getSupportFragmentManager().getFragments().get(1);
+//                        if (frag != null) {
+//                            frag.configChanged(systemService);
+//                        }
+                    }
+
+                }
+            }
+            break;
+            case R.id.menu_Settings: {
+
+            }
+            break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void updateFavorite( boolean status, String block_id) {
+        if( status ) {
+            systemService.addFavorite(block_id);
+        } else {
+            systemService.removeFavorite(block_id);
+        }
+    }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            systemService = ((RemoteBinder)service).getService();
+            doCheckIsDatabaseReady(MainActivity.this);
+
+            Log.d("MAIN", "SystemService connected, calling onSystemServiceConnected on fragments");
+            for(Fragment f:getSupportFragmentManager().getFragments()) {
+                ServiceConnected frag = (ServiceConnected) f;
+                if (frag != null) {
+                    frag.onSystemServiceConnected(systemService);
+                }
+            }
+
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been unexpectedly disconnected - process crashed.
+            systemService = null;
+            Log.d("MAIN", "SystemService disconnected");
+        }
+    };
+
+    void doBindService() {
+        if (!mIsBound) {
+            Log.d("SVCON", "SystemService binding.");
+            bindService(new Intent(this, SystemService.class), mConnection, Context.BIND_AUTO_CREATE);
+            mIsBound = true;
+        }
+    }
+
+    void doUnbindService() {
+        if (mIsBound) {
+            Log.d("SVCON", "SystemService doUnbindService.");
+            // If we have received the service, and hence registered with it, then now is the time to unregister.
+            unbindService(mConnection);
+            mIsBound = false;
+            //textStatus.setText("Unbinding.");
+        }
+    }
+
+    public void showUpdateProgressDialog(Context context, @Nullable String msg) {
+        progressDialog = new ProgressDialog(context);
+        if(msg == null) {
+            msg = "Checking for NJ Transit schedule updates";
+        }
+        progressDialog.setMessage(msg);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+    }
+
+    public void doConfigChanged() {
+        for(Fragment f:getSupportFragmentManager().getFragments()) {
+            ServiceConnected frag = (ServiceConnected) f;
+            if (frag != null) {
+                if(systemService != null ) {
+                    frag.configChanged(systemService);
+                }
+            }
+        }
+    }
+    private void sendNotifyConfigChanged() {
+        Intent intent = new Intent(NotificationValues.BROADCAT_NOTIFY_CONFIG_CHANGED);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        Log.d("MAIN", "sending BROADCAT_NOTIFY_CONFIG_CHANGED");
+
+    }
+    public String getStationCode() {
+
+        return ConfigUtils.getConfig(config, Config.DV_STATION, ConfigDefault.DV_STATION );
+    }
+    public class LocalBcstReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            //Log.d("MAIN", "onReceive " + intent.getAction());
+            if (intent.getAction().equals(NotificationValues.BROADCAT_DATABASE_READY )) {
+                Log.d("MAIN", "Database is ready we can do all the good stuff");
+                if(progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+                doConfigChanged();
+            } else if (intent.getAction().equals(NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE)) {
+                Log.d("MAIN", NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);
+                if(progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            } else if (intent.getAction().equals(NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED )) {
+                Log.d("MAIN", NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
+                for(Fragment f:getSupportFragmentManager().getFragments()) {
+                    ServiceConnected frag = (ServiceConnected) f;
+                    if(systemService != null ) {
+                        frag.onDepartureVisionUpdated(systemService);
+                    }
+
+                }
+            } else if (intent.getAction().equals(NotificationValues.BROADCAT_PERIODIC_TIMER )) {
+                Log.d("MAIN", NotificationValues.BROADCAT_PERIODIC_TIMER);
+                boolean hasfrag = false;
+                for(Fragment f:getSupportFragmentManager().getFragments()) {
+                    ServiceConnected frag = (ServiceConnected) f;
+                    if(systemService != null ) {
+                        frag.onTimerEvent(systemService);
+                    }
+                }
+            } else if (intent.getAction().equals(NotificationValues.BROADCAT_NOTIFY_CONFIG_CHANGED )) {
+                Log.d("MAIN", NotificationValues.BROADCAT_NOTIFY_CONFIG_CHANGED);
+                for(Fragment f:getSupportFragmentManager().getFragments()) {
+                    ServiceConnected frag = (ServiceConnected) f;
+                    if(systemService != null ) {
+                        frag.configChanged(systemService);
+                    }
+                }
+            } else {
+                Log.d("MAIN", "got omething not sure what " + intent.getAction());
+            }
+        }
+    }
+    // Our handler for received Intents. This will be called whenever an Intent
+    private BroadcastReceiver mMessageReceiver = new LocalBcstReceiver();
 }

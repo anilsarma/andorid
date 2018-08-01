@@ -1,316 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.smartdeviceny.njts.RouteActivity">
+    android:fitsSystemWindows="true">
 
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-    <ScrollView
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:title="NJ Train Schedule"
+            app:titleTextColor="#FFFFFF"
+            app:contentInsetStartWithNavigation="0dp"
+            app:layout_scrollFlags="enterAlwaysCollapsed|snap"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+        <!-- app:layout_scrollFlags="scroll|enterAlways" -->
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tab_layout"
+            style="@style/CustomTabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_gravity="left"
+            android:background="@color/colorPrimary"
+            app:tabGravity="fill"
+            app:tabMode="fixed"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <!-- look at https://material.io/develop/android/components/app-bar-layout/
+         layout behaviour, is responsible for working with the AppBarLayout
+         android.support.design.widget.AppBarLayout$ScrollingViewBehavior
+    -->
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="0dp">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:showDividers="middle"
-            android:divider="?android:dividerHorizontal"
-            android:orientation="vertical">
-
-            <TableLayout
-                android:id="@+id/menu"
-                android:layout_width="match_parent"
-                android:showDividers="middle"
-                android:divider="?android:dividerHorizontal"
-                android:padding="10dp"
-                android:layout_height="wrap_content">
-
-                <TableRow>
-                    <TableLayout>
-                        <TableRow>
-
-                            <TextView
-                                android:padding="3dip"
-                                android:text="Header" />
-
-                            <TextView
-                                android:gravity="right"
-                                android:padding="3dip"
-                                android:text="First Line" />
-                        </TableRow>
-
-                        <TableRow>
-
-                            <TextView
-                                android:padding="3dip"
-                                android:text="Second Line" />
-
-                            <TextView
-                                android:gravity="right"
-                                android:padding="3dip"
-                                android:text="Second Line Status" />
-                        </TableRow>
-                    </TableLayout>
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="dd" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="449dp"
-                    android:layout_height="299dp">
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="ddd" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="dome" />
-                </TableRow>
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="djdjdjdj" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="d" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="dd" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="449dp"
-                    android:layout_height="299dp">
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="ddd" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="dome" />
-                </TableRow><TableRow>
-
-                <TextView
-                    android:padding="3dip"
-                    android:text="djdjdjdj" />
-
-                <TextView
-                    android:gravity="right"
-                    android:padding="3dip"
-                    android:text="" />
-            </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="d" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="dd" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="449dp"
-                    android:layout_height="299dp">
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="ddd" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="dome" />
-                </TableRow>
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="djdjdjdj" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="d" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="dd" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="449dp"
-                    android:layout_height="299dp">
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="ddd" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:padding="3dip"
-                        android:text="dd" />
-
-                    <TextView
-                        android:gravity="right"
-                        android:padding="3dip"
-                        android:text="dome" />
-                </TableRow>
-            </TableLayout>
-
-            <Button
-                android:id="@+id/toggle"
-                android:layout_width="386dp"
-                android:layout_height="wrap_content"
-                android:text="Click" />
-        </LinearLayout>
-    </ScrollView>
-
-</android.support.constraint.ConstraintLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -1,21 +1,13 @@
 <resources>
     <string name="app_name">NJTSchedule</string>
-    <string-array name="planets_array">
-        <item>Mercury</item>
-        <item>Venus</item>
-        <item>Earth</item>
-        <item>Mars</item>
-        <item>Jupiter</item>
-        <item>Saturn</item>
-        <item>Uranus</item>
-        <item>Neptune</item>
+    <string name="appbar_scrolling_view_behavior">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
+    <string name="default_notification_channel_id">Channel ID</string>
+
+
+    <string-array name="SettingDeltaDays">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
     </string-array>
-    <string name="title_activity_maps">Test Maps</string>
-    <string name="settings">Settings</string>
-    <string name="upgrade">Upgrade</string>
-    <string name="version">Version</string>
-    <string name="google_maps_key">AIzaSyBoIzv1e-aA-XI5EGj-TNgkjlL-HbEY39c</string>
-    <string name="default_start_station">New York</string>
-    <string name="default_stop_station">New Brunswick</string>
-    <string name="default_route_name">Northeast Corridor</string>
+
 </resources>

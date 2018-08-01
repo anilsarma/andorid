@@ -1,0 +1,4 @@
+<resources>
+    <integer name="NOTIFICATION_ROUTE_STATUS">1</integer>
+
+</resources>

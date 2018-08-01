@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.smartdeviceny.njts">
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.smartdeviceny.njts">
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/app_njs_icon"
@@ -12,31 +10,42 @@
         android:theme="@style/AppTheme">
 
         <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id"/>
 
-        <!--
-           The API key for Google Maps-based APIs.
-      -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
-
-        <activity android:name="com.smartdeviceny.njts.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.smartdeviceny.njts.route.RoutePagerActivity"
-            android:label="@string/title_activity_maps">
-        </activity>
 
-        <activity
-            android:name="com.smartdeviceny.njts.SettingsActivity"
-            android:label="@string/settings">
-        </activity>
+
+        <service android:enabled="true" android:name=".SystemService" />
+        <service android:enabled="true" android:name=".PowerStartService"/>
+        <service android:enabled="true" android:name=".UpdateCheckerJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <!-- just trigger events -->
+        <receiver android:name=".PowerStartServiceReceiver"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+
+        <service android:enabled="true" android:name=".DepartureVisionJobService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <receiver android:name=".MainActivity$LocalBcstReceiver" android:enabled="true"/>
+        <receiver android:name=".SystemService$LocalBcstReceiver" android:enabled="true"/>
+
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 </manifest>
