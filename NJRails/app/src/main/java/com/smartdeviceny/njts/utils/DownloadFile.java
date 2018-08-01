@@ -47,7 +47,7 @@ public class DownloadFile {
             //request.setMimeType("text/plain");//application/x-compressed
         }
         request.setDescription(description);
-        //request.setVisibleInDownloadsUi(false);
+        request.setVisibleInDownloadsUi(false);
         request.setAllowedNetworkTypes(request_flags);
         request.setRequiresDeviceIdle(false);
         request.setRequiresCharging(false);
