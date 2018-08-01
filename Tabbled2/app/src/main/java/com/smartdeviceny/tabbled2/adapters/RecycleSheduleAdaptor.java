@@ -182,8 +182,9 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             ArrayList<HashMap<String, Object>> stops = systemService.getTripStops(holder.route.trip_id);
             ArrayList<HashMap<String, Object>> tmp = new ArrayList<>();
             HashMap<String, Object> header = new HashMap<>();
-            header.put("arrival_time", "Time");
-            header.put("stop_name", "");
+            header.put("arrival_time", "");
+            SimpleDateFormat printFormat = new SimpleDateFormat("hh:mm a");
+            header.put("stop_name", "#" + holder.route.block_id + " " + printFormat.format(holder.route.departure_time_as_date));
             tmp.add(header);
             for(HashMap<String, Object> o : stops) {
                 tmp.add(o);
