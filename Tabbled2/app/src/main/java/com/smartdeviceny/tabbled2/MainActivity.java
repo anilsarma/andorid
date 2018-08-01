@@ -185,8 +185,7 @@ public class MainActivity extends AppCompatActivity {
                 if(systemService!=null) {
                     //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     String departureVisionCode = ConfigUtils.getConfig(config, Config.DV_STATION, ConfigDefault.DV_STATION);
-
-                    systemService.getDepartureVision(departureVisionCode, 30000);
+                    systemService.getDepartureVision(departureVisionCode, 5000);
                 }
                 return true;
             case R.id.menu_reverse: {
