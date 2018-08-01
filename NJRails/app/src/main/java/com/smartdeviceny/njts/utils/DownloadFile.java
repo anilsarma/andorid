@@ -21,31 +21,33 @@ public class DownloadFile {
     DownloadManager manager;
     LocalBcstReceiver receiver = new LocalBcstReceiver();
     ArrayList<Long> requestid = new ArrayList<>();
-    Callback          callback;
+    Callback callback;
 
     public interface Callback {
         boolean downloadComplete(DownloadFile d, long id, String url, File file);
+
         void downloadFailed(DownloadFile d, long id, String url);
     }
+
     public DownloadFile(Context context, Callback callback) {
         this.context = context;
         this.callback = callback;
         manager = (DownloadManager) context.getApplicationContext().getSystemService(Context.DOWNLOAD_SERVICE);
         context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
-    public void cleanup()
-    {
+
+    public void cleanup() {
         context.unregisterReceiver(receiver);
     }
 
-    public long downloadFile(String url, String title, String description, int request_flags, @Nullable String mimetype) {
+    public DownloadManager.Request buildRequest(String url, String title, String description, int request_flags, @Nullable String mimetype) {
         //String url = "https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt";
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        if (mimetype==null) {
+        if (mimetype == null) {
             //request.setMimeType("text/plain");//application/x-compressed
         }
         request.setDescription(description);
-
+        //request.setVisibleInDownloadsUi(false);
         request.setAllowedNetworkTypes(request_flags);
         request.setRequiresDeviceIdle(false);
         request.setRequiresCharging(false);
@@ -53,12 +55,22 @@ public class DownloadFile {
         request.addRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36");
 
         request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, title);
-        long id = manager.enqueue(request);
-        this.requestid.add(id);
-        Log.d("download", "downloadFile scheduling .. " + id  + " " + url + " as " + title);
-        return id;
+        return request;
     }
 
+    public long downloadFile(String url, String title, String description, int request_flags, @Nullable String mimetype) {
+        //String url = "https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt";
+        DownloadManager.Request request = buildRequest( url, title, description, request_flags, mimetype);
+        return enqueue(request);
+
+    }
+
+    public long enqueue(DownloadManager.Request request) {
+        long id = manager.enqueue(request);
+        this.requestid.add(id);
+        //Log.d("download", "downloadFile scheduling .. " + id  + " " + url + " as " + title);
+        return id;
+    }
     long downloadFile(DownloadManager.Request request ) {
         long id = manager.enqueue(request);
         this.requestid.add(id);

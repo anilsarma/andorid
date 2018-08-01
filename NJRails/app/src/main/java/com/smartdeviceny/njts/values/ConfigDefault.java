@@ -9,4 +9,6 @@ public interface ConfigDefault {
     String DV_STATION = "NY";
     String POLLING_TIME = "30000";
 
+    boolean DEBUG=false;
+
 }

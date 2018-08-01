@@ -7,11 +7,15 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/app_njs_icon"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:backupAgent=".NJTSBackupAgent"
+        >
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id"/>
+
+        <meta-data android:name="com.google.android.backup.api_key" android:value="AEdPqrEAAAAIMHl2ybEZTBQNXceXvzz4dDim2xFAekMFhZZ9bw" />
 
         <activity android:name=".MainActivity">
             <intent-filter>

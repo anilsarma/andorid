@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -42,6 +44,7 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
     TextView text_view_db_version;
     EditText text_edit_delta_days;
     EditText edit_text_polling_frequency;
+    CheckBox checkBox_debug;
     SharedPreferences config;
     @Nullable
     @Override
@@ -153,6 +156,18 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
 
             }
         });
+
+        checkBox_debug = view.findViewById(R.id.checkbox_debug);
+        checkBox_debug.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+
+                   SharedPreferences.Editor edit = config.edit();
+                   edit.putBoolean(Config.DEBUG, b);
+                   edit.apply();
+
+            }
+        });
         return view;
         //return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -182,8 +197,9 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
         systemService.get_values("select * from routes", "route_long_name");
         String values[] = systemService.get_values( "select * from routes", "route_long_name");
 
-        text_view_db_version.setText("version " + systemService.getDBVersion());
-        //text_view_db_version.setTextColor(0x0000FF);
+        String str = getActivity().getString(R.string.app_version) + " schedule version " + systemService.getDBVersion();
+        text_view_db_version.setText(str);
+
 
 
         routes_adapter.clear();
@@ -282,7 +298,8 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
     @Override
     public void configChanged(SystemService systemService) {
         if(text_view_db_version != null ) {
-            text_view_db_version.setText("version " + systemService.getDBVersion());
+            String str = getActivity().getString(R.string.app_version) + " schedule version " + systemService.getDBVersion();
+            text_view_db_version.setText(str);
         }
 
         if( route_spinner!=null) {

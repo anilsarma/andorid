@@ -176,50 +176,89 @@
                 android:fontFamily="sans-serif-light"
                 android:gravity="center"
                 />
-            <TextView
-                android:text="Days +/- For Schedules"
+            <TableLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5sp"
-                android:textSize="15sp"
-                android:textColor="@android:color/white"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textStyle="normal"
-                />
-            <EditText
-                android:id="@+id/edit_text_delta_days"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Delta Days"
-                android:inputType="number"
-                android:text="2"
-                android:textAlignment="center"
-                android:textColor="@color/colorPrimary"
-                android:padding="5sp"
-                android:background="@android:color/white"
-                />
-            <TextView
-                android:text="Background Polling Frequency (Seconds)"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5sp"
-                android:textSize="15sp"
-                android:textColor="@android:color/white"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textStyle="normal"
-                />
-            <EditText
-                android:id="@+id/edit_text_polling_frequency"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Delta Days"
-                android:inputType="number"
-                android:text="2"
-                android:textAlignment="center"
-                android:textColor="@color/colorPrimary"
-                android:padding="5sp"
-                android:background="@android:color/white"
-                />
+                android:stretchColumns="*"
+                android:paddingBottom="5sp"
+                android:layout_height="wrap_content">
+                <TableRow android:paddingBottom="5sp">
+                    <TextView
+
+                        android:text="Days +/- For Schedules"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5sp"
+                        android:textSize="15sp"
+                        android:textColor="@android:color/white"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textStyle="normal"
+                        />
+                    <EditText
+                        android:id="@+id/edit_text_delta_days"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="Delta Days"
+                        android:inputType="number"
+                        android:text="2"
+                        android:textAlignment="center"
+                        android:textColor="@color/colorPrimary"
+                        android:paddingBottom="5sp"
+                        android:paddingTop="5sp"
+                        android:background="@android:color/white"
+                        android:paddingEnd="20sp"
+                        />
+                </TableRow>
+                <TableRow android:paddingBottom="5sp">
+                    <TextView
+
+                        android:text="Polling Frequency (sec)"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5sp"
+                        android:textSize="15sp"
+                        android:textColor="@android:color/white"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textStyle="normal"
+                        />
+                    <EditText
+                        android:id="@+id/edit_text_polling_frequency"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Delta Days"
+                        android:inputType="number"
+                        android:text="2"
+                        android:textAlignment="center"
+                        android:textColor="@color/colorPrimary"
+                        android:padding="5sp"
+                        android:paddingEnd="20sp"
+                        android:background="@android:color/white"
+                        />
+                </TableRow>
+                <TableRow android:paddingBottom="5sp">
+                    <TextView
+
+                        android:text="Debugging Mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5sp"
+                        android:textSize="15sp"
+                        android:textColor="@android:color/white"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textStyle="normal"
+                        />
+                    <CheckBox
+                        android:id="@+id/checkbox_debug"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:textAlignment="center"
+                        android:textColor="@color/colorPrimary"
+                        android:padding="5sp"
+                        android:paddingEnd="20sp"
+                        />
+                </TableRow>
+            </TableLayout>
         </LinearLayout>
 
     </LinearLayout>

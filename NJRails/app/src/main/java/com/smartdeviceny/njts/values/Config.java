@@ -13,6 +13,8 @@ public interface Config {
     String DV_STATION = "CONFIG_DV_STATION";
     String POLLING_TIME = "CONFIG_POLLING_TIME";
 
+    String DEBUG = "CONFIG_DEBUG";
+
 
 
 

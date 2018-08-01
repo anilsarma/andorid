@@ -23,7 +23,10 @@ android {
                     output.outputFileName = name
                 }
             }
-
+            resValue "string", "app_version", "${defaultConfig.versionName}_${defaultConfig.versionCode}"
+        }
+        debug {
+            resValue "string", "app_version", "${defaultConfig.versionName}_${defaultConfig.versionCode}-debug"
         }
     }
     compileOptions {

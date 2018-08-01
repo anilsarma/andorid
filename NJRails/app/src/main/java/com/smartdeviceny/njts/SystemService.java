@@ -28,6 +28,7 @@ import com.smartdeviceny.njts.utils.SqlUtils;
 import com.smartdeviceny.njts.utils.Utils;
 import com.smartdeviceny.njts.utils.UtilsDBVerCheck;
 import com.smartdeviceny.njts.values.Config;
+import com.smartdeviceny.njts.values.ConfigDefault;
 import com.smartdeviceny.njts.values.NotificationValues;
 
 import org.jsoup.Jsoup;
@@ -279,23 +280,19 @@ public class SystemService extends Service {
     setupDb() {
         if(sql == null ) {
             File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
-            if(f.exists()) {
+            if (f.exists()) {
                 sql = new SQLiteLocalDatabase(getApplicationContext(), f.getName(), null);
             }
-            if( sql != null ) {
-                // check for a valid database.
-                String db = UtilsDBVerCheck.getDBVersion(sql);
-                if( db.isEmpty()) {
-                    checkForUpdate();
-                }
-            }
-            else {
-                // we don't have a  db get it.
+        }
+        if( sql != null ) {
+            // check for a valid database.
+            String db = UtilsDBVerCheck.getDBVersion(sql);
+            if( db.isEmpty()) {
                 checkForUpdate();
             }
-
-            /// if sql
-
+        } else {
+            // we don't have a  db get it.
+            checkForUpdate();
         }
     }
     private void notify_user_of_upgrade(@NonNull String new_version) {
@@ -400,7 +397,9 @@ public class SystemService extends Service {
     HashMap<String, ArrayList<HashMap<String, Object>>> status = new HashMap<>();
     HashMap<String, DepartureVisionData> status_by_trip = new HashMap<>();
     HashMap<String, Long> dvPendingRequests = new HashMap<>();
+    // why do we need 2 ??
     HashMap<String, Date> lastRequestTime = new HashMap<>();
+    // API is a like a keep alive to refresh the time, we don't really need this anymore.
     HashMap<String, Date> lastApiCallTime = new HashMap<>();
     public void updateDapartureVisionCheck(String station)
     {
@@ -429,12 +428,11 @@ public class SystemService extends Service {
     }
     public void clearDVCache() {
         synchronized (lastRequestTime) {
-            //status_by_trip.clear();
             lastRequestTime.clear();
         }
-        synchronized (dvPendingRequests) {
-            dvPendingRequests.clear();
-        }
+//        synchronized (dvPendingRequests) {
+//            dvPendingRequests.clear();
+//        }
     }
     // the idea here is that this will be periodically triggered
     // when ever we have data.
@@ -557,6 +555,10 @@ public class SystemService extends Service {
                         DepartureVisionData dd = new DepartureVisionData(dv);
                         status_by_trip.put(dd.block_id, dd);
                     }
+                    synchronized (lastRequestTime) {
+                        //refresh the time
+                        lastRequestTime.put(station, new Date());
+                    }
                     sendDepartVisionUpdated();
                     // send this off on an intent.
                 } catch(Exception e) {
@@ -583,10 +585,13 @@ public class SystemService extends Service {
             }
         });
 
-        long id = d.downloadFile(url, "njts_departure_vision_" + station.toLowerCase() + ".html",
+        DownloadManager.Request request = d.buildRequest(url, "njts_departure_vision_" + station.toLowerCase() + ".html",
                 "NJ Transit DepartureVision",
                 DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "text/html");
-
+        if( config.getBoolean(Config.DEBUG, ConfigDefault.DEBUG)) {
+            request.setVisibleInDownloadsUi(true);
+        }
+        long id = d.enqueue(request);
         synchronized (dvPendingRequests) {
             dvPendingRequests.put(url, new Long(id));
         }
