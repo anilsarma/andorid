@@ -1,13 +1,15 @@
 apply plugin: 'com.android.application'
-
+def versionMajor = 2
+def versionMinor = 0
+def versionPatch = 2
 android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.smartdeviceny.njts"
         minSdkVersion 24
         targetSdkVersion 27
-        versionCode 10
-        versionName "2.0.2-10"
+        versionCode versionMajor * 1000 + versionMinor * 100 + versionPatch
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}_${versionCode}"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -19,7 +21,7 @@ android {
 
             applicationVariants.all { variant ->
                 variant.outputs.each{ output ->
-                    def name = "NJTSchedule_v${variant.versionName}_${variant.versionCode}.apk"
+                    def name = "NJTSchedule_v${variant.versionName}.apk"
                     output.outputFileName = name
                 }
             }
