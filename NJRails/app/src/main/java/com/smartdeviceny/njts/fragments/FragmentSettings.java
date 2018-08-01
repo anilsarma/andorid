@@ -110,7 +110,10 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
                 if(!value.isEmpty()){
                     try {
                         //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-                        ConfigUtils.setConfig(config, Config.DELTA_DAYS, value);
+                        int v = Integer.parseInt(value);
+                        v = Math.min(15,v);
+                        v = Math.max(0,v);
+                        ConfigUtils.setConfig(config, Config.DELTA_DAYS, "" + v);
                         //Toast.makeText(getActivity(), "set delta days to value " + value, Toast.LENGTH_LONG).show();
                         ((MainActivity)getActivity()).doConfigChanged();
                     }catch(Exception e) {
