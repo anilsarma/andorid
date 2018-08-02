@@ -161,15 +161,11 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
         });
 
         checkBox_debug = view.findViewById(R.id.checkbox_debug);
-        checkBox_debug.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-
-                   SharedPreferences.Editor edit = config.edit();
-                   edit.putBoolean(Config.DEBUG, b);
-                   edit.apply();
-
-            }
+        checkBox_debug.setChecked(config.getBoolean(Config.DEBUG, ConfigDefault.DEBUG));
+        checkBox_debug.setOnCheckedChangeListener((compoundButton, b) -> {
+               SharedPreferences.Editor edit = config.edit();
+               edit.putBoolean(Config.DEBUG, b);
+               edit.apply();
         });
         return view;
         //return super.onCreateView(inflater, container, savedInstanceState);

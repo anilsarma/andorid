@@ -348,7 +348,7 @@ public class Utils {
             Log.e("JOB", "error: Some error while scheduling the job");
         }
         else {
-            Log.d("JOB", "job scheduled " + ms_frequency);
+           // Log.d("JOB", "job scheduled " + ms_frequency);
         }
     }
 

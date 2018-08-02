@@ -82,7 +82,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
                 SwipeRefreshLayout swipeRefreshLayout = getActivity().findViewById(R.id.fragment_njt_schedule);
                 swipeRefreshLayout.setRefreshing(false);
                 if( ((MainActivity)getActivity()).systemService  != null ) {
-                    ((MainActivity)getActivity()).systemService.getDepartureVision(((MainActivity)getActivity()).getStationCode(), 0);
+                    ((MainActivity)getActivity()).systemService.schdeuleDepartureVision(((MainActivity)getActivity()).getStationCode(), 0);
                 }
             }
         });
@@ -104,6 +104,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
     public void onDepartureVisionUpdated(SystemService systemService) {
         // get the departure vision data.
         HashMap<String, SystemService.DepartureVisionData> data =  systemService.getCachedDepartureVisionStatus_byTrip();
+        data = (data==null)?new HashMap<>():data;
         if(data.isEmpty() ) {
             //nothing to do
             return;
@@ -114,8 +115,8 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         if(recyclerView !=null) {
             recyclerView.invalidate();
         }
-
-        ((MainActivity)getActivity()).systemService.updateDapartureVisionCheck(((MainActivity)getActivity()).getStationCode());
+        //TODO: this is expensive need to remove in the future.
+        ((MainActivity)getActivity()).systemService.updateActiveDepartureVisionStation(((MainActivity)getActivity()).getStationCode());
         for(SystemService.DepartureVisionData dv:data.values()) {
            try {
                if(notifyUser(dv) ) {
@@ -146,7 +147,7 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
         try {delta = Integer.parseInt(ConfigUtils.getConfig(config, Config.DELTA_DAYS, "" + delta)); } catch (Exception e){ }
         ArrayList<SystemService.Route> routes = systemService.getRoutes(startStation, stopStation, null, delta);
 
-        systemService.getDepartureVision(departureVisionCode, 30000);
+        systemService.schdeuleDepartureVision(departureVisionCode, 30000);
         //Log.d("FRAGRT", "updated routes start:" + startStation + " stop:"  + stopStation);
 
         adapter.updateRoutes(routes);

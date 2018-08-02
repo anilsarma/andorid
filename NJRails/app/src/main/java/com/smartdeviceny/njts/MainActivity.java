@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                 if(systemService!=null) {
                     //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     String departureVisionCode = ConfigUtils.getConfig(config, Config.DV_STATION, ConfigDefault.DV_STATION);
-                    systemService.getDepartureVision(departureVisionCode, 5000);
+                    systemService.schdeuleDepartureVision(departureVisionCode, 5000);
                 }
                 return true;
             case R.id.menu_reverse: {
@@ -201,18 +201,10 @@ public class MainActivity extends AppCompatActivity {
 
                     //for(Fragment f:getSupportFragmentManager().getFragments())
                     if(systemService!=null) {
-                        systemService.clearDVCache();
-                        systemService.getDepartureVision(station_code, 10000);
+                        systemService.updateActiveDepartureVisionStation(station_code);
+                        systemService.schdeuleDepartureVision(station_code, 10000);
                     }
-                    {
-                        // we will handle this in a different context.
-                        sendNotifyConfigChanged();
-//                        ServiceConnected frag = (ServiceConnected) getSupportFragmentManager().getFragments().get(1);
-//                        if (frag != null) {
-//                            frag.configChanged(systemService);
-//                        }
-                    }
-
+                    sendNotifyConfigChanged();
                 }
             }
             break;
@@ -309,18 +301,18 @@ public class MainActivity extends AppCompatActivity {
             // TODO Auto-generated method stub
             //Log.d("MAIN", "onReceive " + intent.getAction());
             if (intent.getAction().equals(NotificationValues.BROADCAT_DATABASE_READY )) {
-                Log.d("MAIN", "Database is ready we can do all the good stuff");
+                //Log.d("MAIN", "Database is ready we can do all the good stuff");
                 if(progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
                 }
                 doConfigChanged();
             } else if (intent.getAction().equals(NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE)) {
-                Log.d("MAIN", NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);
+                //Log.d("MAIN", NotificationValues.BROADCAT_DATABASE_CHECK_COMPLETE);
                 if(progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
                 }
             } else if (intent.getAction().equals(NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED )) {
-                Log.d("MAIN", NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
+                //Log.d("MAIN", NotificationValues.BROADCAT_DEPARTURE_VISION_UPDATED);
                 for(Fragment f:getSupportFragmentManager().getFragments()) {
                     ServiceConnected frag = (ServiceConnected) f;
                     if(systemService != null ) {
@@ -329,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             } else if (intent.getAction().equals(NotificationValues.BROADCAT_PERIODIC_TIMER )) {
-                Log.d("MAIN", NotificationValues.BROADCAT_PERIODIC_TIMER);
+                //Log.d("MAIN", NotificationValues.BROADCAT_PERIODIC_TIMER);
                 boolean hasfrag = false;
                 for(Fragment f:getSupportFragmentManager().getFragments()) {
                     ServiceConnected frag = (ServiceConnected) f;
@@ -338,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             } else if (intent.getAction().equals(NotificationValues.BROADCAT_NOTIFY_CONFIG_CHANGED )) {
-                Log.d("MAIN", NotificationValues.BROADCAT_NOTIFY_CONFIG_CHANGED);
+                //Log.d("MAIN", NotificationValues.BROADCAT_NOTIFY_CONFIG_CHANGED);
                 for(Fragment f:getSupportFragmentManager().getFragments()) {
                     ServiceConnected frag = (ServiceConnected) f;
                     if(systemService != null ) {

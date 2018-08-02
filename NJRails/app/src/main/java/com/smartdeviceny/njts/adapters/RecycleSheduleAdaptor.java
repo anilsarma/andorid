@@ -107,48 +107,19 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
     }
     public HashMap<String, SystemService.DepartureVisionData> departureVision = new HashMap<>();
 
-    public void updateDepartureVision(@Nullable HashMap<String, SystemService.DepartureVisionData> departureVision) {
-        HashMap<String, SystemService.DepartureVisionData> tmp = new HashMap<>();
-        HashMap<String, SystemService.DepartureVisionData> track = new HashMap<>();
-        // build a list of entries with track info save them into tmp.
-        for( String key:this.departureVision.keySet()) {
-            SystemService.DepartureVisionData data = this.departureVision.get(key);
-            if ( data.track.isEmpty() && data.status.isEmpty()) {
-                //this.departureVision.remove(key);
-            } else {
-                data = data.clone();
-                tmp.put(key, data);
-                if(!data.track.isEmpty()) {
-                    track.put(data.track, data);
-                }
-            }
-        }
-        for( String key:departureVision.keySet()) {
-            SystemService.DepartureVisionData data = departureVision.get(key);
-            SystemService.DepartureVisionData old = tmp.get(key);
-            if(old != null ) {
-                data = data.clone();
-                if( data.track.isEmpty() && !old.track.isEmpty() && old.station.equals(data.station)) {
-                    data.track = old.track;
-                    data.stale = true;
-                }
-            }
-            tmp.put(key, data);
-            if(!data.track.isEmpty()) {
-                SystemService.DepartureVisionData td = track.get(data.track);
-                if(td!=null) {
-                    //td.track = ""; // do we want to really do this , history is nice
-                    td.status = ""; // new entry exits so clear the old entry.
-                }
-            }
-        }
-        this.departureVision = tmp;
-        Log.d("REC", "DV Size:" + departureVision.size());
-        //for(SystemService.DepartureVisionData dv:this.departureVision.values()) {
-        //    Log.d("REC", "Entry " + dv.block_id + "  track:" + dv.track + " status:" + dv.status + " " + dv.station + " " +  dv.time);
-        //}
+    String make_key(String station, String block_id) {
+        return station + "::" + block_id;
     }
-    public void clearData() { this.mRoutes.clear(); /*this.departureVision.clear();*/ }
+    public void updateDepartureVision(@Nullable HashMap<String, SystemService.DepartureVisionData> departureVision) {
+        HashMap<String, SystemService.DepartureVisionData> data = new HashMap<>();
+        for(SystemService.DepartureVisionData dv:departureVision.values()) {
+            data.put(make_key(dv.station, dv.block_id), dv);
+        }
+        this.departureVision = data;
+        Log.d("REC", "DV Size:" + departureVision.size());
+    }
+
+    public void clearData() { this.mRoutes.clear(); }
     public void updateRoutes( List<SystemService.Route> routes) {
         this.mRoutes = routes;
     }
@@ -217,7 +188,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
     }
 
 
-    // binds the data to the TextView in each row
+    // binds the data to the TextView in each row TODO :: cleanup.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Date now = new Date();
@@ -250,21 +221,12 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
         boolean oldEntry = false;
 
         SimpleDateFormat printFormat = new SimpleDateFormat("hh:mm a");
-        SystemService.DepartureVisionData dv = departureVision.get(route.block_id);
-        // check for a stale cache, happens when swapping from<=>to.
-        if( dv!=null && !route.station_code.equals(dv.station)) {
-            Log.d("REC", "not match station_code " + route.station_code + " " + dv.station);
-            dv = null;
-        }
-        if( dv!=null && !route.block_id.equals(dv.block_id)) {
-            Log.d("REC", "does not match block_id " + route.block_id + " " + dv.block_id);
-            dv = null;
-        }
+        SystemService.DepartureVisionData dv = departureVision.get(make_key(route.station_code, route.block_id));
+
         if( dv !=null ) {
             // we need to check for time.
-            boolean current_train = false;
+           boolean current_train = false; // current train could
            try {
-                //long diff = route.departure_time_as_date.getTime() - now.getTime();
                 Date tm = Utils.makeDate(Utils.getTodayYYYYMMDD(null), dv.time, "yyyyMMdd HH:mm"); // always today's date for this
                 long diff = route.departure_time_as_date.getTime() - tm.getTime();
                 if( diff < Math.abs( 60 * 1000 * 60 )) {
@@ -273,13 +235,12 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             } catch (Exception e) {
                e.printStackTrace();
            }
-            //Log.d("REC", "got departure vision train:" + dv.block_id + " track:" + dv.track + " status:" + dv.status + " code:" + dv.station + " rtcode:" + route.station_code);
             if( !dv.track.isEmpty()) {
                 try {
-                    Date tm = Utils.makeDate(Utils.getTodayYYYYMMDD(null), dv.time, "yyyyMMdd HH:mm"); // always today's date for this
-                    long diff = route.departure_time_as_date.getTime() - tm.getTime();
-                    // more than an hour old must be a previous day
-                    if( diff > -( 60 * 1000 * 60 )) {
+                    //Date now = new Date(); //Utils.makeDate(Utils.getTodayYYYYMMDD(null), dv.time, "yyyyMMdd HH:mm"); // always today's date for this
+                    long diff = route.departure_time_as_date.getTime() - now.getTime();
+                    // time to depart is less than an hour.
+                    if( diff  < ( 60 * 1000 * 60 )) {
                         current_train = true;
                         holder.track_number.setVisibility(View.VISIBLE);
                         holder.track_number.setText(dv.track);
@@ -288,7 +249,10 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                         holder.age.setText("updated " + printFormat.format(dv.createTime));
                         holder.details_line_layout.setVisibility(View.VISIBLE);
 
-                        if (diff > 2 * 1000 * 60) { // more than 5 minutes
+                        // diff will become negative once departure time passes the now.
+                        // check againt the creation time, sometime the train may not have departed
+                        // and the departure vision status has not yet updated.
+                        { // more than x minutes
                             // check the creation time
                             long cdiff = now.getTime() - dv.createTime.getTime();
                             if (cdiff > 2 * 1000 * 60) {
@@ -298,13 +262,18 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                             }
                         }
                     }
-                } catch (ParseException e) {
+                    if(dv.stale) {
+                        //holder.track_number.setBackgroundResource(resid_round_gray);
+                        //holder.details_line_layout.setVisibility(View.GONE);
+                    }
+
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
             if( !dv.status.isEmpty() && current_train) {
-                if (!oldEntry) {
+                if (!dv.stale && !oldEntry) {
                     holder.train_live_layout.setVisibility(View.VISIBLE);
                     holder.train_live_header.setVisibility(View.VISIBLE);
                     holder.train_live_details.setVisibility(View.VISIBLE);
@@ -325,9 +294,7 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                 }
             }
         }
-        else {
-            //Log.d("REC", "DV not found for block_id:" + route.block_id);
-        }
+
 
         String duration = "";
         try {

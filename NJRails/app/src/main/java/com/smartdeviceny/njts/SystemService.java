@@ -25,6 +25,7 @@ import com.smartdeviceny.njts.utils.DownloadFile;
 import com.smartdeviceny.njts.utils.SQLHelper;
 import com.smartdeviceny.njts.utils.SQLiteLocalDatabase;
 import com.smartdeviceny.njts.utils.SqlUtils;
+import com.smartdeviceny.njts.utils.TimerKeeper;
 import com.smartdeviceny.njts.utils.Utils;
 import com.smartdeviceny.njts.utils.UtilsDBVerCheck;
 import com.smartdeviceny.njts.values.Config;
@@ -37,6 +38,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -126,22 +128,35 @@ public class SystemService extends Service {
             _checkRemoteDBZipUpdate(""); // download it anyway we dont have a valid database.
             return;
         }
+        if(  versionPendingRequests.getPending("version.txt") > 0 ) {
+            Log.d("SVC", "pending request for version.txt found");
+            //eturn; for now too much logic on checkVersion
+        }
         final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
             @Override
             public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
-                String version_str = Utils.getFileContent(file);
-                _checkRemoteDBZipUpdate(version_str);
-                Utils.delete(file);
-                Utils.cleanFiles(file.getParentFile(), "version");
+                try {
+                    String version_str = Utils.getFileContent(file);
+                    _checkRemoteDBZipUpdate(version_str);
+                    Utils.delete(file);
+                    Utils.cleanFiles(file.getParentFile(), "version");
+                } finally {
+                    versionPendingRequests.updatePending("version.txt", -1, null);
+                }
                 return true;
             }
 
             @Override
             public void downloadFailed(DownloadFile d,long id, String url) {
-                Log.d("SQL", "download of SQL file failed " + url);
-                checkingVersion=false;  // could not get a version string, we will do it later.
+                try {
+                    Log.d("SQL", "download of SQL file failed " + url);
+                    checkingVersion = false;  // could not get a version string, we will do it later.
+                } finally {
+                    versionPendingRequests.updatePending("version.txt", -1, null);
+                }
             }
         });
+        versionPendingRequests.updatePending("version.txt", 1, null);
         d.downloadFile("https://github.com/anilsarma/misc/raw/master/njt/version.txt", "version.txt", "NJ Transit Schedules Version",
                 DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, null);
     }
@@ -324,9 +339,9 @@ public class SystemService extends Service {
 
     }
 
-    ArrayList<HashMap<String, Object>> parseDepartureVision(String station, Document doc) {
+    HashMap<String, DepartureVisionData> parseDepartureVision(String station, Document doc) {
         //Log.d("DV", "parsing Departure vision Doc");
-        ArrayList<HashMap<String, Object>> result =  new ArrayList<HashMap<String, Object>>();
+        HashMap<String, DepartureVisionData> result =  new HashMap<>();
         try {
             Element table = doc.getElementById("GridView1");
             Node node = table;
@@ -385,7 +400,8 @@ public class SystemService extends Service {
                 data.put("background", background);
                 data.put("foreground", foreground);
                 //Log.d("DV", "details time:" + time +  " to:" + to + " track:" + track + " line:" + line + " status:" + status + " train:" + train + " station:" + station );
-                result.add(data);
+                DepartureVisionData dv = new DepartureVisionData(data);
+                result.put(dv.block_id, dv);
             }
 
         } catch (Exception e) {
@@ -394,64 +410,42 @@ public class SystemService extends Service {
         //Log.d("DV", "result=" + result.size());
         return result;
     }
-    HashMap<String, ArrayList<HashMap<String, Object>>> status = new HashMap<>();
+    HashMap<String, HashMap<String, DepartureVisionData>> status = new HashMap<>();
+    Integer lock_status_by_trip = new Integer(0);
     HashMap<String, DepartureVisionData> status_by_trip = new HashMap<>();
-    HashMap<String, Long> dvPendingRequests = new HashMap<>();
-    // why do we need 2 ??
-    HashMap<String, Date> lastRequestTime = new HashMap<>();
-    // API is a like a keep alive to refresh the time, we don't really need this anymore.
-    HashMap<String, Date> lastApiCallTime = new HashMap<>();
-    public void updateDapartureVisionCheck(String station)
+
+    TimerKeeper  versionPendingRequests = new TimerKeeper();
+    TimerKeeper  dvPendingRequests = new TimerKeeper();
+
+    public void updateActiveDepartureVisionStation(String station)
     {
-        Log.d("SVC", "updateDapartureVisionCheck(async) for DV:" + station );
+        Log.d("SVC", "updateActiveDepartureVisionStation(async) for DV:" + station );
         new AsyncTask<String, String, Date>() {
             @Override
             protected Date doInBackground(String... station) {
-                return _updateDapartureVisionCheck(station[0]);
+                ArrayList<String> stations = dvPendingRequests.getActiveStations();
+                if ( !stations.contains(station[0]) ) {
+                    dvPendingRequests.active(station[0]);
+                    synchronized (lock_status_by_trip) {
+                        status_by_trip = status.get(station[0]);
+                    }
+                    sendDepartVisionUpdated();
+                }
+                return new Date();
 
             }
         }.execute(station);
     }
 
-    protected Date _updateDapartureVisionCheck(String station) {
-        Log.d("SVC", "_updateDapartureVisionCheck for DV:" + station );
-        synchronized (lastRequestTime) {
-            Date last = lastApiCallTime.get(station);
-            // for now we will allow only a single polling.
-            if (lastRequestTime.keySet().size() > 1) {
-                //status_by_trip.clear();
-                lastRequestTime.clear();
-            }
-            lastRequestTime.put(station, new Date());
-            return last;
-        }
-    }
-    public void clearDVCache() {
-        synchronized (lastRequestTime) {
-            lastRequestTime.clear();
-        }
-//        synchronized (dvPendingRequests) {
-//            dvPendingRequests.clear();
-//        }
-    }
+
+
     // the idea here is that this will be periodically triggered
     // when ever we have data.
     public boolean sendDepartureVisionPings()
     {
         Date now = new Date();
         boolean scheduled = false;
-        ArrayList<String> reqs = new ArrayList<>();
-        synchronized (lastRequestTime) {
-            for(String station:lastRequestTime.keySet()) {
-                Date dt = lastRequestTime.get(station);
-                if( (now.getTime() - dt.getTime())< (10 * 1000 * 60 ) ) { // in minutes TODO:: make this configurable by user.
-                    //Log.d("SVC", "scheduling request for DV:" + station );
-                    reqs.add(station);
-                } else {
-                    Log.d("SVC", "Request expired DV:" + station + " Time:" + dt + " now:" + now + " diff:" + (now.getTime() - dt.getTime())/1000  + " secs");
-                }
-            }
-        }
+        ArrayList<String> reqs = dvPendingRequests.getActiveStations();
 
         for(String station:reqs) {
             try {
@@ -464,9 +458,7 @@ public class SystemService extends Service {
         }
         return scheduled;
     }
-    public void getDepartureVision(String station, @Nullable Integer check_lastime) {
-        //_getDepartureVision(station, check_lastime);
-
+    public void schdeuleDepartureVision(String station, @Nullable Integer check_lastime) {
         // make this call async
         class Param {
             public String station;
@@ -486,60 +478,66 @@ public class SystemService extends Service {
             }
         }.execute(new Param(station, check_lastime));
     }
+    private void updateDepartureVision(String station, HashMap<String, DepartureVisionData> byBlockNew) {
+        //ArrayList<DepartureVisionData> oldEntries = status.get(station);
+        //oldEntries= (oldEntries==null)?new ArrayList<>():oldEntries;
+//        HashMap<String, DepartureVisionData> byBlockNew = new HashMap<>();
+//        for(DepartureVisionData dv:results) {
+//            byBlockNew.put(dv.block_id, dv);
+//        }
 
+        HashMap<String, DepartureVisionData> byBlock = status.get(station);
+        byBlock= (byBlock==null)?new HashMap<>():byBlock;
+        HashMap<String, DepartureVisionData> byTrack = new HashMap<>();
+        for(DepartureVisionData dv:byBlock.values()) {
+            if(dv.track.isEmpty()) {
+                continue; // remove empty tracks from the old entries.
+            }
+            DepartureVisionData hasData = byBlockNew.get(dv.block_id);
+            if (hasData == null ) {
+                dv.stale = true;
+                dv.status = "";
+            }
+            byBlock.put(dv.block_id, dv);
+            byTrack.put(dv.track, dv);
+        }
+
+        for(DepartureVisionData dv:byBlockNew.values()) {
+            DepartureVisionData old = byTrack.get(dv.track);
+            if( old !=null ) {
+                    old.stale = true;
+                    old.status = ""; // clear the status but keep the track.
+            }
+            byBlock.put(dv.block_id, dv);
+        }
+        HashMap<String, DepartureVisionData> cleanEntries = new HashMap<>();
+        Date now = new Date();
+        for( DepartureVisionData dv: byBlock.values()) {
+            // now trim any old entries if we the size is too big.
+            if ((now.getTime() - dv.createTime.getTime()) < (8 * 60 * 60 * 1000)) {
+                cleanEntries.put(dv.block_id, dv);
+            }
+        }
+        status.put(station, cleanEntries);
+    }
     public void _getDepartureVision(String station, @Nullable Integer check_lastime) {
         String url = "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+ station;
-        Date last = _updateDapartureVisionCheck(station);
-        synchronized (dvPendingRequests) {
-            Long rid = dvPendingRequests.get(url);
-            if (rid != null ) {
-                // check if we have something pending.
-                boolean found = true;
-                if(rid != 0 ) {
-                    DownloadManager dm=(DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
-                    Cursor c = dm.query( new DownloadManager.Query().setFilterById(rid) );
-                    if( c.moveToFirst() ){
-                        int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
-                        switch(status)
-                        {
-                            case DownloadManager.STATUS_PAUSED:
-                                break;
-                            case DownloadManager.STATUS_PENDING:
-                                break;
-                            case DownloadManager.STATUS_RUNNING:
-                                break;
-                            case DownloadManager.STATUS_SUCCESSFUL:
-                                found = false;
-                                break;
-                            case DownloadManager.STATUS_FAILED:
-                                found = false;
-                                break;
-                        }
-                    }
-                }
-                if(!found) {
-                    Log.d("SVC", "pending request found for  DV:" + station + " " + url);
-                    return;
-                }
 
-            }
-            dvPendingRequests.put(url, new Long(0));
+        if( dvPendingRequests.getPending(station) > 0) {
+            Log.d("SVC", "we already have a pending request for this station dv " + station);
+            return;
         }
-        if ( check_lastime == null ) {
-            check_lastime = new Integer(10000);
-        }
-        if (check_lastime > 0 && last!=null) {
-            Date now = new Date();
-            if(check_lastime > 0) {
-                if ((now.getTime()-last.getTime())<check_lastime) {
-                    return; // too early
-                }
+        Date lastRequesTime = dvPendingRequests.getLastRequestTime(station);
+        Date now = new Date();
+
+        if( check_lastime !=null ) {
+            long diff = now.getTime() - lastRequesTime.getTime();
+            if( diff < check_lastime) {
+                Log.d("SVC", "need to wait for:" + station  + " current:" + diff + " need:" + check_lastime + " diff:" + (check_lastime - diff));
+                return;
             }
         }
 
-        synchronized (lastRequestTime) {
-            lastApiCallTime.put(station, new Date());
-        }
         // check if we have a recent download, less than 1 minute old
         final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
             String code = station;
@@ -549,24 +547,29 @@ public class SystemService extends Service {
                     //Log.d("DV", "File Content\n" + Utils.getEntireFileContent(file));
                     Log.d("SVC", "DV download complete for " + url);
                     Document doc = Jsoup.parse(file, null, "http://dv.njtransit.com");
-                    ArrayList<HashMap<String, Object>> result = parseDepartureVision(code, doc);
-                    status.put(code, result);
-                    for(HashMap<String, Object> dv:result) {
-                        DepartureVisionData dd = new DepartureVisionData(dv);
-                        status_by_trip.put(dd.block_id, dd);
+                    HashMap<String, DepartureVisionData> result = parseDepartureVision(code, doc);
+                    updateDepartureVision(code, result);
+                    // we should use only the active stations
+                    HashMap<String, DepartureVisionData> tmp_trip = new HashMap<>();
+                    ArrayList<String> activeList = dvPendingRequests.getActiveStations();
+                    if( activeList.isEmpty()) {
+                        activeList.add(code);// just so that things are not empty.
                     }
-                    synchronized (lastRequestTime) {
-                        //refresh the time
-                        lastRequestTime.put(station, new Date());
+                    for( String key: activeList ) {
+                        for (DepartureVisionData dd : status.get(key).values()) {
+                            tmp_trip.put(dd.block_id, dd);
+                            //Log.d("SVC", "entry code=" + code + " key=" + key + " " + dd.createTime + " " + dd.time + " train:" + dd.block_id + " " + dd.station  + " track#" + dd.track + " stale:" + dd.stale);
+                        }
+                    }
+                    synchronized (lock_status_by_trip) {
+                        status_by_trip = tmp_trip;
                     }
                     sendDepartVisionUpdated();
                     // send this off on an intent.
                 } catch(Exception e) {
                     Log.d("SVC", "Failed to parse soup " + e.getMessage());
                 } finally {
-                    synchronized (dvPendingRequests) {
-                        dvPendingRequests.remove(url);
-                    }
+                    dvPendingRequests.updatePending(station, -1, null);
                 }
                 Utils.delete(file);
                 Utils.cleanFiles(file.getParentFile(), "njts_departure_vision_" + station.toLowerCase());
@@ -578,9 +581,7 @@ public class SystemService extends Service {
                 try {
                     Log.d("SVC", "download of SQL file failed " + url);
                 } finally {
-                    synchronized (dvPendingRequests) {
-                        dvPendingRequests.remove(url);
-                    }
+                    dvPendingRequests.updatePending(station, -1, null);
                 }
             }
         });
@@ -592,8 +593,9 @@ public class SystemService extends Service {
             request.setVisibleInDownloadsUi(true);
         }
         long id = d.enqueue(request);
+        Log.d("SVC", "downloadFile enqueued " + url  + " " + id);
         synchronized (dvPendingRequests) {
-            dvPendingRequests.put(url, new Long(id));
+            dvPendingRequests.updatePending(station, 1, null);
         }
 
     }
@@ -733,15 +735,18 @@ public class SystemService extends Service {
             obj.block_id = "" + this.block_id;
             obj.station = "" + this.station;
             obj.createTime = this.createTime;
+            obj.header = this.header;
 
             return obj;
         }
     }
-    public HashMap<String, ArrayList<HashMap<String, Object>>> getCachedDepartureVisionStatus() {
-        return  status;
-    }
+//    public HashMap<String, ArrayList<DepartureVisionData>> getCachedDepartureVisionStatus() {
+//        return  status;
+//    }
     public HashMap<String, DepartureVisionData>getCachedDepartureVisionStatus_byTrip() {
-        return  status_by_trip;
+        synchronized (lock_status_by_trip) {
+            return status_by_trip;
+        }
     }
     public String getDBVersion() {
         return UtilsDBVerCheck.getDBVersion(sql);
