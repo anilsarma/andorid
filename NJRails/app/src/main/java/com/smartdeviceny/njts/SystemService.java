@@ -591,9 +591,8 @@ public class SystemService extends Service {
         DownloadManager.Request request = d.buildRequest(url, "njts_departure_vision_" + station.toLowerCase() + ".html",
                 "NJ Transit DepartureVision",
                 DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "text/html");
-        if( config.getBoolean(Config.DEBUG, ConfigDefault.DEBUG)) {
-            request.setVisibleInDownloadsUi(true);
-        }
+        
+        request.setNotificationVisibility(config.getBoolean(Config.DEBUG, ConfigDefault.DEBUG)?DownloadManager.Request.VISIBILITY_VISIBLE:DownloadManager.Request.VISIBILITY_HIDDEN);
         long id = d.enqueue(request);
         Log.d("SVC", "downloadFile enqueued " + url  + " " + id);
         synchronized (dvPendingRequests) {
