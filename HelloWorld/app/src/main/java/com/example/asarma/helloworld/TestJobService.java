@@ -148,7 +148,7 @@ public class TestJobService extends JobService {
 		{
 			String msg = buf.toString();
 			if(!msg.isEmpty()) {
-				NotificationCompat.Builder  builder = Utils.makeNotificationBuilder(TestJobService.this, "NJTS", msg, "Train Details");
+				NotificationCompat.Builder  builder = Utils.makeNotificationBuilder(TestJobService.this, "NJTS", "NJ Transit upcoming trains", "Details");
 				// goes on the header will show as <appname> - Next Train
 				builder.setSubText("Next Train");
 				builder.setStyle(new NotificationCompat.BigTextStyle().bigText("Train Details\n" + msg));
@@ -159,7 +159,7 @@ public class TestJobService extends JobService {
 		}
 		NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 		while(index < 3) {
-			notificationManager.cancel(12 + index);
+			notificationManager.cancel(12);
 			index ++;
 		}
 
