@@ -93,12 +93,12 @@ public class Utils {
         return dateFormat.format(date);
     }
     static public Date adddays(Date date, int days) {
-        if (days > 0 ) {
-            Calendar c = Calendar.getInstance();
-            c.setTime(date);
-            c.add(Calendar.DATE, days);
-            date = c.getTime();
-        }
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(Calendar.DATE, days);
+        date = c.getTime();
+
         return date;
     }
     static public String getLocaDate(int days)

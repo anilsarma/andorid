@@ -512,12 +512,12 @@ public class SystemService extends Service {
         }
         status.put(station, cleanEntries);
     }
-    public void _getDepartureVision(String station, @Nullable Integer check_lastime) {
+    public boolean _getDepartureVision(String station, @Nullable Integer check_lastime) {
         String url = "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+ station;
 
         if( dvPendingRequests.getPending(station) > 0) {
             Log.d("SVC", "we already have a pending request for this station dv " + station);
-            return;
+            return true;
         }
         Date lastRequesTime = dvPendingRequests.getLastRequestTime(station);
         Date now = new Date();
@@ -526,7 +526,7 @@ public class SystemService extends Service {
             long diff = now.getTime() - lastRequesTime.getTime();
             if( diff < check_lastime) {
                 Log.d("SVC", "need to wait for:" + station  + " current:" + diff + " need:" + check_lastime + " diff:" + (check_lastime - diff));
-                return;
+                return false;
             }
         }
 
@@ -595,7 +595,7 @@ public class SystemService extends Service {
         synchronized (dvPendingRequests) {
             dvPendingRequests.updatePending(station, 1, null);
         }
-
+        return true;
     }
     public class Route {
         public String station_code;
