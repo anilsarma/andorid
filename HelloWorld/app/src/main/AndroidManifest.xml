@@ -32,7 +32,7 @@
         <service android:enabled="true" android:name=".SystemService" />
 
         <receiver android:name=".activities.MainActivity$LocalBcstReceiver" android:enabled="true"/>
-        <receiver android:name=".SystemService$LocalbroadcastReceiver" android:enabled="true"/>
+        <receiver android:name=".TestJobService$LocalBcstReceiver" android:enabled="true"/>
 
         <receiver android:name="PowerStartServiceReceiver"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
@@ -48,5 +48,5 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
 </manifest>
