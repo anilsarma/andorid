@@ -175,27 +175,27 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
     }
     boolean notifyUser( SystemService.DepartureVisionData dv) throws ParseException
     {
+        // do this for favs only.
         if (dv == null) {
             return false;
         }
-        if(true) {
+        if(!dv.favorite || dv.stale) {
+            return false;
+        }
+        if( dv.status.isEmpty() && dv.track.isEmpty()) {
             return false;
         }
         long diff = Utils.makeDate(Utils.getTodayYYYYMMDD(null),  dv.time, "yyyyMMdd HH:mm").getTime() - new Date().getTime();
         if (diff > 0 ) {  // other checks needed.
-            NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(getActivity(), "FRAG_SVC")
-                           // .setSmallIcon(R.mipmap.ic_launcher)
-                            .setTicker("NJS")
-                            .setContentTitle("Train " + dv.block_id + " Track# " + dv.track  )
-                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                            .setContentText( Utils.formatToLocalTime(Utils.parseLocalTime(dv.time)) + " departure in " +  Math.abs(diff) + "(mins)" );
-            NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-            Notification notify = mBuilder.build();
-            notify.flags|= Notification.FLAG_AUTO_CANCEL;
-            mNotificationManager.notify(1, notify);
-
-            Toast.makeText(getActivity().getApplicationContext(), (String) "sent notification ", Toast.LENGTH_SHORT).show();
+            String msg  = "Train " + dv.block_id + " departs " + dv.time + " from " + dv.station;
+            if( !dv.track.isEmpty()) {
+                msg += " Track " + dv.track;
+            }
+            if( !dv.status.isEmpty()) {
+                msg += " " + dv.status;
+            }
+            Utils.notify_user(this.getActivity(), "NJTS", "NJTS", msg, 3);
+            //Toast.makeText(getActivity().getApplicationContext(), (String) "sent notification ", Toast.LENGTH_SHORT).show();
             return true;
             //notification = true;
         }

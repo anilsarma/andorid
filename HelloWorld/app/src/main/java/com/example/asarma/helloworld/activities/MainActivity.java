@@ -1,4 +1,4 @@
-package com.example.asarma.helloworld;
+package com.example.asarma.helloworld.activities;
 
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -26,19 +26,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.asarma.helloworld.activities.DepartureVisionActivity;
-import com.example.asarma.helloworld.utils.SQLiteLocalDatabase;
+import com.example.asarma.helloworld.utils.Config;
+import com.example.asarma.helloworld.MessageService;
+import com.example.asarma.helloworld.NJMapActivity;
+import com.example.asarma.helloworld.R;
+import com.example.asarma.helloworld.RemoteBinder;
+import com.example.asarma.helloworld.SystemService;
+import com.example.asarma.helloworld.TestJobService;
+import com.example.asarma.helloworld.utils.Utils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-    //DownloadManager manager;
-    private long enqueue;
-    public static final String PREF_FILE_NAME = "test.pref";
-    DownloadFile download = null;
-    SQLiteLocalDatabase sql;
     SystemService systemService=null;
     ProgressDialog progressDialog =null;
 
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Config config = new Config(getApplicationContext());
         super.onCreate(savedInstanceState);
-        doBindService();
+
 
         IntentFilter filter = new IntentFilter();
         filter.addAction("custom-event-name");
@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("started");
         startService(new Intent(MainActivity.this, MessageService.class));
         startService(new Intent(MainActivity.this, SystemService.class));
+        Utils.scheduleJob(this, TestJobService.class, 15*1000, false);
 
         //startService(new Intent(MainActivity.this, MainActivity.MessageService.class));
         Button buttonStartService = (Button) findViewById(R.id.button_ok);
@@ -138,13 +139,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (systemService!= null ) {
-                    systemService.checkForUpdate();
-                    if ( progressDialog != null && progressDialog.isShowing()) {
-                        progressDialog.dismiss();
-                    }
-                    if( systemService.isUpdateRunning()) {
-                        showUpdateProgressDialog(v.getContext());
-                    }
+
                 } else {
                     Log.d("BTNDNLD", "system service not init " + systemService );
                 }
@@ -156,36 +151,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(systemService!=null) {
-                    systemService.getDepartureVision("NY");
+
                 }
-                Intent i = new Intent(getApplicationContext(), DepartureVisionActivity.class);
-                startActivity(i);
+                //Intent i = new Intent(getApplicationContext(), DepartureVisionActivity.class);
+                //startActivity(i);
             }
         });
+
     }
 
     @Override
     protected void onDestroy() {
-        if(download != null ) {
-            Log.d("main", "cleaning up download .... ");
-            download.cleanup();
-            download = null;
-        }
-        doUnbindService();
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onDestroy();
     }
 
     @Override
+    protected void onResume() {
+        doBindService();
+        super.onResume();
+    }
+
+    @Override
     protected void onPause() {
+        doUnbindService();
         System.out.print("Local::onPause");
-        // Unregister since the activity is paused.
-        //LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
-//        if(progressDialog !=null) {
-//            progressDialog.
-//        }
         super.onPause();
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -193,18 +187,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    protected void onResume() {
-        System.out.print("Local::onResume");
 
-        if(progressDialog !=null && progressDialog.isShowing()) {
-            if(systemService != null && !systemService.isUpdateRunning()) {
-                progressDialog.dismiss();
-                progressDialog = null;
-            }
-        }
-        super.onResume();
-    }
 
     @Override
     protected void onStart() {
@@ -256,35 +239,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    void showUpdateProgressDialog(Context context) {
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setMessage("Checking for NJ Transit schedule updates");
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.show();
-    }
-    boolean departureVisionSubscription = false;
-    ArrayList<String> departureVisionSubscriptionStations = new ArrayList<>();
-    void subscribeDepartureVision(String station)
-    {
-        departureVisionSubscription = true;
-        if( !departureVisionSubscriptionStations.contains(station)) {
-            departureVisionSubscriptionStations.add(station);
-        }
-        updateSubscriptions();
-    }
-    void updateSubscriptions() {
-        if( departureVisionSubscription) {
-            if(systemService!=null ) {
-                systemService.subscribeDepartureVision(1, departureVisionSubscriptionStations);
-            }
-        }
-    }
+
+
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             systemService = ((RemoteBinder)service).getService();
             Log.d("SVCON", "SystemService connected, called method on remote binder "  + ((RemoteBinder)service).getService());
             // we just reconnected  check the progressdialog
-            updateSubscriptions();
+           // updateSubscriptions();
         }
 
         public void onServiceDisconnected(ComponentName className) {

@@ -1,24 +1,12 @@
-package com.example.asarma.helloworld;
+package com.example.asarma.helloworld.utils;
 
-import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.database.Cursor;
-import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.example.asarma.helloworld.utils.SQLiteLocalDatabase;
-import com.example.asarma.helloworld.utils.SqlUtils;
-import com.example.asarma.helloworld.utils.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.zip.ZipInputStream;
 
 // the main purpose of this is to check for new version in the remote
@@ -36,7 +24,7 @@ public class UtilsDBVerCheck {
         } catch (Exception e) {
             Log.d("SQL", "get routes failed need to download");
             sql.close();
-            dbFilePath.delete();
+            Utils.delete(dbFilePath);
             sql = null;
         }
         return sql;
@@ -50,7 +38,6 @@ public class UtilsDBVerCheck {
             ZipInputStream zis = Utils.getFileFromZip(new FileInputStream(downloadedZipFile), nameToExtract);
             Utils.writeExtractedFileToDisk(zis, new FileOutputStream(tmpFilename));
         } catch (IOException e)  {
-
         }
         return tmpFilename;
     }
@@ -75,4 +62,19 @@ public class UtilsDBVerCheck {
         }
         return false;
     }
+
+    static public String getDBVersion(SQLiteLocalDatabase sql) {
+        try {
+            if(sql == null) {
+                return "";
+            }
+            return SqlUtils.get_user_pref_value(sql.getWritableDatabase(), "version", "");
+        } catch(Exception e) {
+            Log.e("DBU", "matchDBVersion failed" + e.getMessage());
+        }
+        return "";
+
+    }
+
+
 }

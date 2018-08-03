@@ -37,6 +37,7 @@ public class DepartureVisionJobService extends JobService {
             Log.d("JOB", "DepartureVisionJobService - isConnected:" + isConnected + " wifi:" + isWiFi + " isMobile:" + isMobile + " ");
             if(isConnected) {
                 sendDepartureVisionPings();
+               // Utils.notify_user(this.getApplicationContext(), "NJTS", "NJTS", "Ping Sent " + new Date(), 1);
             }
             sendTimerEvent();
         } catch(Exception e) {

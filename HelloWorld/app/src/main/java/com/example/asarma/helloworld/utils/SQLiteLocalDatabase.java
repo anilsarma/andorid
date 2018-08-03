@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.Nullable;
 
-import com.example.asarma.helloworld.utils.Utils;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,9 +29,9 @@ public class SQLiteLocalDatabase extends SQLiteOpenHelper {
             databaseDir = dbDir;
         }
         databaseFullPath = databaseDir + File.separator + getDatabaseName();
-        System.out.println("checking for file " + databaseFullPath);
+        //System.out.println("checking for file " + databaseFullPath);
         if (checkdatabase(new File(databaseFullPath))) {
-            System.out.println(databaseFullPath + "length " + new File(databaseFullPath).length());
+            //System.out.println(databaseFullPath + "length " + new File(databaseFullPath).length());
             opendatabase();
         } else {
             try {
@@ -141,6 +139,7 @@ public class SQLiteLocalDatabase extends SQLiteOpenHelper {
     public synchronized void close() {
         if (myDataBase != null) {
             myDataBase.close();
+            myDataBase  = null;
         }
         super.close();
     }

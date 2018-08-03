@@ -1,10 +1,7 @@
 package com.example.asarma.helloworld;
 
-import android.app.DownloadManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -14,6 +11,7 @@ import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.example.asarma.helloworld.utils.Config;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;

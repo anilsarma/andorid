@@ -1,4 +1,4 @@
-package com.example.asarma.helloworld;
+package com.example.asarma.helloworld.utils;
 
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.Nullable;
-import android.support.v4.content.res.TypedArrayUtils;
 import android.util.Log;
 
 import java.io.File;
@@ -22,31 +21,33 @@ public class DownloadFile {
     DownloadManager manager;
     LocalBcstReceiver receiver = new LocalBcstReceiver();
     ArrayList<Long> requestid = new ArrayList<>();
-    Callback          callback;
+    Callback callback;
 
     public interface Callback {
         boolean downloadComplete(DownloadFile d, long id, String url, File file);
+
         void downloadFailed(DownloadFile d, long id, String url);
     }
+
     public DownloadFile(Context context, Callback callback) {
         this.context = context;
         this.callback = callback;
         manager = (DownloadManager) context.getApplicationContext().getSystemService(Context.DOWNLOAD_SERVICE);
         context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
-    void cleanup()
-    {
+
+    public void cleanup() {
         context.unregisterReceiver(receiver);
     }
 
-    long downloadFile(String url, String title, String description, int request_flags, @Nullable String mimetype) {
+    public DownloadManager.Request buildRequest(String url, String title, String description, int request_flags, @Nullable String mimetype) {
         //String url = "https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt";
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        if (mimetype==null) {
+        if (mimetype == null) {
             //request.setMimeType("text/plain");//application/x-compressed
         }
         request.setDescription(description);
-
+        request.setVisibleInDownloadsUi(false);
         request.setAllowedNetworkTypes(request_flags);
         request.setRequiresDeviceIdle(false);
         request.setRequiresCharging(false);
@@ -54,12 +55,22 @@ public class DownloadFile {
         request.addRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36");
 
         request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, title);
-        long id = manager.enqueue(request);
-        this.requestid.add(id);
-        Log.d("download", "downloadFile scheduling .. " + id  + " " + url + " as " + title);
-        return id;
+        return request;
     }
 
+    public long downloadFile(String url, String title, String description, int request_flags, @Nullable String mimetype) {
+        //String url = "https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt";
+        DownloadManager.Request request = buildRequest( url, title, description, request_flags, mimetype);
+        return enqueue(request);
+
+    }
+
+    public long enqueue(DownloadManager.Request request) {
+        long id = manager.enqueue(request);
+        this.requestid.add(id);
+        //Log.d("download", "downloadFile scheduling .. " + id  + " " + url + " as " + title);
+        return id;
+    }
     long downloadFile(DownloadManager.Request request ) {
         long id = manager.enqueue(request);
         this.requestid.add(id);
@@ -72,7 +83,7 @@ public class DownloadFile {
         @Override
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
-            Log.d("download", "BroadcastReceiver::onReceive");
+            //Log.d("DLD", "BroadcastReceiver::onReceive");
             //String action = intent.getAction();
             //if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action))
             {
@@ -86,16 +97,16 @@ public class DownloadFile {
             long rids[] = requestid.stream().mapToLong(l->l).toArray();
             query.setFilterById(rids);
             if (rids.length==0) {
-                Log.d("download", "no pending requests" + intent.getAction());
+                //Log.d("DNLD", "no pending requests " + intent.getAction());
                 return;
             }
-            Log.d("download", "hadle download complete" + intent.getAction());
+            //Log.d("DNLD", "hadle download complete" + intent.getAction());
             Cursor c = manager.query(query);
 
             for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
                 int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 int ID = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_ID));
-                Log.d("DNLD", "checking entry " + status + " " + ID);
+                //Log.d("DNLD", "checking entry " + status + " " + ID);
 
                 if ((status & DownloadManager.STATUS_SUCCESSFUL) == DownloadManager.STATUS_SUCCESSFUL) {
                     File mFile = new File(Uri.parse(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))).getPath());
@@ -105,7 +116,7 @@ public class DownloadFile {
                         removeFile = DownloadFile.this.callback.downloadComplete(DownloadFile.this, ID, url, mFile);
                     }
                     if (removeFile) {
-                        mFile.delete();
+                        Utils.delete(mFile);
                     }
                     requestid.remove(new Long(ID));
                 }
@@ -126,7 +137,7 @@ public class DownloadFile {
                     Log.d("DNLD", "Pending ID " + ID + " url:" + url);
                 }
             } // for loop
-            Log.d("DNLD", "loop done");
+            //Log.d("DNLD", "loop done");
         }
     } // Receiver
 

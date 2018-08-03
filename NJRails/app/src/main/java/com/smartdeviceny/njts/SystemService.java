@@ -320,21 +320,7 @@ public class SystemService extends Service {
 //        notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
 //        notification.defaults |= Notification.DEFAULT_SOUND; // Sound
         String msg = "NJT Schedule upgraded to version " + new_version;
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this) //, getString(R.string.default_notification_channel_id))
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("NJ Transit Schedule")
-                        //.setTicker("NT Transit Schedule.")
-                        //  .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                        .setContentText(msg);
-        Intent targetIntent = new Intent(this, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(contentIntent);
-        Notification notification = mBuilder.build();
-
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        notification.defaults |= Notification.DEFAULT_SOUND;
-        mNotificationManager.notify(1, notification);
+        Utils.notify_user(this.getApplicationContext(), "NJTS", "NJTS", msg, 2);
         Log.d("SVC", "notification database schedule upgraded " + msg  + " "  + getString(R.string.default_notification_channel_id));
 
     }
@@ -428,6 +414,16 @@ public class SystemService extends Service {
                     dvPendingRequests.active(station[0]);
                     synchronized (lock_status_by_trip) {
                         status_by_trip = status.get(station[0]);
+                        if( status_by_trip ==null) {
+                            status_by_trip = new HashMap<>();
+                        }
+                        for(DepartureVisionData dd:status_by_trip.values()) {
+                            dd.favorite = false;
+                            if (favorites.contains(dd.block_id)) {
+                                dd.favorite = true;
+                            }
+                        }
+
                     }
                     sendDepartVisionUpdated();
                 }
@@ -555,8 +551,14 @@ public class SystemService extends Service {
                     if( activeList.isEmpty()) {
                         activeList.add(code);// just so that things are not empty.
                     }
+
+
                     for( String key: activeList ) {
                         for (DepartureVisionData dd : status.get(key).values()) {
+                            dd.favorite = false;
+                            if(favorites.contains(dd.block_id)) {
+                                dd.favorite = true;
+                            }
                             tmp_trip.put(dd.block_id, dd);
                             //Log.d("SVC", "entry code=" + code + " key=" + key + " " + dd.createTime + " " + dd.time + " train:" + dd.block_id + " " + dd.station  + " track#" + dd.track + " stale:" + dd.stale);
                         }
@@ -707,6 +709,7 @@ public class SystemService extends Service {
         public String station="";
         public Date   createTime=new Date(); // time this object was created
         public boolean stale = false;
+        public boolean favorite = false;
         public DepartureVisionData() {
         }
 
@@ -718,9 +721,11 @@ public class SystemService extends Service {
             status = data.get("status").toString();
             block_id = data.get("train").toString();
             station = data.get("station").toString();
-
+            favorite = false;
             header  = " " + createTime + " "  + to;
             createTime = new Date();
+
+
         }
 
 
@@ -734,6 +739,7 @@ public class SystemService extends Service {
             obj.status = "" + this.status;
             obj.block_id = "" + this.block_id;
             obj.station = "" + this.station;
+            obj.favorite = this.favorite;
             obj.createTime = this.createTime;
             obj.header = this.header;
 

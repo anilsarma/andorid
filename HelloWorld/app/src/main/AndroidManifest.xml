@@ -11,7 +11,7 @@
         android:theme="@style/AppTheme">
 
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -24,22 +24,14 @@
             </intent-filter>
         </activity>
         <activity android:name=".NJMapActivity"/>
-        <activity android:name=".activities.DepartureVisionActivity"
-            android:label="Departure Vision"
-            android:parentActivityName=".MainActivity" >
 
-        </activity>
-
-        <service
-            android:name=".TestJobService"
-            android:label="Word service"
-            android:permission="android.permission.BIND_JOB_SERVICE" >
-
+        <service android:name=".TestJobService" android:label="Word service" android:permission="android.permission.BIND_JOB_SERVICE" >
         </service>
 
         <service android:enabled="true" android:name=".MessageService" />
         <service android:enabled="true" android:name=".SystemService" />
-        <receiver android:name=".MainActivity$LocalBcstReceiver" android:enabled="true"/>
+
+        <receiver android:name=".activities.MainActivity$LocalBcstReceiver" android:enabled="true"/>
         <receiver android:name=".SystemService$LocalbroadcastReceiver" android:enabled="true"/>
 
         <receiver android:name="PowerStartServiceReceiver"

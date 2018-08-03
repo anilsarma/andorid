@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">NJTSchedule</string>
+    <string name="app_name">NJT Schedule</string>
     <string name="appbar_scrolling_view_behavior">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
     <string name="default_notification_channel_id">Channel ID</string>
-
-
+    <string name="channel_name">NJTSChannel</string>
+    <string name="channel_description">Notification channel for the NJ Transit Schedule application.</string>
+    channel_name
     <string-array name="SettingDeltaDays">
         <item>1</item>
         <item>2</item>
