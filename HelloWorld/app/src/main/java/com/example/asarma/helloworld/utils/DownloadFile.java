@@ -48,6 +48,7 @@ public class DownloadFile {
         }
         request.setDescription(description);
         request.setVisibleInDownloadsUi(false);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
         request.setAllowedNetworkTypes(request_flags);
         request.setRequiresDeviceIdle(false);
         request.setRequiresCharging(false);

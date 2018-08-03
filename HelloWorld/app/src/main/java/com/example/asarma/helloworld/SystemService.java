@@ -588,7 +588,7 @@ public class SystemService extends Service {
                 "NJ Transit DepartureVision",
                 DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "text/html");
         if( config.getBoolean(Config.DEBUG, ConfigDefault.DEBUG)) {
-            request.setVisibleInDownloadsUi(true);
+            request.setVisibleInDownloadsUi(false);
         }
         long id = d.enqueue(request);
         Log.d("SVC", "downloadFile enqueued " + url  + " " + id);
