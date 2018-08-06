@@ -320,8 +320,8 @@ public class SystemService extends Service {
 //        notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
 //        notification.defaults |= Notification.DEFAULT_SOUND; // Sound
         String msg = "NJT Schedule upgraded to version " + new_version;
-        Utils.notify_user(this.getApplicationContext(), "NJTS", "NJTS", msg, 2);
-        Log.d("SVC", "notification database schedule upgraded " + msg  + " "  + getString(R.string.default_notification_channel_id));
+        Utils.notify_user(this.getApplicationContext(), "NJTS", "Schedule DB upgraded.", msg, 2);
+        //Log.d("SVC", "notification database schedule upgraded " + msg  + " "  + getString(R.string.default_notification_channel_id));
 
     }
 

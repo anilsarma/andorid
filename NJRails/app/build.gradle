@@ -28,7 +28,8 @@ android {
             resValue "string", "app_version", "${defaultConfig.versionName}"
         }
         debug {
-            resValue "string", "app_version", "${defaultConfig.versionName}-debug"
+
+            resValue "string", "app_version", "${defaultConfig.versionName}-debug-" + InetAddress.getLocalHost().getCanonicalHostName() + "-" + new Date()
         }
     }
     compileOptions {
