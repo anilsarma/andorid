@@ -167,16 +167,16 @@ public class SystemService extends Service {
         sql = UtilsDBVerCheck.getSQLDatabase(getApplicationContext(), f);
         if (UtilsDBVerCheck.matchDBVersion( sql, version_str) ) {
             checkingVersion = false;
-            Log.d("DBSVC", "system schedule db is uptodate " + version_str);
+            Log.d("DBSVC", "system schedule db is up-todate " + version_str);
             sendCheckcomplete();
 
-            notify_user_of_upgrade("No Update Required.");
+            notify_user_of_upgrade("Schedule Database", "No Update Required, version " + getDBVersion());
             return;
         }
         final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
             @Override
             public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
-                notify_user_of_upgrade("Download Complete");
+                notify_user_of_upgrade("Schedule Database", "Download Complete");
                 checkingVersion=false;
                 File dbFilePath = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
                 File tmpFilename=null;
@@ -209,7 +209,7 @@ public class SystemService extends Service {
                     SqlUtils.update_user_pref( sql.getWritableDatabase(),"version", version_str, new Date());
 
                     // let the user know we have upgraded.
-                    notify_user_of_upgrade(version_str);
+                    notify_user_of_upgrade("Schedule Database", "upgraded to " + version_str);
                 }
                 finally {
                     Utils.delete(tmpFilename);
@@ -310,19 +310,8 @@ public class SystemService extends Service {
             checkForUpdate();
         }
     }
-    private void notify_user_of_upgrade(@NonNull String new_version) {
-        final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        //int icon = R.mipmap.ic_launcher;
-        //long when = System.currentTimeMillis();
-//        Notification notification = new Notification(icon, getString(R.string.app_name), when);
-//        notification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
-//        notification.defaults |= Notification.DEFAULT_LIGHTS; // LED
-//        notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
-//        notification.defaults |= Notification.DEFAULT_SOUND; // Sound
-        String msg = "NJT Schedule upgraded to version " + new_version;
-        Utils.notify_user(this.getApplicationContext(), "NJTS", "Schedule DB upgraded.", msg, 2);
-        //Log.d("SVC", "notification database schedule upgraded " + msg  + " "  + getString(R.string.default_notification_channel_id));
-
+    private void notify_user_of_upgrade(@NonNull String title, @NonNull String msg) {
+        Utils.notify_user(this.getApplicationContext(), "NJTS", title, msg, 2);
     }
 
     HashMap<String, DepartureVisionData> parseDepartureVision(String station, Document doc) {

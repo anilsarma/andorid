@@ -83,13 +83,8 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
 
             }
         });
-        Button sqlButton = (Button)view.findViewById(R.id.start_stop_submit);
-        sqlButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainActivity)getActivity()).doCheckForUpdate(getActivity());
-            }
-        });
+        Button sqlButton = view.findViewById(R.id.button_schedule_update);
+        sqlButton.setOnClickListener(v -> ((MainActivity)getActivity()).doCheckForUpdate(getActivity()));
 
         edittext_app_version = view.findViewById(R.id.edittext_app_version);
         edittext_view_db_version = view.findViewById(R.id.edittext_db_version);
@@ -229,28 +224,25 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
         start_spinner.setSelection(start_adapter.getPosition(Utils.capitalize(start)));
         stop_spinner.setSelection(stop_adapter.getPosition(Utils.capitalize(stop)));
         Button button = getView().findViewById(R.id.start_stop_submit);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // get the selected values
-                String route = route_spinner.getSelectedItem().toString();
-                String start = start_spinner.getSelectedItem().toString();
-                String stop = stop_spinner.getSelectedItem().toString();
+        button.setOnClickListener(view -> {
+            // get the selected values
+            String route = route_spinner.getSelectedItem().toString();
+            String start1 = start_spinner.getSelectedItem().toString();
+            String stop1 = stop_spinner.getSelectedItem().toString();
 
-                MainActivity m = (MainActivity)getActivity();
-                if(m.systemService != null ){
-                    int delta = -1;
-                    try {delta = Integer.parseInt(ConfigUtils.getConfig(config, Config.DELTA_DAYS, "" + delta)); } catch (Exception e){ }
+            MainActivity m = (MainActivity)getActivity();
+            if(m.systemService != null ){
+                int delta = -1;
+                try {delta = Integer.parseInt(ConfigUtils.getConfig(config, Config.DELTA_DAYS, "" + delta)); } catch (Exception e){ }
 
-                    ArrayList<SystemService.Route> rts = m.systemService.getRoutes(start, stop, null, delta);
-                    if(rts.isEmpty()) {
-                        Toast.makeText(getActivity(),"No direct trains found for " + start + " to " + stop + " config not updated", Toast.LENGTH_LONG).show();
-                    }else {
-                        Toast.makeText(getActivity(),"config updated", Toast.LENGTH_LONG).show();
-                        Utils.setConfig(config, Config.ROUTE, route);
-                        Utils.setConfig(config, Config.START_STATION, start);
-                        Utils.setConfig(config, Config.STOP_STATION, stop);
-                    }
+                ArrayList<SystemService.Route> rts = m.systemService.getRoutes(start1, stop1, null, delta);
+                if(rts.isEmpty()) {
+                    Toast.makeText(getActivity(),"No direct trains found for " + start1 + " to " + stop1 + " config not updated", Toast.LENGTH_LONG).show();
+                }else {
+                    Toast.makeText(getActivity(),"config updated", Toast.LENGTH_LONG).show();
+                    Utils.setConfig(config, Config.ROUTE, route);
+                    Utils.setConfig(config, Config.START_STATION, start1);
+                    Utils.setConfig(config, Config.STOP_STATION, stop1);
                 }
             }
         });

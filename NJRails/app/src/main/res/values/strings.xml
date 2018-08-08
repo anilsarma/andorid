@@ -14,6 +14,6 @@
 
     <string name="setting_delta_days_text"><b>Delta Days</b>\nThis setting is used to populate the Route Tables, in the Schedule Tab. The value in this configuration is used to go back and forward the number of days to retrieve, recommended value 1. </string>
 
-    <string name="setting_polling_frequency"><b>Polling frequency(sec)</b>\nThe application needs to query the remote server to retrieve real-time track information, this is the number of seconds between each query. Note that if the value is too small it could possibly drain the battery quickly. Recommended value 30. </string>
-    <string name="setting_debug_flag"><b>Enable Debugging</b>\nThis is a developer option should not disabled.</string>
+    <string name="setting_polling_frequency"><b>Polling frequency(sec)</b>\nThe application needs to query the remote server to retrieve real-time track information, this is the number of seconds between each query. Recommended value 30. </string>
+    <string name="setting_debug_flag"><b>Enable Debugging</b>\nThis is a developer option recommended disabled.</string>
 </resources>
