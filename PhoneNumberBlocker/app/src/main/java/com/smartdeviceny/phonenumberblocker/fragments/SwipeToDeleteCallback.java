@@ -60,7 +60,7 @@ abstract class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
         boolean isCanceled = dX == 0f && !isCurrentlyActive;
 
         if (isCanceled) {
-            clearCanvas(c,(float)(itemView.getRight() + dX), (float)itemView.getTop(), (float)itemView.getRight(), (float)itemView.getBottom());
+            clearCanvas(c,itemView.getRight() + dX, (float)itemView.getTop(), (float)itemView.getRight(), (float)itemView.getBottom());
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             return;
         }
