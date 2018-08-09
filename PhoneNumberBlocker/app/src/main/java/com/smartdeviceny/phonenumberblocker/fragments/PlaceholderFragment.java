@@ -1,15 +1,11 @@
 package com.smartdeviceny.phonenumberblocker.fragments;
 
-import android.Manifest;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.PermissionChecker;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.smartdeviceny.phonenumberblocker.R;
 
@@ -42,12 +38,10 @@ public  class PlaceholderFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-        textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-
-
-
-
+        TextView textView =  rootView.findViewById(R.id.tvBlockedNumber);
+        if(textView!=null) {
+            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+        }
         return rootView;
     }
 }

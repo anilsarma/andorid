@@ -1,7 +1,9 @@
 package com.smartdeviceny.phonenumberblocker;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.PermissionChecker;
@@ -12,6 +14,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.smartdeviceny.phonenumberblocker.fragments.SectionsPagerAdapter;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,6 +65,11 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
         checkPermissions();
+
+        // clear everything.
+        SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        ArrayList<String> entries = new ArrayList<>();
+        config.edit().putStringSet("TerminatedNumbers",new HashSet<>(entries)).commit();
     }
 
 
