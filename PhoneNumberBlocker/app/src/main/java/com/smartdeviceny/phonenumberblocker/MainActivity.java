@@ -67,9 +67,9 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions();
 
         // clear everything.
-        SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        ArrayList<String> entries = new ArrayList<>();
-        config.edit().putStringSet("TerminatedNumbers",new HashSet<>(entries)).commit();
+//        SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//        ArrayList<String> entries = new ArrayList<>();
+//        config.edit().putStringSet("TerminatedNumbers",new HashSet<>(entries)).commit();
     }
 
 

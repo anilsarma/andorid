@@ -1,6 +1,8 @@
 package com.smartdeviceny.phonenumberblocker.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.telecom.Call;
 import android.view.LayoutInflater;
@@ -11,6 +13,8 @@ import android.widget.TextView;
 import com.smartdeviceny.phonenumberblocker.R;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class BlockedNumberRecycleViewAdaptor extends RecyclerView.Adapter<BlockedNumberRecycleViewAdaptor.ViewHolder> {
     // stores and recycles views as they are scrolled off screen
@@ -63,6 +67,18 @@ public class BlockedNumberRecycleViewAdaptor extends RecyclerView.Adapter<Blocke
 
     }
 
+    public void removeAt(int position) {
+        if( position < numbers.size()) {
+            String msg = numbers.get(position);
+            SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(mInflater.getContext());
+            Set<String> entries = new HashSet<>();
+            entries = config.getStringSet("TerminatedNumbers", entries);
+            ArrayList<String> c = new ArrayList<>(entries);
+            c.remove(msg);
+            config.edit().putStringSet("TerminatedNumbers",new HashSet<String>(c)).commit();
+            this.numbers = c;
+        }
+    }
     // total number of rows
     @Override
     public int getItemCount() {

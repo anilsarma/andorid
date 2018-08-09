@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,6 +62,15 @@ public  class BlockedNumberFragment extends Fragment {
         RecyclerView recyclerView = getActivity().findViewById(R.id.blockedNumberContainer);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
+
+        ItemTouchHelper handler = new ItemTouchHelper(new SwipeToDeleteCallback(getActivity()) {
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                adapter.removeAt(viewHolder.getAdapterPosition());
+                adapter.notifyDataSetChanged();
+            }
+        });
+        handler.attachToRecyclerView(recyclerView);
 
         config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         Set<String> entries = config.getStringSet("TerminatedNumbers", new HashSet<String>());
