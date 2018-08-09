@@ -19,9 +19,12 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
         switch (position) {
-            case 0: return BlockedNumberFragment.newInstance(0);
+            case 0:
+                return BlockedNumberFragment.newInstance(position);
+            case 1:
+                return RuleFragment.newInstance(position);
         }
-        return PlaceholderFragment.newInstance(position + 1);
+        return  null;
     }
 
     @Override
