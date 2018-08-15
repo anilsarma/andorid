@@ -14,6 +14,7 @@ public interface Config {
     String POLLING_TIME = "CONFIG_POLLING_TIME";
 
     String DEBUG = "CONFIG_DEBUG";
+    String UPDATE_LAST_CHECK_TIME = "UPDATE_LAST_CHECK_TIME";
 
 
 

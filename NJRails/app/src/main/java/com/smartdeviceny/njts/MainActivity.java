@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void doCheckForUpdate(Context context) {
         if (systemService!= null ) {
-            systemService.checkForUpdate();
+            systemService.checkForUpdate(false);
             if ( progressDialog != null && progressDialog.isShowing()) {
                 progressDialog.dismiss();
             }
@@ -125,6 +125,13 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             Log.d("MAIN", "system service not init " + systemService );
+        }
+    }
+
+    public void doForceCheckUpgrade(Context context) {
+        if (systemService!= null ) {
+            systemService.doForceCheckUpgrade();
+            //doCheckForUpdate(context);
         }
     }
     @Override

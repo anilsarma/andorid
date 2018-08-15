@@ -14,4 +14,4 @@ app/proguard-rules.pro
 gradlew
 gradlew.bat
 settings.gradle
-
+*.jks

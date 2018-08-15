@@ -288,11 +288,29 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginTop="16dp"
                 android:text="@string/setting_debug_flag"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_right"
                 app:layout_constraintHorizontal_bias="0.571"
                 app:layout_constraintStart_toStartOf="@+id/guideline_left"
                 app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+            <Button
+                android:id="@+id/debugForceUpgrade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:text="Change DB Version"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_right"
+                app:layout_constraintStart_toStartOf="@+id/guideline_left"
+                app:layout_constraintTop_toBottomOf="@+id/checkbox_debug" />
+
         </android.support.constraint.ConstraintLayout>
     </android.support.v4.widget.NestedScrollView>
+
+
 
 </android.support.constraint.ConstraintLayout>

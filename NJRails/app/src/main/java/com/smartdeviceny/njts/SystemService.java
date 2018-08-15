@@ -106,12 +106,12 @@ public class SystemService extends Service {
         super.onDestroy();
     }
 
-    public boolean checkForUpdate() {
+    public boolean checkForUpdate(boolean silent) {
         if (checkingVersion) {
             Log.d("SVC", "update already running");
             return false; // already running.
         }
-        _checkRemoteDBUpdate();
+        _checkRemoteDBUpdate(silent);
         return checkingVersion;
     }
     public boolean isUpdateRunning() {
@@ -119,25 +119,26 @@ public class SystemService extends Service {
     }
 
 
-    void _checkRemoteDBUpdate() {
+    void _checkRemoteDBUpdate(boolean silent) {
         Log.d("SVC", "checking for updated schedule db");
         File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
         sql = UtilsDBVerCheck.getSQLDatabase(getApplicationContext(), f);
         checkingVersion=true;
         if( sql == null) {
-            _checkRemoteDBZipUpdate(""); // download it anyway we dont have a valid database.
+            _checkRemoteDBZipUpdate(silent,""); // download it anyway we dont have a valid database.
             return;
         }
         if(  versionPendingRequests.getPending("version.txt") > 0 ) {
             Log.d("SVC", "pending request for version.txt found");
             //eturn; for now too much logic on checkVersion
         }
+        config.edit().putLong(Config.UPDATE_LAST_CHECK_TIME, new Date().getTime()).commit();
         final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
             @Override
             public boolean downloadComplete(DownloadFile d, long id, String url, File file) {
                 try {
                     String version_str = Utils.getFileContent(file);
-                    _checkRemoteDBZipUpdate(version_str);
+                    _checkRemoteDBZipUpdate(silent, version_str);
                     Utils.delete(file);
                     Utils.cleanFiles(file.getParentFile(), "version");
                 } finally {
@@ -162,15 +163,16 @@ public class SystemService extends Service {
     }
 
     // never call this directly shold be called via _checkRemoteDBUpdate
-    private void _checkRemoteDBZipUpdate(String version_str) {
+    private void _checkRemoteDBZipUpdate(boolean silent, String version_str) {
         File f = new File(getApplicationContext().getApplicationInfo().dataDir + File.separator + "rails_db.sql");
         sql = UtilsDBVerCheck.getSQLDatabase(getApplicationContext(), f);
         if (UtilsDBVerCheck.matchDBVersion( sql, version_str) ) {
             checkingVersion = false;
             Log.d("DBSVC", "system schedule db is up-todate " + version_str);
             sendCheckcomplete();
-
-            notify_user_of_upgrade("Schedule Database", "No Update Required, version " + getDBVersion());
+            if(!silent) {
+                notify_user_of_upgrade("Schedule Database", "No Update Required, version " + getDBVersion());
+            }
             return;
         }
         final DownloadFile d = new DownloadFile(getApplicationContext(), new DownloadFile.Callback() {
@@ -203,13 +205,28 @@ public class SystemService extends Service {
                     Log.d("SQL", "renamed file " + tmpFilename.getAbsolutePath() + " to " + dbFilePath.getAbsolutePath());
                     tmpFilename.renameTo(dbFilePath); tmpFilename = null;
                     //dbFilePath = new File(dbFilePath.getAbsolutePath());
-
-                    sql = new SQLiteLocalDatabase(getApplicationContext(), dbFilePath.getName(), null);
-                    SqlUtils.create_user_pref_table(sql.getWritableDatabase());
-                    SqlUtils.update_user_pref( sql.getWritableDatabase(),"version", version_str, new Date());
-
-                    // let the user know we have upgraded.
-                    notify_user_of_upgrade("Schedule Database", "upgraded to " + version_str);
+                    int retries = 0;
+                    while ( retries < 5) {
+                        retries ++;
+                        try {
+                            sql = new SQLiteLocalDatabase(getApplicationContext(), dbFilePath.getName(), null);
+                            SqlUtils.create_user_pref_table(sql.getWritableDatabase());
+                            SqlUtils.update_user_pref(sql.getWritableDatabase(), "version", version_str, new Date());
+                            // let the user know we have upgraded.
+                            notify_user_of_upgrade("Schedule Database", "upgraded to " + version_str);
+                            break;
+                        } catch (Exception e) {
+                            try {Thread.sleep(100); } catch(Exception e1) {}
+                            Log.d("SVC", "failed to get sql retries:"+ retries);
+                            // check sql
+                            if( sql != null ) {
+                                // this is definately a sync problem, need to fix this. TODO::
+                                // or the notify failed.
+                                Log.d("SVC", "failed to get sql but sql object already set.");
+                                break;
+                            }
+                        }
+                    }
                 }
                 finally {
                     Utils.delete(tmpFilename);
@@ -234,7 +251,20 @@ public class SystemService extends Service {
                 DownloadManager.Request.NETWORK_MOBILE| DownloadManager.Request.NETWORK_WIFI, "application/zip");
         checkingVersion=true;
     }
+    public void doForceCheckUpgrade() {
 
+        try {
+            DateFormat dateTimeFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss - 0.00");
+           if (sql != null ) {
+               SqlUtils.create_user_pref_table(sql.getWritableDatabase());
+               Date now =  new Date();
+               SqlUtils.update_user_pref(sql.getWritableDatabase(), "version", dateTimeFormat.format(now),now);
+           }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
     @Override
     public IBinder onBind(Intent intent) {
         setupDb();
@@ -303,11 +333,11 @@ public class SystemService extends Service {
             // check for a valid database.
             String db = UtilsDBVerCheck.getDBVersion(sql);
             if( db.isEmpty()) {
-                checkForUpdate();
+                checkForUpdate(false);
             }
         } else {
             // we don't have a  db get it.
-            checkForUpdate();
+            checkForUpdate(false);
         }
     }
     private void notify_user_of_upgrade(@NonNull String title, @NonNull String msg) {
@@ -825,10 +855,15 @@ public class SystemService extends Service {
             if (intent.getAction().equals(NotificationValues.BROADCAT_SEND_DEPARTURE_VISION_PING )) {
                 SystemService.this.sendDepartureVisionPings();
             } else if (intent.getAction().equals(NotificationValues.BROADCAT_CHECK_FOR_UPDATE )) {
-                SystemService.this.checkForUpdate();
+                Date now = new Date();
+                Date d = new Date(config.getLong(Config.UPDATE_LAST_CHECK_TIME, Utils.adddays(new Date(), -1).getTime()));
+                // every hour.
+                if( (now.getTime() - d.getTime()) > 1*60* 1000) {
+                    SystemService.this.checkForUpdate(true);
+                }
             }
             else {
-                Log.d("receiver", "got omething not sure what " + intent.getAction());
+                Log.d("receiver", "got something not sure what " + intent.getAction());
             }
         }
     }

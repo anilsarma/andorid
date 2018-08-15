@@ -44,9 +44,9 @@ public class UpdateCheckerJobService extends JobService {
             Date lasttime = formatter.parse(last);
             long diff = now.getTime()- lasttime.getTime();
             //Log.d("UPDJOB", "Time diffence :"  + (diff/(1000 * 60)) + " minutes");
-            if( diff  > (1000* 60 * 60 * 6 )) { // 6 hrs.
+            //if( diff  > (1000* 60 * 60 * 6 )) { // 6 hrs.
                 sendCheckForUpdate();
-            }
+            //}
         } catch(Exception e) {
           e.printStackTrace();
         } finally {

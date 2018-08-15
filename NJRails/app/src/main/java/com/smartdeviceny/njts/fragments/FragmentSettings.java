@@ -107,7 +107,10 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
                     try {
                         //SharedPreferences config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
                         int v = Integer.parseInt(value);
-                        v = Math.min(15,v);
+                        if( v > 15 ) {
+                            v = 1;
+                        }
+                        v = Math.min(5,v);
                         v = Math.max(0,v);
                         ConfigUtils.setConfig(config, Config.DELTA_DAYS, "" + v);
                         //Toast.makeText(getActivity(), "set delta days to value " + value, Toast.LENGTH_LONG).show();
@@ -162,7 +165,17 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
             SharedPreferences.Editor edit = config.edit();
             edit.putBoolean(Config.DEBUG, b);
             edit.apply();
+
+            Button debugUpgrade = view.findViewById(R.id.debugForceUpgrade);
+            debugUpgrade.setVisibility(b?View.VISIBLE:View.INVISIBLE);
+            view.invalidate();
+
         });
+
+        Button debugUpgrade = view.findViewById(R.id.debugForceUpgrade);
+        debugUpgrade.setVisibility(checkBox_debug.isChecked()?View.VISIBLE:View.INVISIBLE);
+        debugUpgrade.setOnClickListener(v -> ((MainActivity)getActivity()).doForceCheckUpgrade(getActivity()));
+
         return view;
         //return super.onCreateView(inflater, container, savedInstanceState);
     }

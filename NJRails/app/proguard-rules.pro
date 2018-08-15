@@ -12,6 +12,9 @@
 #   public *;
 #}
 
+#-keep class sun.misc.Unsafe { *; }
+#-keep class com.google.gson.stream.** { *; }
+
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable

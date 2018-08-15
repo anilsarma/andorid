@@ -18,7 +18,7 @@ public class PowerStartServiceReceiver extends BroadcastReceiver {
     public static void schdeulJob(Context context) {
         Log.d("PWR", "Scheduling test job.");
         // schedule a job for upgrade check
-        long ms_frequency = 20 * 60 * 1000;
+        long ms_frequency = 1 * 60 * 1000;
         ComponentName serviceComponent = new ComponentName(context, UpdateCheckerJobService.class);
         JobInfo.Builder builder = new JobInfo.Builder(2, serviceComponent);
         builder.setPeriodic(ms_frequency);
