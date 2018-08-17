@@ -493,14 +493,8 @@ public class SystemService extends Service {
             }
         }.execute(new Param(station, check_lastime));
     }
-    private void updateDepartureVision(String station, HashMap<String, DepartureVisionData> byBlockNew) {
-        //ArrayList<DepartureVisionData> oldEntries = status.get(station);
-        //oldEntries= (oldEntries==null)?new ArrayList<>():oldEntries;
-//        HashMap<String, DepartureVisionData> byBlockNew = new HashMap<>();
-//        for(DepartureVisionData dv:results) {
-//            byBlockNew.put(dv.block_id, dv);
-//        }
 
+    public void updateDepartureVision(String station, HashMap<String, DepartureVisionData> byBlockNew) {
         HashMap<String, DepartureVisionData> byBlock = status.get(station);
         byBlock= (byBlock==null)?new HashMap<>():byBlock;
         HashMap<String, DepartureVisionData> byTrack = new HashMap<>();
@@ -519,7 +513,7 @@ public class SystemService extends Service {
 
         for(DepartureVisionData dv:byBlockNew.values()) {
             DepartureVisionData old = byTrack.get(dv.track);
-            if( old !=null ) {
+            if( old !=null && !dv.track.isEmpty()) {
                     old.stale = true;
                     old.status = ""; // clear the status but keep the track.
             }
@@ -763,10 +757,24 @@ public class SystemService extends Service {
 
             return obj;
         }
+
+        public String toString() {
+            StringBuffer str = new StringBuffer();
+            str.append("time=" + time);
+            str.append(" to=" + to);
+            str.append(" track=" + track);
+            str.append(" line=" + line);
+            str.append(" status=" + status);
+            str.append(" block_id=" + block_id);
+            str.append(" station=" + station);
+            str.append(" favorite=" + favorite);
+            str.append(" createTime=" + createTime);
+            str.append(" header=" + header);
+            return str.toString();
+
+        }
     }
-//    public HashMap<String, ArrayList<DepartureVisionData>> getCachedDepartureVisionStatus() {
-//        return  status;
-//    }
+
     public HashMap<String, DepartureVisionData>getCachedDepartureVisionStatus_byTrip() {
         synchronized (lock_status_by_trip) {
             return status_by_trip;

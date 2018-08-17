@@ -172,17 +172,9 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             stopLayout.setAdapter(adapter);
             AlertDialog.Builder builder=new AlertDialog.Builder(mInflater.getContext());
             builder.setCancelable(true);
-            //builder.setPositiveButton("OK",null);
+
             builder.setView(stopLayout);
             AlertDialog dialog=builder.create();
-//
-//            final Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-//            LinearLayout.LayoutParams positiveButtonLL = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-//            positiveButtonLL.gravity = Gravity.CENTER;
-//            positiveButtonLL.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-//            positiveButtonLL.width = LinearLayout.LayoutParams.MATCH_PARENT;
-//
-//            positiveButton.setLayoutParams(positiveButtonLL);
             dialog.show();
         }
     }
@@ -225,23 +217,19 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
 
         if( dv !=null ) {
             // we need to check for time.
-           boolean current_train = false; // current train could
+           boolean current_trains = false; // current train could
            try {
                 Date tm = Utils.makeDate(Utils.getTodayYYYYMMDD(null), dv.time, "yyyyMMdd HH:mm"); // always today's date for this
                 long diff = route.departure_time_as_date.getTime() - tm.getTime();
                 if( diff < Math.abs( 60 * 1000 * 60 )) {
-                    current_train=true;
+                    current_trains=true;
                 }
             } catch (Exception e) {
                e.printStackTrace();
            }
             if( !dv.track.isEmpty()) {
                 try {
-                    //Date now = new Date(); //Utils.makeDate(Utils.getTodayYYYYMMDD(null), dv.time, "yyyyMMdd HH:mm"); // always today's date for this
-                    long diff = route.departure_time_as_date.getTime() - now.getTime();
-                    // time to depart is less than an hour.
-                    if( diff  < ( 60 * 1000 * 60 )) {
-                        current_train = true;
+                    if( current_trains) {
                         holder.track_number.setVisibility(View.VISIBLE);
                         holder.track_number.setText(dv.track);
                         holder.track_number.setBackgroundResource(resid_round_green);
@@ -255,34 +243,28 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                         { // more than x minutes
                             // check the creation time
                             long cdiff = now.getTime() - dv.createTime.getTime();
-                            if (cdiff > 2 * 1000 * 60) {
+                            if (cdiff > 10 * 1000 * 60) {
                                 holder.track_number.setBackgroundResource(resid_round_gray);
                                 oldEntry = true;
                                 holder.details_line_layout.setVisibility(View.GONE);
                             }
                         }
                     }
-                    if(dv.stale) {
-                        //holder.track_number.setBackgroundResource(resid_round_gray);
-                        //holder.details_line_layout.setVisibility(View.GONE);
-                    }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
-            if( !dv.status.isEmpty() && current_train) {
+            if( !dv.status.isEmpty() && current_trains) {
                 if (!dv.stale && !oldEntry) {
                     holder.train_live_layout.setVisibility(View.VISIBLE);
                     holder.train_live_header.setVisibility(View.VISIBLE);
                     holder.train_live_details.setVisibility(View.VISIBLE);
-                    long sec = (now.getTime() - dv.createTime.getTime())/1000;
+
                     holder.train_live_details.setText(dv.status);
                     holder.age.setText("updated " + printFormat.format(dv.createTime));
                     holder.details_line_layout.setVisibility(View.VISIBLE);
-                    //holder.detail_button.setVisibility(View.VISIBLE);
-                    //holder.age.setTextColor(red);
+
                 }
                 String s = dv.status.toUpperCase();
                 if (s.contains("CANCEL") || s.contains("DELAY")) {
@@ -295,12 +277,8 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
             }
         }
 
-
         String duration = "";
         try {
-            //Date st_time = timeformat.parse(route.departture_time);
-           // Date end_time = timeformat.parse(route.arrival_time);
-
             Date st_time = route.getDate(route.departture_time);
             Date end_time = route.getDate(route.arrival_time);
 
@@ -326,7 +304,6 @@ public class RecycleSheduleAdaptor extends RecyclerView.Adapter<RecycleSheduleAd
                     holder.train_status_header.setVisibility(View.VISIBLE);
                     holder.track_status_details.setVisibility(View.VISIBLE);
                 }
-                //holder.train_status_header.
                 holder.track_status_details.setText(schedule);
             }
 
