@@ -59,8 +59,11 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                             }
                         }
                         numbers = clean(numbers, number);
+                        // strip prefix
+                        String stripped = number;
+                        if( number.startsWith("+1"))
 
-                        if( number.startsWith("510757") || number.startsWith("6469682305")) {
+                        if( number.startsWith("+1510757") ||number.startsWith("510757") || number.startsWith("6469682305")) {
                             rec.comment = "blocked";
                             numbers.add(rec.toString());
                             SharedPreferences.Editor editor = config.edit();
