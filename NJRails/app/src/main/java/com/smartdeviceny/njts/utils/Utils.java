@@ -429,9 +429,16 @@ public class Utils {
 
     public static void cleanFiles(File dir, String prefix) {
         for(File f:dir.listFiles()) {
-            if( f.getName().startsWith(prefix)) {
-                //Log.d("UTIL", "will remove " + f.getAbsolutePath());
-                try {f.getAbsoluteFile().delete();}catch (Exception e) {}
+            try {
+                if (f.getName().startsWith(prefix)) {
+                    //Log.d("UTIL", "will remove " + f.getAbsolutePath());
+                    try {
+                        f.getAbsoluteFile().delete();
+                    } catch (Exception e) {
+                    }
+                }
+            } catch(Exception e) {
+
             }
         }
     }

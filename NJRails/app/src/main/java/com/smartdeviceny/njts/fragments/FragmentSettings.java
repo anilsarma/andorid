@@ -46,6 +46,7 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
     EditText edit_text_polling_frequency;
     Switch checkBox_debug;
     SharedPreferences config;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -201,6 +202,9 @@ public class FragmentSettings extends Fragment implements ServiceConnected{
     }
 
     void initData(SystemService systemService ) {
+        if(route_spinner ==null) {
+            return; // system not initalized
+        }
         config = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         systemService.get_values("select * from routes", "route_long_name");
         String values[] = systemService.get_values( "select * from routes", "route_long_name");

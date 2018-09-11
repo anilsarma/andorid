@@ -215,13 +215,15 @@ public class FragmentRouteSchedule extends Fragment implements ServiceConnected 
 
             @Override
             public CharSequence getSectionHeader(int position) {
+                position = Math.max(position, 0);
+                position = Math.min( position, adapter.mRoutes.size()-1);
                 return adapter.mRoutes.get(position).from + " \u279F " + adapter.mRoutes.get(position).to;
             }
 
             @Override
             public CharSequence getSectionDate(int position) {
                 position = Math.max(position, 0);
-                position = Math.min(position, adapter.mRoutes.size());
+                position = Math.min(position, adapter.mRoutes.size()-1);
                 return printableDateFmt.format(adapter.mRoutes.get(position).departure_time_as_date);
             }
         };
