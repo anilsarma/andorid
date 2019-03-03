@@ -17,18 +17,18 @@ import java.util.Iterator;
 
 public class SqlUtils {
 
-    public static void update_user_pref(SQLiteDatabase db, String name, String value, Date dt )
-    {
+    public static void update_user_pref(SQLiteDatabase db, String name, String value, Date dt) {
         ArrayList<HashMap<String, Object>> data = new ArrayList<>();
-        HashMap<String, Object> rec  = new HashMap<>();
+        HashMap<String, Object> rec = new HashMap<>();
         rec.put("name", name);
         rec.put("value", value);
         rec.put("date", Utils.formatToLocalDateTime(dt));
         data.add(rec);
-        query( db, "delete from user_pref where name like '%" + name + "%'" );
+        query(db, "delete from user_pref where name like '%" + name + "%'");
         insert(db, "user_pref", data);
     }
-    public static String get_user_pref_value(SQLiteDatabase db, String name, String default_value ) {
+
+    public static String get_user_pref_value(SQLiteDatabase db, String name, String default_value) {
         try {
             ArrayList<HashMap<String, Object>> data = query(db, "select * from user_pref where name like '%" + name + "%'");
             if (data.isEmpty()) {
@@ -36,14 +36,13 @@ public class SqlUtils {
                 //return null;
             }
             return (String) data.get(0).get("value");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return default_value;
     }
-    public static void insert(SQLiteDatabase db, String table_name, ArrayList<HashMap<String, Object>> df )
-    {
+
+    public static void insert(SQLiteDatabase db, String table_name, ArrayList<HashMap<String, Object>> df) {
 
         if (df.isEmpty()) {
             return;
@@ -51,37 +50,37 @@ public class SqlUtils {
         String cols = "";
         ArrayList<String> columns = new ArrayList<String>();
         String values = "";
-        for(Iterator<String> iterator = df.get(0).keySet().iterator(); iterator.hasNext(); ) {
-            String key =  iterator.next();
-            if ( !cols.isEmpty()) {
-                cols +=",";
-                values +=",";
+        for (Iterator<String> iterator = df.get(0).keySet().iterator(); iterator.hasNext(); ) {
+            String key = iterator.next();
+            if (!cols.isEmpty()) {
+                cols += ",";
+                values += ",";
             }
             cols += key;
             values += "?";
             columns.add(key);
         }
-        String sql = "INSERT INTO " + table_name  + "(" + cols + ") VALUES(" + values + ")";
+        String sql = "INSERT INTO " + table_name + "(" + cols + ") VALUES(" + values + ")";
         //String sql_truncate = "db.execSQL("delete from "+ TABLE_NAME);
-       // System.out.println("insert begin " + table_name);
+        // System.out.println("insert begin " + table_name);
         try {
 
             SQLiteStatement pstmt = db.compileStatement(sql);
             //conn.setAutoCommit(false);
             int count = 0;
             db.beginTransaction();
-            for(Iterator<HashMap<String, Object>> iterator = df.iterator(); iterator.hasNext(); ) {
+            for (Iterator<HashMap<String, Object>> iterator = df.iterator(); iterator.hasNext(); ) {
                 HashMap<String, Object> data = iterator.next();
                 for (int i = 0; i < columns.size(); i++) {
                     String key = columns.get(i);
                     Object v = data.get(key);
                     //System.err.println("Data -" +  key + " " + v + " type=" + v.getClass());
-                    if ( v instanceof Integer) {
-                        pstmt.bindLong(i+1, (Integer)v);
-                    } else if ( v instanceof Double) {
-                        pstmt.bindDouble(i+1, (Double)v);
+                    if (v instanceof Integer) {
+                        pstmt.bindLong(i + 1, (Integer) v);
+                    } else if (v instanceof Double) {
+                        pstmt.bindDouble(i + 1, (Double) v);
                     } else {
-                        pstmt.bindString(i+1, (String)v);
+                        pstmt.bindString(i + 1, (String) v);
                     }
                 }
                 pstmt.executeInsert();
@@ -91,21 +90,18 @@ public class SqlUtils {
             //System.out.println("insert end " + table_name);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }
-        finally {
+        } finally {
             db.endTransaction();
         }
     }
 
-    static public int check_table(SQLiteDatabase db, String table)
-    {
+    static public int check_table(SQLiteDatabase db, String table) {
         String sql = "select count(*) from " + table;
         Cursor c = db.rawQuery(sql, null);
         return Utils.parseCursor(c).size();
     }
 
-    static public String getStationCode(SQLiteDatabase db, String name)
-    {
+    static public String getStationCode(SQLiteDatabase db, String name) {
         try {
             String sql = "select station_code from station_codes where station_name like '%" + name + "%'";
             Cursor c = db.rawQuery(sql, null);
@@ -114,33 +110,31 @@ public class SqlUtils {
                 return "";
             }
             return result.get(0).get("station_code").toString();
-        } catch(Exception e ) {
-            e.printStackTrace();;
+        } catch (Exception e) {
+            e.printStackTrace();
+            ;
         }
         return "";
     }
 
 
-
-    static public ArrayList<HashMap<String, Object>> query(SQLiteDatabase db, String sql)
-    {
+    static public ArrayList<HashMap<String, Object>> query(SQLiteDatabase db, String sql) {
         //String sql = "select * from routes";
         ArrayList<HashMap<String, Object>> curser = Utils.parseCursor(db.rawQuery(sql, null));
         return curser;
     }
 
 
-
     static public void create_user_pref_table(SQLiteDatabase db) {
         String sql_string = "create table IF NOT EXISTS user_pref( name text primary key, value text, date real )";
-        db.execSQL( sql_string );
+        db.execSQL(sql_string);
     }
 
     static public boolean check_if_table_exists(SQLiteDatabase db, String name) {
         String sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + name + "';";
         ArrayList<HashMap<String, Object>> data = query(db, sql);
         if (data.isEmpty()) {
-           return false;
+            return false;
         }
         return true;
     }
@@ -148,7 +142,6 @@ public class SqlUtils {
     static public boolean check_if_user_pref_exists(SQLiteDatabase db) {
         return check_if_table_exists(db, "user_pref");
     }
-
 
 
 }

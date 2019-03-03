@@ -17,7 +17,7 @@ public class UtilsDBVerCheck {
         if (!dbFilePath.exists()) {
             return null;
         }
-        SQLiteLocalDatabase sql =new SQLiteLocalDatabase(appContext, dbFilePath.getName(), dbFilePath.getParent());
+        SQLiteLocalDatabase sql = new SQLiteLocalDatabase(appContext, dbFilePath.getName(), dbFilePath.getParent());
         sql.getWritableDatabase();
         try {
             sql.getWritableDatabase(); // force and open
@@ -31,22 +31,23 @@ public class UtilsDBVerCheck {
     }
 
     // extract the specified name to a temp file.
-    public static File createTempFile(File downloadedZipFile, File outputDir, String nameToExtract ) {
+    public static File createTempFile(File downloadedZipFile, File outputDir, String nameToExtract) {
         File tmpFilename = null;
         try {
             tmpFilename = File.createTempFile(Utils.getBasename(nameToExtract), "." + Utils.getExtension(nameToExtract), outputDir);
             ZipInputStream zis = Utils.getFileFromZip(new FileInputStream(downloadedZipFile), nameToExtract);
             Utils.writeExtractedFileToDisk(zis, new FileOutputStream(tmpFilename));
-        } catch (IOException e)  {
+        } catch (IOException e) {
         }
         return tmpFilename;
     }
+
     static public boolean matchDBVersion(SQLiteLocalDatabase sql, String version_str) {
         try {
-            if(sql == null) {
+            if (sql == null) {
                 return false;
             }
-            if(version_str.equals("")) {
+            if (version_str.equals("")) {
                 return false; // bad database or not upgraded.
             }
             if (SqlUtils.check_if_user_pref_exists(sql.getWritableDatabase())) {
@@ -57,7 +58,7 @@ public class UtilsDBVerCheck {
                 }
             }
             return false; // different version or db is not available.
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.e("DBU", "matchDBVersion failed" + e.getMessage());
         }
         return false;
@@ -65,11 +66,11 @@ public class UtilsDBVerCheck {
 
     static public String getDBVersion(SQLiteLocalDatabase sql) {
         try {
-            if(sql == null) {
+            if (sql == null) {
                 return "";
             }
             return SqlUtils.get_user_pref_value(sql.getWritableDatabase(), "version", "");
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.e("DBU", "matchDBVersion failed" + e.getMessage());
         }
         return "";

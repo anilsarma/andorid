@@ -14,8 +14,7 @@ import android.util.Log;
 import java.io.File;
 import java.util.ArrayList;
 
-// the main purpose of this is to check for new version in the remote
-// server.
+// a general purpose code to download using the download manager.
 public class DownloadFile {
     Context context;
     DownloadManager manager;
@@ -25,7 +24,6 @@ public class DownloadFile {
 
     public interface Callback {
         boolean downloadComplete(DownloadFile d, long id, String url, File file);
-
         void downloadFailed(DownloadFile d, long id, String url);
     }
 
@@ -61,7 +59,7 @@ public class DownloadFile {
 
     public long downloadFile(String url, String title, String description, int request_flags, @Nullable String mimetype) {
         //String url = "https://raw.githubusercontent.com/anilsarma/misc/master/njt/version.txt";
-        DownloadManager.Request request = buildRequest( url, title, description, request_flags, mimetype);
+        DownloadManager.Request request = buildRequest(url, title, description, request_flags, mimetype);
         return enqueue(request);
 
     }
@@ -69,13 +67,13 @@ public class DownloadFile {
     public long enqueue(DownloadManager.Request request) {
         long id = manager.enqueue(request);
         this.requestid.add(id);
-        //Log.d("download", "downloadFile scheduling .. " + id  + " " + url + " as " + title);
         return id;
     }
-    long downloadFile(DownloadManager.Request request ) {
+
+    long downloadFile(DownloadManager.Request request) {
         long id = manager.enqueue(request);
         this.requestid.add(id);
-        Log.d("download", "downloadFile scheduling .. " + id );
+        Log.d("download", "downloadFile scheduling .. " + id);
         return id;
     }
 
@@ -83,31 +81,20 @@ public class DownloadFile {
     public class LocalBcstReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // TODO Auto-generated method stub
-            //Log.d("DLD", "BroadcastReceiver::onReceive");
-            //String action = intent.getAction();
             //if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action))
-            {
-                //Log.d("download complete2", "compleete ... ");
-                handle_download_complete(context, intent);
-            }
+            handle_download_complete();
         }
-
-        public void handle_download_complete(Context context, Intent intent) {
+        public void handle_download_complete() {
             DownloadManager.Query query = new DownloadManager.Query();
-            long rids[] = requestid.stream().mapToLong(l->l).toArray();
+            long rids[] = requestid.stream().mapToLong(l -> l).toArray();
             query.setFilterById(rids);
-            if (rids.length==0) {
-                //Log.d("DNLD", "no pending requests " + intent.getAction());
+            if (rids.length == 0) {
                 return;
             }
-            //Log.d("DNLD", "hadle download complete" + intent.getAction());
             Cursor c = manager.query(query);
-
             for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
                 int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 int ID = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_ID));
-                //Log.d("DNLD", "checking entry " + status + " " + ID);
 
                 if ((status & DownloadManager.STATUS_SUCCESSFUL) == DownloadManager.STATUS_SUCCESSFUL) {
                     File mFile = new File(Uri.parse(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))).getPath());
