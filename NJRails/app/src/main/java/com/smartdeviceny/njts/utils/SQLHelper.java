@@ -39,19 +39,18 @@ public class SQLHelper extends SQLiteOpenHelper {
         this.context = context;
     }
 
-    InputStream getFile(String filename)throws IOException
-    {
+    InputStream getFile(String filename) throws IOException {
         if (useAsset) {
             return amgr.open(filename);
-        }
-        else {
+        } else {
             return new FileInputStream(new File(context.getCacheDir() + "/db/nj_rails_cache" + filename));
         }
     }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         //db.execSQL("create table todos (_id integer primary key autoincrement, title text, priority integer)");
-      //  RailHelper.create_tables(db);
+        //  RailHelper.create_tables(db);
 
     }
 
@@ -62,44 +61,40 @@ public class SQLHelper extends SQLiteOpenHelper {
 
     // read the files from the asset directory,
     // we need to make this either the assets or the cache directory
-    public ArrayList<HashMap<String, Object>> read_csv(String filename)
-    {
+    public ArrayList<HashMap<String, Object>> read_csv(String filename) {
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";
         String cols[] = null;
         ArrayList<HashMap<String, Object>> result = new ArrayList<HashMap<String, Object>>();
         try {
-            br = new BufferedReader(new InputStreamReader(getFile(filename)) );
+            br = new BufferedReader(new InputStreamReader(getFile(filename)));
             while ((line = br.readLine()) != null) {
-                if ( line.toCharArray()[0] == 0xFEFF) { // BOM
+                if (line.toCharArray()[0] == 0xFEFF) { // BOM
                     line = line.substring(1);
                 }
                 // use comma as separator
                 String[] tokens = line.split(cvsSplitBy);
-                if (cols == null ) {
+                if (cols == null) {
                     cols = tokens;
                     continue;
                 }
-                HashMap<String, Object> data=new HashMap<String, Object>();
+                HashMap<String, Object> data = new HashMap<String, Object>();
                 for (int i = 0; i < tokens.length; i++) {
                     Object v = tokens[i];
                     try {
-                        v = Integer.parseInt(tokens[i] );
-                    }
-                    catch (NumberFormatException e) {
+                        v = Integer.parseInt(tokens[i]);
+                    } catch (NumberFormatException e) {
                         try {
                             v = Double.parseDouble(tokens[i]);
-                        }
-                        catch (NumberFormatException e1)
-                        {
+                        } catch (NumberFormatException e1) {
 
                         }
                     }
                     //System.out.println(v + " type=" + v.getClass());
-                    data.put( cols[i], v);
+                    data.put(cols[i], v);
                 }
-                result.add( data );
+                result.add(data);
 
                 //System.out.println("Country [code= " + country[4] + " , name=" + country[5] + "]");
 
@@ -120,18 +115,19 @@ public class SQLHelper extends SQLiteOpenHelper {
         }
         return result;
     }
-    public static void update_user_pref(SQLiteDatabase db, String name, String value, Date dt )
-    {
+
+    public static void update_user_pref(SQLiteDatabase db, String name, String value, Date dt) {
         ArrayList<HashMap<String, Object>> data = new ArrayList<>();
-        HashMap<String, Object> rec  = new HashMap<>();
+        HashMap<String, Object> rec = new HashMap<>();
         rec.put("name", name);
         rec.put("value", value);
         rec.put("date", Utils.formatToLocalDateTime(dt));
         data.add(rec);
-        query( db, "delete from user_pref where name like '%" + name + "%'" );
+        query(db, "delete from user_pref where name like '%" + name + "%'");
         insert(db, "user_pref", data);
     }
-    public static String get_user_pref_value(SQLiteDatabase db, String name, String default_value ) {
+
+    public static String get_user_pref_value(SQLiteDatabase db, String name, String default_value) {
         try {
             ArrayList<HashMap<String, Object>> data = query(db, "select * from user_pref where name like '%" + name + "%'");
             if (data.isEmpty()) {
@@ -139,14 +135,13 @@ public class SQLHelper extends SQLiteOpenHelper {
                 //return null;
             }
             return (String) data.get(0).get("value");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return default_value;
     }
-    public static void insert(SQLiteDatabase db, String table_name, ArrayList<HashMap<String, Object>> df )
-    {
+
+    public static void insert(SQLiteDatabase db, String table_name, ArrayList<HashMap<String, Object>> df) {
 
         if (df.isEmpty()) {
             return;
@@ -154,17 +149,17 @@ public class SQLHelper extends SQLiteOpenHelper {
         String cols = "";
         ArrayList<String> columns = new ArrayList<String>();
         String values = "";
-        for(Iterator<String> iterator = df.get(0).keySet().iterator(); iterator.hasNext(); ) {
-            String key =  iterator.next();
-            if ( !cols.isEmpty()) {
-                cols +=",";
-                values +=",";
+        for (Iterator<String> iterator = df.get(0).keySet().iterator(); iterator.hasNext(); ) {
+            String key = iterator.next();
+            if (!cols.isEmpty()) {
+                cols += ",";
+                values += ",";
             }
             cols += key;
             values += "?";
             columns.add(key);
         }
-        String sql = "INSERT INTO " + table_name  + "(" + cols + ") VALUES(" + values + ")";
+        String sql = "INSERT INTO " + table_name + "(" + cols + ") VALUES(" + values + ")";
         //String sql_truncate = "db.execSQL("delete from "+ TABLE_NAME);
         //System.out.println("insert begin " + table_name);
         try {
@@ -173,18 +168,18 @@ public class SQLHelper extends SQLiteOpenHelper {
             //conn.setAutoCommit(false);
             int count = 0;
             db.beginTransaction();
-            for(Iterator<HashMap<String, Object>> iterator = df.iterator(); iterator.hasNext(); ) {
+            for (Iterator<HashMap<String, Object>> iterator = df.iterator(); iterator.hasNext(); ) {
                 HashMap<String, Object> data = iterator.next();
                 for (int i = 0; i < columns.size(); i++) {
                     String key = columns.get(i);
                     Object v = data.get(key);
                     //System.err.println("Data -" +  key + " " + v + " type=" + v.getClass());
-                    if ( v instanceof Integer) {
-                        pstmt.bindLong(i+1, (Integer)v);
-                    } else if ( v instanceof Double) {
-                        pstmt.bindDouble(i+1, (Double)v);
+                    if (v instanceof Integer) {
+                        pstmt.bindLong(i + 1, (Integer) v);
+                    } else if (v instanceof Double) {
+                        pstmt.bindDouble(i + 1, (Double) v);
                     } else {
-                        pstmt.bindString(i+1, (String)v);
+                        pstmt.bindString(i + 1, (String) v);
                     }
                 }
                 pstmt.executeInsert();
@@ -194,54 +189,57 @@ public class SQLHelper extends SQLiteOpenHelper {
             //System.out.println("insert end " + table_name);
         } catch (SQLException e) {
             //System.out.println(e.getMessage());
-        }
-        finally {
+        } finally {
             db.endTransaction();
         }
     }
 
-    static public int check_table(SQLiteDatabase db, String table)
-    {
+    static public int check_table(SQLiteDatabase db, String table) {
         String sql = "select count(*) from " + table;
         Cursor c = db.rawQuery(sql, null);
         return Utils.parseCursor(c).size();
     }
 
-    static public HashMap<String, Object> get_station(SQLiteDatabase db, String name)
-    {
+    static public HashMap<String, Object> get_station(SQLiteDatabase db, String name) {
         //String sql = "select * from stops where stop_name like '%" + name + "%'";
         String sql = "select * from stops where upper(stop_name) = upper('" + name + "')";
         Cursor c = db.rawQuery(sql, null);
         ArrayList<HashMap<String, Object>> result = Utils.parseCursor(c);
-        if (result.isEmpty()){
+        if (result.isEmpty()) {
             return new HashMap<>();
         }
         return result.get(0);
     }
 
 
-    static public ArrayList<HashMap<String, Object>> query(SQLiteDatabase db, String sql)
-    {
+    static public ArrayList<HashMap<String, Object>> query(SQLiteDatabase db, String sql) {
         //String sql = "select * from routes";
         ArrayList<HashMap<String, Object>> curser = Utils.parseCursor(db.rawQuery(sql, null));
         return curser;
     }
 
-    static public String[] get_values(SQLiteDatabase db, String sql, String key )
-    {
+    static public String[] get_values(SQLiteDatabase db, String sql, String key) {
         ArrayList<HashMap<String, Object>> data = SQLHelper.query(db, sql);
         //System.out.println(data);
         ArrayList<String> njtr = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
-            String d = (String)data.get(i).get(key).toString();
+            HashMap<String, Object> entry = data.get(i);
+            if( entry == null) {
+                continue;
+            }
+            Object value = entry.get(key);
+            if( value == null ) {
+                continue;
+            }
+            String d = value.toString();
             njtr.add(d);
         }
         return njtr.toArray(new String[]{});
     }
-    static public Cursor getRoutes(SQLiteDatabase db, String from, String to, int date )
-    {
-        int start_stop_id = (int)get_station(db,from).get("stop_id");
-        int stop_stop_id = (int)get_station(db, to).get("stop_id");
+
+    static public Cursor getRoutes(SQLiteDatabase db, String from, String to, int date) {
+        int start_stop_id = (int) get_station(db, from).get("stop_id");
+        int stop_stop_id = (int) get_station(db, to).get("stop_id");
         //and departure_time > '18:10:00' and departure_time < '20:00:00'
         //date = 20171102;
 //System.out.println("output " + date + " stop:" + start_stop_id + " end:"+ stop_stop_id);
@@ -266,19 +264,18 @@ public class SQLHelper extends SQLiteOpenHelper {
     }
 
 
-    static public String[] getRouteStations(SQLiteDatabase db, String route_name)
-    {
+    static public String[] getRouteStations(SQLiteDatabase db, String route_name) {
         String sql_stations = "select * from stops where stop_id in (select  distinct stop_id from stop_times where trip_id in ( select distinct trip_id from trips where route_id  = {route_id} ) );";
 
         String sql_route = "select * from routes where route_long_name like '%{route_name}%';".replace("{route_name}", route_name);
         //System.out.println("SQL:" + sql_route);
-        String route_id[]  = SQLHelper.get_values(db,sql_route, "route_id");
-        if( route_id.length ==0) {
-            return  new String[]{};
+        String route_id[] = SQLHelper.get_values(db, sql_route, "route_id");
+        if (route_id.length == 0) {
+            return new String[]{};
         }
-        sql_stations = sql_stations.replace("{route_id}", "" + route_id[0] );
+        sql_stations = sql_stations.replace("{route_id}", "" + route_id[0]);
         //System.out.println("SQL:" + sql_stations );
-        String startStations[] = SQLHelper.get_values( db, sql_stations, "stop_name");
+        String startStations[] = SQLHelper.get_values(db, sql_stations, "stop_name");
         Set<String> u = new TreeSet<>();
 
         Log.d("SQL", "getRouteStations for " + route_name + " got:" + startStations.length);
@@ -288,7 +285,8 @@ public class SQLHelper extends SQLiteOpenHelper {
         startStations = u.toArray(new String[0]);
         return startStations;
     }
-   static public  Cursor getTripStops(SQLiteDatabase db, String trip_id) {
+
+    static public Cursor getTripStops(SQLiteDatabase db, String trip_id) {
 
         String sql = "select st.*, sp.stop_lat, sp.stop_lon, sp.stop_name from stop_times st, stops sp where sp.stop_id = st.stop_id and st.trip_id = {trip_id} order by stop_sequence";
         sql = sql.replace("{trip_id}", trip_id);

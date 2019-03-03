@@ -45,17 +45,15 @@ import java.util.zip.ZipInputStream;
 
 public class Utils {
 
-    static public String getTodayYYYYMMDD(@Nullable Date dt)
-    {
-        if(dt ==null) {
+    static public String getTodayYYYYMMDD(@Nullable Date dt) {
+        if (dt == null) {
             dt = new Date();
         }
         DateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
         return dateFormat.format(dt);
     }
 
-    static public String formatToLocalDate(Date dt)
-    {
+    static public String formatToLocalDate(Date dt) {
         Calendar cal = Calendar.getInstance();
         TimeZone tz = cal.getTimeZone();
 
@@ -64,8 +62,8 @@ public class Utils {
 
         return dateFormat.format(dt);
     }
-    static public String formatToLocalTime(Date dt)
-    {
+
+    static public String formatToLocalTime(Date dt) {
         Calendar cal = Calendar.getInstance();
         TimeZone tz = cal.getTimeZone();
 
@@ -74,16 +72,16 @@ public class Utils {
 
         return dateFormat.format(dt);
     }
-    static Calendar make_cal(Date date, int field, int ammount)
-    {
-        Calendar ca= Calendar.getInstance();
+
+    static Calendar make_cal(Date date, int field, int ammount) {
+        Calendar ca = Calendar.getInstance();
         ca.setTime(date);
         ca.add(field, ammount);
 
         return ca;
     }
-    static public String formatToLocalDateTime(Date dt)
-    {
+
+    static public String formatToLocalDateTime(Date dt) {
         Calendar cal = Calendar.getInstance();
         TimeZone tz = cal.getTimeZone();
 
@@ -93,8 +91,7 @@ public class Utils {
         return dateFormat.format(dt);
     }
 
-    static public String getLocaDateTime()
-    {
+    static public String getLocaDateTime() {
         Calendar cal = Calendar.getInstance();
         TimeZone tz = cal.getTimeZone();
 
@@ -103,6 +100,7 @@ public class Utils {
         Date date = new Date();
         return dateFormat.format(date);
     }
+
     static public Date adddays(Date date, int days) {
         //if (days > 0 )
         {
@@ -113,15 +111,15 @@ public class Utils {
         }
         return date;
     }
-    static public String getLocaDate(int days)
-    {
+
+    static public String getLocaDate(int days) {
         Calendar cal = Calendar.getInstance();
         TimeZone tz = cal.getTimeZone();
 
         DateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
         dateFormat.setTimeZone(tz);
         Date date = new Date();
-        if (days > 0 ) {
+        if (days > 0) {
             Calendar c = Calendar.getInstance();
             c.setTime(date);
             c.add(Calendar.DATE, days);
@@ -129,6 +127,7 @@ public class Utils {
         }
         return dateFormat.format(date);
     }
+
     static public Date parseLocalTime(String time) {
         Calendar cal = Calendar.getInstance();
         TimeZone tz = cal.getTimeZone();
@@ -142,8 +141,7 @@ public class Utils {
         try {
             Date st_time = timeformat.parse(time);
             return st_time;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -167,42 +165,41 @@ public class Utils {
         cursor.close();
         return result;
     }
+
     public static float pxFromDp(float dp, Context mContext) {
         return dp * mContext.getResources().getDisplayMetrics().density;
     }
+
     public static int pxFromSp(int sp, Context mContext) {
-        return (int)((double)sp * mContext.getResources().getDisplayMetrics().scaledDensity);
+        return (int) ((double) sp * mContext.getResources().getDisplayMetrics().scaledDensity);
     }
 
 
-    public static TextView addTextView(Context context, ViewGroup parent, String text, int font_size, int padding)
-    {
+    public static TextView addTextView(Context context, ViewGroup parent, String text, int font_size, int padding) {
         TextView tv = new TextView(context);
-        tv.setText( text);
+        tv.setText(text);
         tv.setTextSize(Utils.pxFromDp(font_size, context));
-        TableRow.LayoutParams params =  new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
         //params.setMargins(0, 5, 0, 5);
         parent.addView(tv, params);
         tv.setPadding(10, padding, 0, 0);
-        return  tv;
+        return tv;
     }
 
-    public static String capitalize(String str)
-    {
+    public static String capitalize(String str) {
         String strs[] = str.split("\\s");
         StringBuffer b = new StringBuffer();
 
         for (int i = 0; i < strs.length; i++) {
-            if ( strs[i].length() > 1 && strs[i].substring(1,1)!= "." )
-            {
-                strs[i] = strs[i].substring(0,1).toUpperCase() + strs[i].substring(1).toLowerCase();
+            if (strs[i].length() > 1 && strs[i].substring(1, 1) != ".") {
+                strs[i] = strs[i].substring(0, 1).toUpperCase() + strs[i].substring(1).toLowerCase();
             }
             b.append(strs[i] + " ");
         }
         return b.toString().trim();
     }
-    public static String join(String delimit, String data[] )
-    {
+
+    public static String join(String delimit, String data[]) {
         String str = "";
         for (int i = 0; i < data.length; i++) {
             if (!str.isEmpty()) {
@@ -212,21 +209,20 @@ public class Utils {
         }
         return str;
     }
-    public static ArrayList<String> split(String delimit, String data )
-    {
+
+    public static ArrayList<String> split(String delimit, String data) {
         ArrayList<String> favA = new ArrayList<String>();
-        for (String x: data.split(delimit)) {
+        for (String x : data.split(delimit)) {
             favA.add(x);
         }
         return favA;
     }
 
-    public static ArrayList<HashMap<String, String>> coerce(ArrayList<HashMap<String, Object>> data )
-    {
-        ArrayList<HashMap<String, String>> result  = new ArrayList<>();
+    public static ArrayList<HashMap<String, String>> coerce(ArrayList<HashMap<String, Object>> data) {
+        ArrayList<HashMap<String, String>> result = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
             HashMap<String, String> r = new HashMap<>();
-            for ( String key:data.get(i).keySet()) {
+            for (String key : data.get(i).keySet()) {
                 r.put(key, data.get(i).get(key).toString());
             }
             result.add(r);
@@ -264,7 +260,7 @@ public class Utils {
     public static void writeExtractedFileToDisk(InputStream in, OutputStream outs) throws IOException {
         byte[] buffer = new byte[1024];
         int length;
-        while ((length = in.read(buffer))>0){
+        while ((length = in.read(buffer)) > 0) {
             outs.write(buffer, 0, length);
         }
         outs.flush();
@@ -288,7 +284,7 @@ public class Utils {
         ZipEntry ze;
         while ((ze = zis.getNextEntry()) != null) {
             Log.w(TAG, "Zip entry  '" + ze.getName() + "'...");
-            if(ze.getName().toUpperCase().equals(name.toUpperCase())) {
+            if (ze.getName().toUpperCase().equals(name.toUpperCase())) {
                 Log.w(TAG, "Found matching file: '" + name + "'...");
                 return zis;
             }
@@ -300,9 +296,8 @@ public class Utils {
         return new Scanner(is).useDelimiter("\\A").next();
     }
 
-    static public String getFileContent(File file)
-    {
-        if(!file.exists()) {
+    static public String getFileContent(File file) {
+        if (!file.exists()) {
             return "";
         }
         try {
@@ -310,26 +305,24 @@ public class Utils {
             String data = br.readLine();
             br.close();
             return data;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             return "";
         }
     }
-    static public String getEntireFileContent(File file)
-    {
-        if(!file.exists()) {
+
+    static public String getEntireFileContent(File file) {
+        if (!file.exists()) {
             return "";
         }
         StringBuffer str = new StringBuffer();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
-           String line = "";
+            String line = "";
             while ((line = br.readLine()) != null) {
                 str.append(line + "\n");
             }
 
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
 
         }
         return str.toString();
@@ -338,24 +331,23 @@ public class Utils {
     public static void scheduleJob(Context context, @NonNull Class<?> cls, @Nullable Integer ms_frequency, boolean periodic) {
         ComponentName serviceComponent = new ComponentName(context, cls);
         JobInfo.Builder builder = new JobInfo.Builder(1, serviceComponent);
-        if ( ms_frequency == null ) {
-            ms_frequency = new Integer(60*1000); // every minute.
+        if (ms_frequency == null) {
+            ms_frequency = new Integer(60 * 1000); // every minute.
         }
-        if( periodic ) {
+        if (periodic) {
             builder.setPeriodic(ms_frequency);
         } else {
             builder.setMinimumLatency(ms_frequency); // wait at least
-            builder.setOverrideDeadline((int)(ms_frequency)); // maximum delay
+            builder.setOverrideDeadline((int) (ms_frequency)); // maximum delay
         }
         //builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED); // require unmetered network
         //builder.setRequiresDeviceIdle(true); // device should be idle
         //builder.setRequiresCharging(true); // we don't care if the device is charging or not
         JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
-        if(jobScheduler.schedule(builder.build()) <= 0) {
+        if (jobScheduler.schedule(builder.build()) <= 0) {
             Log.e("JOB", "error: Some error while scheduling the job");
-        }
-        else {
-           // Log.d("JOB", "job scheduled " + ms_frequency);
+        } else {
+            // Log.d("JOB", "job scheduled " + ms_frequency);
         }
     }
 
@@ -364,7 +356,7 @@ public class Utils {
         String fileName = name.getName();
         int i = fileName.lastIndexOf('.');
         if (i > 0) {
-            extension = fileName.substring(i+1);
+            extension = fileName.substring(i + 1);
         }
         return extension;
     }
@@ -374,7 +366,7 @@ public class Utils {
         String fileName = name.getName();
         int i = fileName.lastIndexOf('.');
         if (i > 0) {
-            extension = fileName.substring(0, i-1);
+            extension = fileName.substring(0, i - 1);
         }
         return extension;
     }
@@ -383,7 +375,7 @@ public class Utils {
         String extension = "";
         int i = fileName.lastIndexOf('.');
         if (i > 0) {
-            extension = fileName.substring(i+1);
+            extension = fileName.substring(i + 1);
         }
         return extension;
     }
@@ -392,43 +384,48 @@ public class Utils {
         String extension = "";
         int i = fileName.lastIndexOf('.');
         if (i > 0) {
-            extension = fileName.substring(0, i-1);
+            extension = fileName.substring(0, i - 1);
         }
         return extension;
     }
 
     static public void delete(File file) {
-        if(file != null ) {
+        if (file != null) {
             try {
-                if(file.getAbsoluteFile().delete() ) {
+                if (file.getAbsoluteFile().delete()) {
                     Log.d("DEL", "deleted " + file.getAbsolutePath());
                 } else {
                     Log.e("DEL", "delete failed " + file.getAbsolutePath());
                 }
-            } catch (Exception e){}
+            } catch (Exception e) {
+            }
         }
     }
 
-    static  public Date makeDate(String yyyymmdd, String time, @Nullable String format) throws ParseException {
-        if(format == null ) {
+    static public Date makeDate(String yyyymmdd, String time, @Nullable String format) throws ParseException {
+        if (format == null) {
             format = "yyyyMMdd HH:mm:ss";
         }
         DateFormat dateTimeFormat = new SimpleDateFormat(format);
-        Date tm = dateTimeFormat.parse("" + yyyymmdd + " "  + time);
+        Date tm = dateTimeFormat.parse("" + yyyymmdd + " " + time);
         return tm;
     }
 
     public static String getConfig(SharedPreferences config, String name, String defaultValue) {
         return config.getString(name, defaultValue);
     }
-    public static  void setConfig(SharedPreferences config, String name, String value) {
-        SharedPreferences.Editor editor  = config.edit();
+
+    public static void setConfig(SharedPreferences config, String name, String value) {
+        SharedPreferences.Editor editor = config.edit();
         editor.putString(name, value);
         editor.commit();
     }
 
     public static void cleanFiles(File dir, String prefix) {
-        for(File f:dir.listFiles()) {
+        if( dir ==null ) {
+            return;
+        }
+        for (File f : dir.listFiles()) {
             try {
                 if (f.getName().startsWith(prefix)) {
                     //Log.d("UTIL", "will remove " + f.getAbsolutePath());
@@ -437,11 +434,12 @@ public class Utils {
                     } catch (Exception e) {
                     }
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
 
             }
         }
     }
+
     private static void createNotificationChannel(Context context, String CHANNEL_ID) {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
@@ -457,8 +455,9 @@ public class Utils {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
     public static NotificationCompat.Builder makeNotificationBuilder(Context context, String channelID, String title, String msg) {
-        createNotificationChannel( context, channelID);
+        createNotificationChannel(context, channelID);
         //int icon = R.mipmap.ic_launcher;
         //long when = System.currentTimeMillis();
 //        Notification notification = new Notification(icon, getString(R.string.app_name), when);
@@ -467,33 +466,30 @@ public class Utils {
 //        notification.defaults |= Notification.DEFAULT_VIBRATE; //Vibration
 //        notification.defaults |= Notification.DEFAULT_SOUND; // Sound
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context, channelID)
-                        .setSmallIcon(R.mipmap.app_njs_icon)
-                        .setContentTitle(title)
-                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                        .setContentText(msg);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelID).setSmallIcon(R.mipmap.app_njs_icon).setContentTitle(title).setVisibility(
+                NotificationCompat.VISIBILITY_PUBLIC).setContentText(msg);
         return mBuilder;
     }
-    public static void notify(Context context, NotificationCompat.Builder builder, @Nullable  Integer id) {
+
+    public static void notify(Context context, NotificationCompat.Builder builder, @Nullable Integer id) {
         final NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification notification = builder.build();
         //notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        if(id == null ) {
+        if (id == null) {
             id = new Integer(1);
         }
         mNotificationManager.notify(id, notification);
     }
 
-    public static void notify_user(Context context, String channelID, String title, String msg, @Nullable  Integer id) {
+    public static void notify_user(Context context, String channelID, String title, String msg, @Nullable Integer id) {
         final NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationCompat.Builder mBuilder =makeNotificationBuilder( context, channelID, title, msg);
+        NotificationCompat.Builder mBuilder = makeNotificationBuilder(context, channelID, title, msg);
         Notification notification = mBuilder.build();
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
         //notification.defaults |= Notification.DEFAULT_SOUND;
 
-        Log.d("SVC", "notification sent " + msg );
-        if(id == null ) {
+        Log.d("SVC", "notification sent " + msg);
+        if (id == null) {
             id = new Integer(1);
         }
         mNotificationManager.notify(id, notification);
