@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">HelloWorld</string>
-    <string name="channel_name">Helloworld Services</string>
-    <string name="channel_description">HelloWorld Services desc</string>
-    <string name="default_notification_channel_id">Channel ID</string>
-</resources>
