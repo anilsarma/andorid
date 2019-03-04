@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">NJT Schedule</string>
+    <string name="appbar_scrolling_view_behavior">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
+    <string name="default_notification_channel_id">Channel ID</string>
+    <string name="channel_name">NJTSChannel</string>
+    <string name="channel_description">Notification channel for the NJ Transit Schedule application.</string>
+
+    <string-array name="SettingDeltaDays">
+        <item>New York Penn Station</item>
+        <item>New Brunswick</item>
+        <item>Princeton Jct</item>
+    </string-array>
+
+
+    <string name="setting_delta_days_text"><b>Delta Days</b>\nThis setting is used to populate the Route Tables, in the Schedule Tab. The value in this configuration is used to go back and forward the number of days to retrieve, recommended value 1. </string>
+
+    <string name="setting_polling_frequency"><b>Polling frequency(sec)</b>\nThe application needs to query the remote server to retrieve real-time track information, this is the number of seconds between each query. Recommended value 30. </string>
+    <string name="setting_debug_flag"><b>Enable Debugging</b>\nThis is a developer option recommended disabled.</string>
+</resources>

@@ -1,0 +1,68 @@
+apply plugin: 'com.android.application'
+def versionMajor = 2
+def versionMinor = 1
+def versionPatch = 6
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId "com.smartdeviceny.njts"
+        minSdkVersion 24
+        targetSdkVersion 27
+        versionCode versionMajor * 1000 + versionMinor * 100 + versionPatch
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+        multiDexEnabled true
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            applicationVariants.all { variant ->
+                variant.outputs.each{ output ->
+                    def name = "NJTSchedule_v${variant.versionName}.apk"
+                    output.outputFileName = name
+                }
+            }
+            resValue "string", "app_version", "${defaultConfig.versionName}"
+        }
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue "string", "app_version", "${defaultConfig.versionName}-debug-" + InetAddress.getLocalHost().getCanonicalHostName() + "-" + new Date()
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:percent:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation 'org.mockito:mockito-core:2.4.0'
+    testImplementation 'org.powermock:powermock-core:1.7.0RC2'
+    testImplementation 'org.powermock:powermock-module-junit4:1.7.0RC2'
+    testImplementation 'org.powermock:powermock-api-mockito2:1.7.0RC2'
+    implementation 'org.jsoup:jsoup:1.10.3'
+}
