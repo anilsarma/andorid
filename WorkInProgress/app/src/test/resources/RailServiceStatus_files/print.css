@@ -1,0 +1,40 @@
+/*  This style sheet controls printing capabilities and is referenced in the include files  with this tag
+<link href="styles/print.css"  rel="stylesheet" type="text/css" media="print"  /> in the header
+*/
+
+BODY {
+	color: black;
+	background: white;
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : larger;
+} 
+
+A:link, A:visited {background: white; color: black; text-decoration: underline;
+   font-weight: bold;}
+   
+H1, H2, H3 {background: white; color: black; padding-bottom: 1px;
+   border-bottom: 1px solid gray;}
+   
+/*  the following tag is used for all the banner pages that we don't want to print the headings and images */
+DIV.banner {
+	display: none;
+}
+
+TABLE {
+	font : normal normal normal 10pt;
+	width : 95%;
+	padding-bottom : 0%;
+	padding-left : 0%;
+	padding-right : 0%;
+	padding-top : 0%;
+}
+	
+ .noprint {
+	display: none;
+}
+
+
+
+
+
+

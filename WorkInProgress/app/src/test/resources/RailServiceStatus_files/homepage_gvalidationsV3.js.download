@@ -1,0 +1,462 @@
+
+/* Validate Form */
+  var geocoder;
+  var map;
+  var selpoint;
+  var foundEndCoords = false;
+  var foundStartCoords = false;
+  var startGoogleAddress;
+  var endGoogleAddress;
+
+ Array.prototype.findIndex = function(value){
+ 	var ctr = "";
+ 	for (var i=0; i < this.length; i++) {
+	 	if (this[i] == value) return i;
+ 	}
+ 	return ctr;
+ };
+
+  function initialize() {
+	geocoder = new google.maps.Geocoder();
+    selpoint = new google.maps.LatLng(-34.397, 150.644);
+	$('input[name=mode]')[3].checked = true;
+	$('input[name=time]')[0].checked = true;
+	$('input#Atr').attr('checked', false);
+
+	$('.datepicker').dpSetSelected(''); //wipe out
+	$('.datepicker').dpSetSelected(new Date().asString()); //select current date
+  }
+
+  function reCheckCoords(){
+ 	if(!foundStartCoords || !foundEndCoords){
+  		setTimeout("submitForm()",500);
+  	} else {
+  		submitForm();
+  	}
+  }
+
+  function submitForm(){
+   	$("#frm_trip_planner").submit();
+  }
+
+  /* Check if coordinates already exist for starting address otherwise use google geocoder to find it */
+  function checkStartCoords(){
+     //Don't do the geocoding if the user selects from autocomplete.
+     var travelFrom = $("input#starting_street_address").val();
+  	 var travelFromIndex = stationNamesList.findIndex(travelFrom);
+     var travelFromLatLong = stationCoordinatesList[travelFromIndex];
+     if(!travelFromLatLong && !isUsingAutoSuggest && !$('.ac_even').length){
+     	setStartCoordinates(travelFrom);
+      } else {
+    	$("input#TravelFromLatLong").val(travelFromLatLong);
+    	foundStartCoords = true;
+    	isUsingAutoSuggest = false;
+      }
+     return true;
+  }
+/*
+function codeAddress() {
+    var address = document.getElementById('address').value;
+    geocoder.geocode( { 'address': address}, function(results, status) {
+      if (status == 'OK') {
+        map.setCenter(results[0].geometry.location);
+        var marker = new google.maps.Marker({
+            map: map,
+            position: results[0].geometry.location
+        });
+      } else {
+        alert('Geocode was not successful for the following reason: ' + status);
+      }
+    });
+  }
+  */
+  function setStartCoordinates(address) {
+	  var startState,startAddr;
+ 	  if(geocoder){
+		 geocoder.geocode({
+			     'address': address,
+		          componentRestrictions: {
+		            country: 'US'
+		          }
+		        }, function(results, status) {
+		          if (status === 'OK') {
+		           if (results[0]) {
+
+						//console.log(results);
+
+					    // Get address_components
+					             for (var i = 0; i < results[0].address_components.length; i++)
+					             {
+					               var addr = results[0].address_components[i];
+					               var state;
+					               if (addr.types[0] == 'administrative_area_level_1'){
+					                 state = addr.short_name;
+
+            						var formattedAddress = results[0].formatted_address;
+                                    var position  =  results[0].geometry.location;
+											if(isValidIPState(state)){
+														startAddr = formattedAddress;
+														selpoint = position;
+														foundStartCoords = true;
+														break;
+											 }
+									}
+
+				   					} //for
+					} //results
+		          } else {
+		            window.alert('Geocode was not successful for the following reason: ' +
+		                status);
+		          }
+		           if(foundStartCoords){
+				            startGoogleAddress = startAddr;
+				            $("input#TravelFromLatLong").val(selpoint.lat()+","+selpoint.lng());
+				            startGoogleAddress = startGoogleAddress.replace(", USA", "");
+				            $("input#starting_street_address").val(startGoogleAddress);
+                   }
+        });
+	  } //geocoder
+
+  }
+
+  /* Check if coordinates already exist for ending address otherwise use google geocoder to find it */
+   function checkEndCoords(){
+     //Don't do the geocoding if the user selects from autocomplete.
+     var travelTo = $("input#dest_street_address").val();
+   	 var travelToIndex = stationNamesList.findIndex(travelTo);
+   	 var travelToLatLong = stationCoordinatesList[travelToIndex];
+     if(!travelToLatLong && !isUsingAutoSuggest && !$('.ac_even').length){
+     	setEndCoordinates(travelTo);
+     } else {
+    	 $("input#TravelToLatLong").val(travelToLatLong);
+    	 foundEndCoords = true;
+    	 isUsingAutoSuggest = false;
+      }
+  }
+
+
+ function setEndCoordinates(address) {
+	  var endState,endAddr;
+ 	  if(geocoder){
+		 geocoder.geocode({
+			     'address': address,
+		          componentRestrictions: {
+		            country: 'US'
+		          }
+		        }, function(results, status) {
+		          if (status === 'OK') {
+		           if (results[0]) {
+				   					  for (var i = 0; i < results[0].address_components.length; i++)
+														             {
+														               var addr = results[0].address_components[i];
+														               var state;
+														               if (addr.types[0] == 'administrative_area_level_1'){
+														                 state = addr.short_name;
+
+									            						var formattedAddress = results[0].formatted_address;
+									                                    var position  =  results[0].geometry.location;
+																				if(isValidIPState(state)){
+																							endAddr = formattedAddress;
+																							selpoint = position;
+																							foundEndCoords = true;
+																							break;
+																				 }
+																	}
+
+				   					} //for
+					} //results
+		          } else {
+		            window.alert('Geocode was not successful for the following reason: ' +
+		                status);
+		          }
+		          if(foundEndCoords){
+  	             			endGoogleAddress = endAddr;
+				            $("input#TravelToLatLong").val(selpoint.lat()+","+selpoint.lng());
+				            endGoogleAddress = endGoogleAddress.replace(", USA", "");
+				            $("input#dest_street_address").val(endGoogleAddress);
+                   }
+        });
+	  } //geocoder
+
+  }
+
+ function isValidIPState(state){
+    var validIPStates = ['NJ','PA','NY','DE'];
+    state = state.toUpperCase();
+    if($.inArray(state, validIPStates) == -1) {
+    	return false;
+    }
+    return true;
+  }
+
+  function isUsingAutoComplete(){
+  	var index = getCurrentlySelectedSmartInputItem();
+  	if(index >= 0){
+  		return true;
+  	}
+  	return false;
+  }
+
+  function isValidTime(time) {
+	var pattern = new RegExp(/^(0[1-9]|1[012]|[0-9]):([0-5][0-9])$/);
+	return pattern.test(time);
+  }
+
+  var form = $("#frm_trip_planner");
+
+  //disable sumbit on enter
+  form.keypress(function (evt) {
+     if (evt.keyCode == 13) {
+     	return false;
+     }
+  });
+
+
+
+  $('#starting_street_address').focus(function() {
+             if($('.ac_even').length){
+                $('.ac_even').remove();
+             }
+             if($('.ac_odd').length){
+                $('.ac_odd').remove();
+             }
+
+  });
+
+
+  $('#dest_street_address').focus(function() {
+             if($('.ac_even').length){
+                $('.ac_even').remove();
+             }
+             if($('.ac_odd').length){
+                $('.ac_odd').remove();
+             }
+
+  });
+
+  $("#starting_street_address").keypress(function (evt) {
+	  if (evt.keyCode == 13) {
+			if($('.ac_even').length){
+				$('.ac_even').remove();
+			}
+			if($('.ac_odd').length){
+				$('.ac_odd').remove();
+			}
+	  }
+  });
+
+  $("#dest_street_address").keypress(function (evt) {
+	  if (evt.keyCode == 13) {
+			if($('.ac_even').length){
+				$('.ac_even').remove();
+			}
+			if($('.ac_odd').length){
+				$('.ac_odd').remove();
+			}
+	  }
+  });
+
+  //$("#spnr").keypress(function (evt) {
+	//  if (evt.keyCode == 13) {
+	//  	redirectStationInfo();
+	//  }
+// });
+
+ // $("#dv_station").keypress(function (evt) {
+	//  if (evt.keyCode == 13) {
+	//  	launchDepVision();
+	//  }
+ // });
+
+  function launchDepVision(){
+	     var selDvStation = $("input#dv_station").val();
+		 var selDvIndex = dvStationNamesList.findIndex(selDvStation);
+	     var selDvId = dvIdsList[selDvIndex];
+	     if(selDvId == undefined){
+			 alert('Please select station name for departure vision.');
+			 $("input#dv_station").focus();
+			 return false;
+		 }
+		 var dvUrl = "/rg/rg_servlet.srv?hdnPageAction=PentaDisplayTo&SID="+selDvId+"&KeepThis=true&TB_iframe=true&height=650&width=900";
+         tb_show("Departure Vision",dvUrl,"images/loadingAnimation.gif");
+  }
+
+  function redirectStationInfo(){
+		 var selSprStation = $("input#spnr").val();
+		 var selSprIndex = stationInfoNamesList.findIndex(selSprStation);
+		 var selAtisId = atisIdsList[selSprIndex];
+	     if(selAtisId == undefined){
+			 alert('Please select station name for station and parking info.');
+			 $("input#spnr").focus();
+			 return false;
+		 }
+		 var spnrUrl = "/rg/rg_servlet.srv?hdnPageAction=TrainStationLookupFrom&selStation="+selAtisId;
+		 location.href = spnrUrl;
+
+	}
+
+
+  $(document).ready(function() {
+
+	 initialize();
+	 $("input#TravelFromLatLong").val("");
+	 $("input#TravelToLatLong").val("");
+	 var startAddrTitle = $("input#starting_street_address").attr('title');
+	 var destAddrTitle = $("input#dest_street_address").attr('title');
+
+	 $("input#starting_street_address").val(startAddrTitle);
+ 	 $("input#dest_street_address").val(destAddrTitle);
+
+ 	 var dvTitle = $("input#dv_station").attr('title');
+ 	 $("input#dv_station").val(dvTitle);
+
+ 	 var spnrTitle = $("input#spnr").attr('title');
+ 	 $("input#spnr").val(spnrTitle);
+
+
+	 $("#starting_street_address").autocomplete(stationNamesList,{
+			width: 210
+	  });
+	 $("#dest_street_address").autocomplete(stationNamesList,{
+			width: 210
+	  });
+	 $("#spnr").autocomplete(stationInfoNamesList,{
+	      width: 210
+	 });
+
+	 $("#dv_station").autocomplete(dvStationNamesList,{
+	      width: 210
+	 });
+
+   	 //$("input#arrive").attr("checked", false);
+ 	 //$("input#depart").attr("checked", false);
+
+	//Get current time and initialize time
+ 	/*
+ 	var date = new Date();
+ 	var datetime = date.toLocaleString().substr(date.toLocaleString().length-11);
+ 	var ampm = datetime.substr(8);
+ 	var time = trim(datetime.substr(0,5));
+ 	if(time.length == 4){
+ 		time = "0" + time;
+ 	}
+ 	$("input#Time").val(time);
+ 	$("select#Suffix").val(trim(ampm));
+	*/
+    });
+
+    var count = 0;
+ 	form.submit(function(e){
+	 if (count > 0)
+     	return false;
+     else
+     	count++;
+
+ 		//alert("submited form");
+		var reqFields = ['#starting_street_address', '#dest_street_address', '#Time'];
+		var isValidForm = 1; //default to valid form - true
+		var useAtis = 1; //default to Atis
+		var useGoogle = 0; //default to false;
+
+    /*
+	$("input#time")
+    .filter(function() {
+        alert(this.value);
+        var isValidTimeFormat = this.value.match(/^(0[1-9]|1[012]|[0-9]):([0-5][0-9])$/);
+        alert(isValidTimeFormat);
+        return isValidTimeFormat;
+    })
+	*/
+
+	 //$("input#starting_street_address").val(startGoogleAddress);
+	 //$("input#dest_street_address").val(endGoogleAddress);
+
+ 	 $.each(reqFields, function(n, value) {
+			var j = $(value).val();
+			if (j == "" || j == $(value).attr('title')) {
+				var fieldName = $(value).attr('name');
+				var alertMsg = "";
+				if(fieldName == 'starting_street_address'){
+					alertMsg = "Please enter an origin address, it is one of the required fields.";
+				}
+				if(fieldName == 'dest_street_address'){
+					alertMsg = "Please enter an destination address, it is one of the required fields.";
+				}
+				if(fieldName == 'Time'){
+					alertMsg = "Please enter the time of travel, it is one of the required fields.";
+				}
+				//if(fieldName == 'time'){
+				//	alertMsg = "Please select arrival or departure.";
+				//}
+				alert(alertMsg);
+				$(value).focus();
+				e.preventDefault();
+				isValidForm = 0;
+	document.getElementById('submit').style.visibility = 'visible';
+	document.getElementById('wait').style.visibility = 'hidden';
+    //$("#submitbtn").attr("src", "<%=strWebsiteUrl%>/images/home_tpsubmit.gif");
+    count = 0;
+				return false;
+			}
+
+	});
+	if(isValidForm){
+		var vTravelFromLatLong= $("input#TravelFromLatLong").val();
+		var vTravelToLatLong= $("input#TravelToLatLong").val();
+		if(vTravelFromLatLong == vTravelToLatLong){
+			alert("Origin and destination addresses are the same. Please enter different origin and destination addresses.");
+			e.preventDefault();
+			isValidForm = 0;
+			document.getElementById('submit').style.visibility = 'visible';
+			document.getElementById('wait').style.visibility = 'hidden';
+			count = 0;
+			return false;
+		}
+
+	}
+
+	/* check if arrive at/depart by is checked */
+	if(isValidForm){
+		if (!$(":input[@name='time']:checked").val()){
+			alert("Please select arrival or departure.");
+			$("input#depart").focus();
+			isValidForm = 0;
+	document.getElementById('submit').style.visibility = 'visible';
+	document.getElementById('wait').style.visibility = 'hidden';
+    //$("#submitbtn").attr("src", "<%=strWebsiteUrl%>/images/home_tpsubmit.gif");
+    count = 0;
+			return false;
+		}
+    }
+
+    /* check for time format HH:MM */
+	var enteredTime = $("input#Time").val();
+	var selectedSuffix = $("select#Suffix").val();
+	if(!isValidTime(enteredTime)){
+		alert("Please enter the time of travel in the format of HH:MM");
+		$("input#Time").focus();
+		e.preventDefault();
+		isValidForm = 0;
+	document.getElementById('submit').style.visibility = 'visible';
+	document.getElementById('wait').style.visibility = 'hidden';
+    //$("#submitbtn").attr("src", "<%=strWebsiteUrl%>/images/home_tpsubmit.gif");
+    count = 0;
+		return false;
+	}
+
+
+	if(!isValidForm){
+	document.getElementById('submit').style.visibility = 'visible';
+	document.getElementById('wait').style.visibility = 'hidden';
+	//$("#submitbtn").attr("src", "<%=strWebsiteUrl%>/images/home_tpsubmit.gif");
+    count = 0;
+		return false;
+	}
+
+
+   var timeParts = enteredTime.split(":");
+   $("input#Hour").val(timeParts[0]);
+   $("input#Minute").val(timeParts[1]);
+
+   return true;
+ });

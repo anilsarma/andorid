@@ -1,0 +1,119 @@
+#bgImg1 { position: absolute; top:0; }
+
+#bgImg2 { position: absolute; top:0; opacity: 0 }
+
+#bgImg3 { position: absolute; top:0; opacity: 0 }
+
+.colorIN{ 
+	color:#FF9E16;
+}
+#bkgColor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 190;
+}
+
+#bkgColor2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 230;
+}
+
+/* logos */
+#Allstate{
+    position: absolute;
+    width: 90px;
+    height: 20px;
+    bottom: 10px;
+    right: 10px;
+    background-image: url(Allstate_white.svg);
+    background-repeat: no-repeat;
+    z-index: 300;
+}
+#Allstate_blue{
+    position: absolute;
+    width: 90px;
+    height: 20px;
+    bottom: 10px;
+    right: 10px;
+    background-image: url(Allstate_blue.svg);
+    background-repeat: no-repeat;
+    opacity: 0;
+    z-index: 300;
+}
+
+#Allstate_beacon{
+   position: absolute;
+    width: 60px;
+    height: 46px;
+    top: 23px;
+    left: 25px;
+    background-image: url(White_Beacon.svg);
+    background-repeat: no-repeat;
+    z-index: 300;
+}
+
+#frame1, #frame2{
+	font-size:24px;
+    line-height: 1.3;
+    width: 728px;
+    height: 90px; 
+    text-align: center;
+    z-index: 100;
+    display: table;
+    top:0;
+}
+#frame1 > div, #frame2 > div {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#frame2{
+    z-index: 220;
+}
+
+.f1 {
+    display: inline-block;
+}
+
+
+/* FRAMES */
+
+
+.shadow {
+	text-shadow: 2px 2px 4px #000000;
+}
+
+#endFrame{
+    font-size: 22px;
+    top:16px;
+    left:100px;
+    line-height: 1.3;
+    z-index: 240;
+}
+
+.smallCopy {
+    font-size: 22px;
+    font-weight: 700!important;
+}
+.lighter {
+    font-weight: 500!important;
+}
+
+#byLine{
+    position: absolute;
+    font-size: 12px;
+    bottom:5px;
+    width: 728px;
+    text-align: center;
+    line-height: 1.1;
+    z-index: 240;
+    font-weight: 300!important;
+}
+
+sup {
+    font-size:12px;
+}

@@ -1,0 +1,88 @@
+var monthList = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+var dayList = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+now = new Date();
+
+function writeDate()
+{
+	now                = new Date();
+	
+	numDay             = now.getDate()
+	numDay             = (numDay < 10) ? "0" + numDay : numDay;
+	month              = monthList[now.getMonth()]; 
+	dayOfWeek          = dayList[now.getDay()]; 
+	year               = now.getFullYear()
+	
+//	hour 			   = now.getHours();
+//	meridian 		   = (hour >= 12) ? "PM" : "AM"; 
+//	hour 			   = (meridian == "PM" && hour > 12) ? hour % 12 : hour;
+//	hour               = (hour < 10) ? "0" + hour : hour;
+//	minutes            = now.getMinutes();
+//	minutes            = (minutes < 10) ? "0" + minutes : minutes;
+	
+	
+//	document.writeln(dayOfWeek+ ", " +month+ " " +numDay+ ", " +year+ 
+//						" " +hour+ ":" +minutes+ " " +meridian);
+	document.writeln(dayOfWeek+ ", " +month+ " " +numDay+ ", " +year);
+}
+
+function writeDay()
+{
+	now                = new Date();
+	
+	numDay             = now.getDate()
+//	numDay             = (numDay < 10) ? "0" + numDay : numDay;
+
+	document.writeln(numDay);
+}
+
+function writeDayOfWeek()
+{
+	now                = new Date();
+	
+	dayOfWeek          = dayList[now.getDay()]; 
+
+	document.writeln(dayOfWeek);
+}
+
+function writeMonth()
+{
+	now                = new Date();
+	
+	month              = monthList[now.getMonth()]; 
+
+	document.writeln(month);
+}
+
+function writeYear()
+{
+	now                = new Date();
+	
+	year               = now.getFullYear()
+
+	document.writeln(year);
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_showHideLayers() { //v6.0
+  var i,p,v,obj,args=MM_showHideLayers.arguments;
+  for (i=0; i<(args.length-2); i+=3) if ((obj=MM_findObj(args[i]))!=null) { v=args[i+2];
+    if (obj.style) { obj=obj.style; v=(v=='show')?'visible':(v=='hide')?'hidden':v; }
+    obj.visibility=v; }
+}
+
+function openQuikLinks(){
+	MM_showHideLayers('quickLinksButtonDown','','show','quickLinksMenu','','show');
+	if ((location + "").indexOf("/index") != -1 || location.pathname  == "/" || location.pathname.indexOf("/hp/hp_servlet.srv") != -1){
+		MM_showHideLayers('quickLinksButtonDown','','hide','quickLinksButtonUp','','hide','quickLinksButtonNonActive','','show');
+	} else {
+		return;
+	}
+}

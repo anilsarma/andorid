@@ -1,0 +1,33 @@
+/*CTA*/
+#btn_cta {
+    width: 120px;
+    z-index: 360;
+    position: absolute;
+    top: 10px!important;
+    right: 40px;
+}
+
+#ctaCopy {
+    font-size: 15px;
+    font-family: 'Objektiv Mk2';
+    font-weight: 700;
+    text-align: center;
+    border-radius: 5px;
+}
+
+#ctaCopy:hover {
+    background-color: #FFB357;
+    cursor: pointer;
+}
+
+#ctaCopy:active {
+    box-shadow: inset 0px 0px 15px rgba(0, 0, 0, .8);
+    -webkit-box-shadow: inset 0px 0px 15px rgba(0, 0, 0, .8);
+    -moz-box-shadow: inset 0px 0px 15px rgba(0, 0, 0, .8);
+    background-color: #FFB357;
+
+}
+
+p.quote {
+    padding: 10px;
+}

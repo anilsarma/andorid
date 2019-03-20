@@ -1,0 +1,64 @@
+$(document).ready(function() {
+    TweenLite.set("#atAd728x90", {
+        visibility: "visible"
+    });
+    var tl, frame1, frame2, frame3, frame4, frame5, frame6, landing;
+
+   
+    CSSPlugin.useSVGTransformAttr = true
+
+    tl = new TimelineMax();
+
+
+    tl.from("#frame1, .f1", 0.3, {
+        autoAlpha:0,
+    });
+
+    tl.from("#bkgColor", 0.4, {
+        autoAlpha:0,
+        delay:2
+    });
+
+
+   // tl.to("#Allstate_blue", 0.1, {
+   //      autoAlpha:1,
+   //      delay:-.4
+   //  }); 
+
+   // tl.from("#frame2", 0.3, {
+   //      autoAlpha:0,
+   //  });
+
+    tl.to("#frame1, #bkgColor, #Allstate", 0.3, {
+        autoAlpha:0,
+        delay:2
+    });
+
+
+   tl.from("#endFrame", 0.2, {
+        autoAlpha:0,
+        });
+
+    tl.from("#Allstate_beacon", 0.2, {
+        scale:0,
+        });
+
+     tl.from(".EF1,.EF2", 0.5, {
+        autoAlpha:0,
+        delay:0
+        });
+
+     tl.from("#btn_cta", 0.5, {
+        scale:0,
+        ease: Elastic.easeOut.config(1.2, 1),
+        delay:0
+        });
+
+     tl.from("#byLine", 0.5, {
+        autoAlpha:0,
+        delay:0.5
+        
+        });
+
+});
+

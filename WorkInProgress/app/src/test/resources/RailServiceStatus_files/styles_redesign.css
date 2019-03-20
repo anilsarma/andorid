@@ -1,0 +1,246 @@
+body {
+	margin: 0px 0px 0px 0px;
+	background-color:#FFFFFF;
+}
+
+body,table,td,th,p,li,input,textarea,select,optgroup,option {
+	font-family:arial,sans-serif;
+	/*font-size:90%;*/
+	font-size:8pt;
+	color:#555555;
+}
+
+a#bcrumb_links{
+	font-family:helvetica,arial,sans-serif;
+	font-size:120%;
+	color:#094b7c;
+}
+
+table td{
+	font-family:helvetica,arial,sans-serif;
+	font-size:8pt;
+}
+table td a{
+	font-family:helvetica,arial,sans-serif;
+	/*font-size:8pt;*/
+	color:#555555;
+}
+table td input{
+	font-family:helvetica;
+}
+table option{
+	font-family:helvetica;
+}
+table select{
+	font-family:helvetica;
+}
+
+.emphasis {
+	font-weight:bold;
+	/*color:#669900; green*/
+	color:#1D2339; /*same as menu*/
+	/*color:#FF8500; orange*/
+}
+.boldred {
+	font-weight:bold;
+	color:#FF0000;
+}
+.boldblue {
+	font-weight:bold;
+	color:#000077;
+}
+.hint {
+	font-size:10px;
+}
+
+.tip {
+  background-color: #EEEEEE
+}
+
+.superScript {
+	font-size:8px;
+	vertical-align:super;
+}
+
+.copyright {
+	font-size:10px;
+}
+
+.topNavDividers {
+	color:#708899;
+}
+
+.whiteText {
+	color:#FFFFFF;
+}
+
+.TitleWhite {
+    font-size:17px;
+	color:#FFFFFF;
+	font-weight:bold;
+}
+
+.subTitleWhite {
+    font-size:12px;
+	color:#FFFFFF;
+	font-weight:bold;
+}
+
+
+.redText {
+	color:#ff0000;
+}
+
+.capText {
+	text-transform : capitalize;
+}
+
+.bluetitle {
+	font-size:17px;
+	color:#000077;
+    font-weight:bold;
+}
+.subTitle {
+	font-size:12px;
+	color:#000000;
+	font-weight:bold;
+}
+
+.title {
+	font-size:120%;
+	color:#094b7c;
+	font-weight:bold;
+	font-family:helvetica;
+}
+.largebluetitle {
+	font-size:32px;
+	color:#020167;
+	font-weight:bold;
+}
+
+.tip {
+	bgcolor:#eeeeee;
+	font-weight:bold;
+}
+
+.date {
+	color: white;/*#020167;*/
+	font-weight:bold;
+}
+
+.tadate {
+	color: #020167;
+	font-weight:bold;
+}
+
+.navDividers {
+	color:#020167;
+}
+
+a:link,a:active,a:visited {
+	font-family:helvetica,arial,sans-serif;
+	/*font-size:8pt;*/
+	/*color:#020167;*/
+	text-decoration:underline;
+}
+
+a.quikTikNav:link,a.quikTikNav:active,a.quikTikNav:visited {
+	color:#020167;
+	font-weight:bold;
+	text-decoration:none;
+}
+
+a.topNav:link,a.topNav:active,a.topNav:visited {
+	font-size:13px;
+	color:#020167;
+	text-decoration:none;
+	font-weight:bold;
+}
+
+a.topNav:hover {
+	color:#FFFFFF;
+}
+
+a.copyright:link,a.copyright:active,a.copyright:visited {
+	text-decoration:underline;
+	font-size:10px;
+}
+
+.police_subtitle
+{
+   font-family:arial;
+	font-size:17px;
+	color:black;
+}
+.police_section_title
+{
+	font-size:17px;
+	color:#20326C;
+    font-weight:bold;
+}
+.police_menu
+{
+	font-family:tahoma,arial,sans-serif;
+	font-size:17px;
+	font-weight:bold;
+	color:#20326C;
+}
+
+.portalBold {
+    color:Black;
+    font-size:12px;
+    font-weight:bold;
+    font-family:arial,sans-serif;
+	text-decoration:underline;
+}
+
+table.portalTitle {
+	border-width: 0px 0px 0px 0px;
+	border-spacing: 0px;
+	border-style: none none none none;
+	border-color: white white white white;
+	border-collapse: separate;
+	background-color: rgb(10, 9, 108);
+}
+table.portalTitle tr {
+	height: 20px;
+}
+table.portalTitle td {
+	border-width: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 5px;
+	border-style: none none none none;
+	border-color: white white white white;
+	background-color: #0A096C;
+	-moz-border-radius: 0px 0px 0px 0px;
+    color:#FFFFFF;
+    font-size:12px;
+    font-weight:bold;
+    font-family:arial,sans-serif;
+}
+
+table.portalBody {
+	border-width: 1px 1px 1px 1px;
+	border-spacing: 2px;
+	border-style: outset outset outset outset;
+	border-color: rgb(10, 9, 108) rgb(10, 9, 108) rgb(10, 9, 108) rgb(10, 9, 108);
+	border-collapse: collapse;
+	background-color: white;
+}
+table.portalBody td {
+	border-width: 0px 0px 0px 0px;
+	padding: 1px 1px 1px 5px;
+	border-style: none none none none;
+	border-color: gray gray gray gray;
+	background-color: white;
+	-moz-border-radius: 0px 0px 0px 0px;
+}
+a.topNavContact:link,a.topNavContact:active,a.topNavContact:visited {
+	font-size:14px;
+	color:#B61C8D;
+	text-decoration:none;
+	font-weight:bold;
+}
+
+a.topNavContact:hover {
+	color:#020167;
+}

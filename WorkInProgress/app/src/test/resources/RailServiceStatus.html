@@ -1,0 +1,794 @@
+
+<!-- saved from url=(0068)https://www.njtransit.com/hp/hp_servlet.srv?hdnPageAction=HomePageTo -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>New Jersey Transit - Home</title>
+
+<meta content="New Jersey Transit, NJ TRANSIT, transportation, Mass Transit, commuting, trains, bus, New Jersey, schedules, fares, travel">
+<meta name="Description" content="NJ TRANSIT is New Jersey&#39;s public transportation corporation. Its mission is to provide safe, reliable, convenient and cost-effective transit service with a skilled team of employees, dedicated to our customers&#39; needs and committed to excellence">
+
+<link href="./RailServiceStatus_files/datePicker.css" rel="stylesheet" type="text/css">
+<link href="./RailServiceStatus_files/thickbox.css" rel="stylesheet" type="text/css" media="screen">
+<link href="./RailServiceStatus_files/jquery.autocomplete.css" rel="stylesheet" type="text/css">
+
+
+<link rel="stylesheet" href="./RailServiceStatus_files/default.css" type="text/css" media="screen">
+<link rel="stylesheet" href="./RailServiceStatus_files/nivo-slider.css" type="text/css" media="screen">
+
+
+
+<script src="./RailServiceStatus_files/osd.js.download"></script><script src="./RailServiceStatus_files/ca-pub-7698699613857784.js.download"></script><script language="JavaScript">
+var stationNamesList = new Array();
+var stationCoordinatesList = new Array();
+var isUsingAutoSuggest = false;
+var stationInfoNamesList = new Array();
+var atisIdsList= new Array(); 
+var dvStationNamesList = new Array();
+var dvIdsList = new Array();
+
+
+ 
+ stationNamesList = ['22nd Street Station (Bayonne)','2nd Street Station (Hoboken)','30th Street Station Philadelphia','33rd Street PATH Station','34th Street Station (Bayonne)','36th Street','45th Street Station (Bayonne)','8th Street Station (Bayonne)','9th Street - Congress Street (HBLR)','Aberdeen Matawan Station','Absecon Station','Aldrich Road Park & Ride','Allendale Station','Allenhurst Station','Allwood Road Park & Ride','Anderson Street Station','Annandale Station','Aquarium Station (River Line)','Asbury Park Station','Atco Station','Atlantic City Bus Terminal','Atlantic City Rail Terminal','Atlantic Street Station Newark','Avandale Park & Ride','Avenel Station','Basking Ridge Station','Bay Head Station','Bay Street Station','Belmar Station','Bergenline Avenue Station','Berkeley Heights Station','Bernardsville Station','Beverly/Edgewater Park Station','Bloomfield Avenue Station (Newark)','Bloomfield Rail Station','Bonnel Court - Union Twp','Boonton Station','Bordentown Station','Boro Hall Glen Rock Station','Bound Brook Station','Bradley Beach Station','Branch Brook Park Light Rail Station','Brick Church Station','Brick Twp Park & Ride','Bridgewater Station','Broad Street Light Rail Station (Newark)','Broad Street Station Newark','Broadway Bus Terminal - Paterson','Broadway Station Fair Lawn','Burlington South Station','Burlington Towne Centre Station','Camden Walter Rand Transportation Center','Campbell Hall Station','Cape May Bus Terminal','Carteret Park & Ride','Cass Street Station Trenton','Chatham Station','Cherry Hill Mall','Cherry Hill Station','Cinnaminson Station','Clifton Commons Park & Ride','Clifton Station','Convent Station','Cooper Street/Rutgers Station Camden','Cornwall Station','Craig Road Park & Ride','Cranford Station','Danforth Avenue Station Jersey City','Davenport Avenue Station Newark','Delanco Station','Delawanna Station','Denville Station','Dorado Park & Ride','Dover Station','Dumont A','Dumont B - West Shore','Dunellen Station','EWR Newark Airport Station','East Orange Station','Edison Station','Egg Harbor City Station','Elberon Station','Elizabeth Station','Emerson Station','Entertainment Center Station Camden','Essex Street (HBLR)','Essex Street Station (PVL)','Exchange Place Station','Fairlawn DPW','Fanwood Station','Far Hills Station','Florence Station','Fort Lee','Freehold Center','Freehold Mall','Garden State Parkway Exit 120','Garden State Parkway Exit 165 - Paramus','Garden State Plaza','Garfield Avenue Station (HBLR)','Garfield Station','Garwood Station','George Washington Bridge Bus Terminal','Gillette Station','Gladstone Station','Glen Ridge Station','Glen Rock Boro Hall Station','Glen Rock Main Line Station','Gordons Corner Park & Ride','Great Adventure','Greenwood Lake - NY','Greyhound Bus Terminal Philadelphia','Grove Street Light Rail Station Bloomfield','Grove Street PATH Station','Hackensack Bus Terminal','Hackettstown Station','Hamilton Avenue Light Rail Station Trenton','Hamilton Station','Hammonton Station','Harborside Financial Center Station','Harriman Station','Harrison PATH Station','Harsimus Cove Station','Hawthorne Station','Hazlet Station','High Bridge Station','Highland Avenue Station','Hillsdale Station','Ho-Ho-Kus Station','Hoboken Light Rail','Hoboken Terminal','Hoboken Terminal Bus Lanes','Howell Park & Ride','IZOD Center (event service)','Inverness Park & Ride','Irvington Bus Terminal','Jake Brown Park & Ride','Jersey Avenue Light Rail (HBLR)','Jersey Avenue Station (Northeast Corridor)','Journal Square Transportation Center','Kingsland Station','Lake Hopatcong Station','Lakewood Terminal','Lebanon Station','Liberty State Park Light Rail Station','Lincoln Harbor Station Weehawken','Lincoln Park Station','Linden Station','Lindenwold Station','Little Falls Station','Little Silver Station','Lloyd Road Park & Ride - Aberdeen','Long Branch Station','Lyndhurst Station','Lyons Station','MSU Station','Madison Square Garden','Madison Station','Mahwah Station','Manasquan Station','Maplewood Station','Marin Boulevard Light Rail Station','Marlboro Park & Ride','Martin Luther King Drive Light Rail Station Jersey City','Matawan Station','Meadowlands (Racetrack)','Meadowlands (Stadium events)','MetLife Stadium','Metropark Station','Metuchen Station','Middletown New Jersey Station','Middletown New York Station','Midland Park - Wortendyke Station','Military Park Light Rail Station','Millburn Station','Millington Station','Monmouth Park Station','Montclair Heights Station','Montclair State University Station','Montvale Station','Morris Plains Station','Morristown Station','Mothers Park & Ride','Mount Arlington Station','Mount Olive Station','Mount Tabor Station','Mountain Avenue Station','Mountain Creek','Mountain Lakes Station','Mountain Station','Mountain View Station','Mt. Arlington Station','Mt. Olive Station','Mt. Tabor Station','Murray Hill Station','NJPAC/Center Street','NY Penn Station','Nanuet Station','Netcong Station','Netherwood Station','New Bridge Landing Station','New Brunswick Station','New Providence Station','New York Penn Station','Newark Airport North Cargo Area','Newark Airport Rail Station','Newark Airport Terminal A Bus Stop','Newark Airport Terminal B Bus Stop','Newark Airport Terminal C Bus Stop','Newark Broad Street Station','Newark Penn Station','Newark Penn Station Bus Lanes','Newark Penn Station Light Rail','Newfoundland Park & Ride - West Milford NJ','Newport Light Rail Station','Norfolk Street Light Rail Station','North Bergen Park & Ride','North Branch Station','North Elizabeth Station','Ocean City Transportation Center','Old Bridge Park & Ride','Oradell Station','Orange Station','Orange Street','Otisville Station','Palmyra Station','Park Avenue Light Rail Station','Park Ridge Station','Passaic Bus Terminal','Passaic Station','Paterson Station','Peapack Station','Pearl River Station','Penn Station New York','Penn Station Newark','Pennsauken Transit Center Bus Stop','Pennsauken Transit Center River Line Station','Pennsauken Transit Center Station','Pennsauken/Route 73 Station','Perth Amboy Station','Philadelphia 30th Street Station','Philadelphia Greyhound Bus Terminal','Pine Avenue - Union Twp','Plainfield Station','Plauderville Station','Point Pleasant Beach Station','Port Authority Bus Terminal','Port Imperial Station Weehawken','Port Jervis Station','Princeton Junction Station','Princeton Station','Prudential Center','Radburn Station','Rahway Station','Ramsey Main Street Station','Ramsey Route 17 Station','Raritan Station','Red Bank Station','Red Bull Arena','Richard Street Light Rail Station','Ridgewood Bus Terminal','Ridgewood Station','Ringwood Park & Ride','River Edge Station','Riverfront Stadium','Riverside Station','Riverton Station','Roebling Station','Roselle Park Station','Route 17 Ramsey Station','Rt. 17 Ramsey Station','Rt. 23 Wayne Transit Center','Rutgers Lane Hospital - Union Twp','Rutherford Station','Salisbury Mills Cornwall Station','Sayreville Park & Ride','Schibanoff Park & Ride','Seaside Heights','Secaucus Junction Station','Short Hills Station','Silver Lake Light Rail Station','Six Flags Great Adventure','Sloatsburg Station','Somerville Station','South Amboy Station','South Orange Station','Spring Lake Station','Spring Valley Station','Springfield Center - Springfield Twp','Stirling Station','Stockholm Park & Ride - Hardyston','Suffern Station','Summit Station','Susquehanna Bank Center','Symmes Drive - Manalapan Mall','Teterboro Station','Texas Road Park & Ride','Toms River Park & Ride','Tonnelle Avenue Station North Bergen','Towaco Station','Trenton Transit Center','Trenton Transit Center Bus Stop','Trenton Transit Center River Line Station','Tuxedo Station','Union Center - Union Twp','Union Hill Park & Ride','Union Station','Upper Montclair Station','Vince Lombardi Park & Ride','Vineland Terminal','Waldwick Station','Walnut Street Station','Walter Rand Transportation Center','Walter Rand Transportation Center Light Rail Stop','Warren Street Light Rail Station','Warwick NY Park & Ride','Washington Park Light Rail Station','Washington Street Light Rail Station','Watchung Avenue Station','Watchung Park & Ride','Watsessing Avenue Station','Wayne/Route 23 Transit Center','Wayne/Route 23 Transit Center Rail Station','Wesmont Station','West Milford Park & Ride - Greenwood Lake NJ','West Side Avenue Station','Westfield Station','Westwood Station','White House Station','Wildwood Terminal','Willowbrook Mall','Wood Ridge Station','Woodbridge Station','Woodcliff Lake Station','World Trade Center PATH Station','Yankee Stadium']; 
+ stationCoordinatesList = ['40.661968,-74.116641','40.740827,-74.042511','39.956567,-75.182327','40.749111,-73.988240','40.671932,-74.108095','39.96144,-75.079222','40.678670,-74.102511','40.654298,-74.129142','40.748797,-74.038496','40.420161,-74.223702','39.424333,-74.502091','40.15616,-74.22714','41.030902,-74.130957','40.237659,-74.006769','40.853828,-74.175212','40.894458,-74.043781','40.645173,-74.878569','39.944548,-75.130022','40.215359,-74.014782','39.783549,-74.907588','39.36012,-74.43546','39.3633,-74.44148','40.744162,-74.168489','39.71195,-74.97614','40.577620,-74.277530','40.711380,-74.555267','40.077178,-74.046201','40.808178,-74.208681','40.180590,-74.027301','40.782082,-74.021819','40.682345,-74.442649','40.716847,-74.571023','40.061188,-74.915793','40.765978,-74.180212','40.792709,-74.200043','40.696076,-74.272277','40.903378,-74.407733','40.148088,-74.714751','40.961370,-74.129300','40.560931,-74.530614','40.203753,-74.018891','40.780531,-74.175614','40.765136,-74.218609','40.096680,-74.139457','40.559909,-74.551741','40.747206,-74.171506','40.747626,-74.171940','40.918638,-74.17447','40.922507,-74.115233','40.072878,-74.865361','40.077679,-74.858171','39.94336,-75.11843','41.450919,-74.266551','38.93514,-74.92269','40.59084,-74.22844','40.205959,-74.754642','40.740137,-74.384812','39.942839,-75.027001','39.928449,-75.041661','40.016859,-74.999302','40.827067,-74.141111','40.867998,-74.153199','40.779043,-74.443435','39.947618,-75.124710','41.437078,-74.101871','40.28746,-74.29654','40.655523,-74.303226','40.693588,-74.088971','40.772658,-74.178761','40.048109,-74.950821','40.831369,-74.131262','40.883900,-74.481513','40.0946,-74.14632','40.883417,-74.555884','40.94144,-73.99204','40.94139,-73.9957','40.590869,-74.463043','40.704417,-74.190714','40.760979,-74.210461','40.519148,-74.410972','39.526443,-74.648025','40.265292,-73.997617','40.667859,-74.215171','40.975038,-74.027467','39.941868,-75.129352','40.712948,-74.036420','40.878973,-74.051890','40.716277,-74.032866','40.94969,-74.10528','40.641062,-74.385003','40.685715,-74.633734','40.100048,-74.805112','40.85211,-73.97125','40.259178,-74.276451','40.24592,-74.28257','40.43282,-74.25197','40.96402,-74.0642','40.918238,-74.078131','40.708528,-74.072403','40.866669,-74.105560','40.652569,-74.324794','40.849014,-73.939223','40.678256,-74.468314','40.720284,-74.666368','40.800590,-74.204652','40.961370,-74.129300','40.962208,-74.133485','40.31202,-74.30304','40.140409,-74.444411','41.222465,-74.294358','39.95304,-75.15725','40.779186,-74.189311','40.719535,-74.043016','40.8818,-74.04201','40.851444,-74.835352','40.213388,-74.756413','40.255309,-74.704120','39.631673,-74.799457','40.719059,-74.03407','41.293359,-74.139863','40.740225,-74.155843','40.722668,-74.037281','40.942539,-74.152411','40.415385,-74.190393','40.666884,-74.895863','40.766865,-74.243740','41.002416,-74.041033','40.997369,-74.113521','40.734048,-74.029207','40.734843,-74.028043','40.735611,-74.028985','40.211307,-74.258007','40.761190,-74.075821','40.38673,-74.30704','40.726389,-74.22733','40.416716,-74.303947','40.716568,-74.048893','40.476912,-74.467360','40.73205,-74.06199','40.810121,-74.117334','40.904219,-74.665694','40.09077,-74.21264','40.636908,-74.835766','40.707799,-74.058480','40.759360,-74.023901','40.924138,-74.301823','40.629487,-74.251772','39.833811,-75.000314','40.880669,-74.235372','40.326715,-74.041054','40.41643,-74.21318','40.297145,-73.988331','40.816478,-74.124161','40.684849,-74.549467','40.869782,-74.197436','40.750556,-73.993611','40.757028,-74.415102','41.094416,-74.146617','40.120573,-74.047685','40.731149,-74.275424','40.715880,-74.042662','40.313465,-74.249645','40.712340,-74.077504','40.420161,-74.223702','40.820569,-74.071861','40.813053,-74.072114','40.813053,-74.072114','40.568640,-74.329391','40.540738,-74.360671','40.389780,-74.116131','41.457488,-74.370390','40.997538,-74.151753','40.737429,-74.171133','40.725622,-74.303752','40.673518,-74.523603','40.313427,-74.015172','40.857538,-74.202493','40.869782,-74.197436','41.040879,-74.029152','40.828642,-74.478194','40.797118,-74.474086','40.92231,-74.26771','40.896590,-74.632731','40.907378,-74.730653','40.875906,-74.481912','40.848717,-74.205303','41.19132,-74.505401','40.885949,-74.433601','40.755370,-74.253024','40.914407,-74.268155','40.896590,-74.632731','40.907378,-74.730653','40.875906,-74.481912','40.695073,-74.403134','40.739501,-74.16558','40.750051,-73.992358','41.090017,-74.014791','40.897557,-74.707317','40.629148,-74.403455','40.910856,-74.035044','40.497278,-74.445751','40.712024,-74.386498','40.750051,-73.992358','40.70528,-74.17137','40.704417,-74.190714','40.688179,-74.182441','40.68948,-74.17840','40.694339,-74.176740','40.747626,-74.171940','40.734223,-74.164550','40.73416,-74.16348','40.734223,-74.164550','41.04607,-74.43596','40.726819,-74.036233','40.745349,-74.183351','40.777528,-74.043531','40.592022,-74.683802','40.680270,-74.206165','39.27914,-74.57808','40.44685,-74.29936','40.953478,-74.029983','40.771883,-74.233103','40.751328,-74.185822','41.471789,-74.529211','40.004040,-75.021713','40.758538,-74.185061','41.032307,-74.036161','40.863048,-74.12732','40.849416,-74.133926','40.914889,-74.167327','40.708796,-74.658469','41.058181,-74.022313','40.750051,-73.992358','40.734223,-74.164550','39.977859,-75.06136','39.978278,-75.061962','39.977769,-75.061796','39.993404,-75.039083','40.509398,-74.273752','39.956567,-75.182327','39.95304,-75.15725','40.697766,-74.270541','40.618425,-74.420160','40.88492,-74.10269','40.092718,-74.048191','40.756367,-73.990753','40.775931,-74.012769','41.374899,-74.694622','40.316316,-74.623753','40.342088,-74.65887','40.733611,-74.171111','40.939919,-74.121613','40.606338,-74.276692','41.056422,-74.141877','41.075130,-74.145485','40.571010,-74.634361','40.348284,-74.074535','40.740225,-74.155843','40.700159,-74.079880','40.9785,-74.11842','40.980631,-74.120592','41.08853,-74.26608','40.935148,-74.029140','40.746015,-74.16966','40.038910,-74.959444','40.009748,-75.011992','40.115837,-74.786092','40.667155,-74.266319','41.075130,-74.145485','41.075130,-74.145485','40.900259,-74.256971','40.673928,-74.266296','40.828248,-74.100556','41.437078,-74.101871','40.477599,-74.298288','40.27402,-74.29362','39.940087,-74.075613','40.761190,-74.075821','40.725249,-74.323751','40.780893,-74.180800','40.140409,-74.444411','41.157138,-74.191304','40.566075,-74.613970','40.48431,-74.28014','40.745952,-74.260538','40.150559,-74.035481','41.111978,-74.043991','40.71051,-74.31266','40.674584,-74.493720','41.09763,-74.53098','41.113540,-74.153442','40.716549,-74.357807','39.940845,-75.129822','40.292883,-74.301645','40.864860,-74.062676','40.362033,-74.304553','39.95164,-74.20524','40.787540,-74.031560','40.922809,-74.343839','40.218518,-74.753923','40.218839,-74.754974','40.216282,-74.754523','41.194208,-74.184460','40.695224,-74.265734','40.339072,-74.304902','40.683668,-74.238602','40.842006,-74.209365','40.82698,-74.02824','39.48707,-75.03389','41.012736,-74.123412','40.817218,-74.209630','39.94336,-75.11843','39.942428,-75.119171','40.742080,-74.181592','41.2479,-74.33877','40.743944,-74.169849','40.738249,-74.173811','40.829519,-74.206931','40.644537,-74.410339','40.782743,-74.198451','40.90091,-74.25604','40.900259,-74.256971','40.854979,-74.096951','41.149641,-74.347410','40.714784,-74.087708','40.649453,-74.347629','40.990817,-74.032693','40.615616,-74.770660','38.98593,-74.82303','40.887139,-74.261191','40.843974,-74.078716','40.55661,-74.27775','41.021078,-74.040772','40.711787,-74.010525','40.826706,-73.92929'];
+  
+   
+  dvStationNamesList = ['Aberdeen Matawan Station','Absecon Station','Allendale Station','Allenhurst Station','Anderson Street Station','Annandale Station','Asbury Park Station','Atco Station','Atlantic City Station','Avenel Station','Basking Ridge Station','Bay Head Station','Bay Street Station','Belmar Station','Berkeley Heights Station','Bernardsville Station','Bloomfield Station','Boonton Station','Bound Brook Station','Bradley Beach Station','Brick Church Station','Bridgewater Station','Broadway Station','Campbell Hall Station','Chatham Station','Cherry Hill Station','Clifton Station','Convent Station','Cranford Station','Delawanna Station','Denville Station','Dover Station','Dunellen Station','East Orange Station','Edison Station','Egg Harbor City Station','Elberon Station','Elizabeth Station','Emerson Station','Essex Street Station','Fanwood Station','Far Hills Station','Garfield Station','Garwood Station','Gillette Station','Gladstone Station','Glen Ridge Station','Glen Rock Boro Hall Station','Glen Rock Main Line Station','Hackettstown Station','Hamilton Station','Hammonton Station','Harriman Station','Hawthorne Station','Hazlet Station','High Bridge Station','Highland Avenue Station','Hillsdale Station','Ho-Ho-Kus Station','Hoboken Station','Jersey Avenue Station','Kingsland Station','Lake Hopatcong Station','Lebanon Station','Lincoln Park Station','Linden Station','Lindenwold Station','Little Falls Station','Little Silver Station','Long Branch Station','Lyndhurst Station','Lyons Station','Madison Station','Mahwah Station','Manasquan Station','Maplewood Station','Meadowlands Sports Complex Station','Metropark Station','Metuchen Station','Middletown New Jersey Station','Middletown New York Station','Millburn Station','Millington Station','Monmouth Park Station','Montclair Heights Station','Montclair State University Station','Montvale Station','Morris Plains Station','Morristown Station','Mount Arlington Station','Mount Olive Station','Mount Tabor Station','Mountain Avenue Station','Mountain Lakes Station','Mountain Station','Mountain View Station','Murray Hill Station','Nanuet Station','Netcong Station','Netherwood Station','New Bridge Landing Station','New Brunswick Station','New Providence Station','New York Penn Station','Newark Airport Station','Newark Broad Street Station','Newark Penn Station','North Branch Station','North Elizabeth Station','Oradell Station','Orange Station','Otisville Station','Park Ridge Station','Passaic Station','Paterson Station','Peapack Station','Pearl River Station','Pennsauken Transit Center Station','Perth Amboy Station','Philadelphia 30th Street Station','Plainfield Station','Plauderville Station','Point Pleasant Beach Station','Port Jervis Station','Princeton Station','Princeton Junction Station','Radburn Station','Rahway Station','Ramsey Station','Ramsey Route 17 Station','Raritan Station','Red Bank Station','Ridgewood Station','River Edge Station','Roselle Park Station','Rutherford Station','Salisbury Mills Cornwall Station','Secaucus Junction Station','Short Hills Station','Sloatsburg Station','Somerville Station','South Amboy Station','South Orange Station','Spring Lake Station','Spring Valley Station','Stirling Station','Suffern Station','Summit Station','Teterboro Station','Towaco Station','Trenton Transit Center Station','Tuxedo Station','Union Station','Upper Montclair Station','Waldwick Station','Walnut Street Station','Watchung Avenue Station','Watsessing Avenue Station','Wayne/Route 23 Transit Center Station','Wesmont Station','Westfield Station','Westwood Station','White House Station','Wood Ridge Station','Woodbridge Station','Woodcliff Lake Station']; 
+  dvIdsList = ['AM','AB','AZ','AH','AS','AN','AP','AO','AC','AV','BI','BH','MC','BS','BY','BV','BM','BN','BK','BB','BU','BW','BF','CB','CM','CY','IF','CN','XC','DL','DV','DO','DN','EO','ED','EH','EL','EZ','EN','EX','FW','FH','GD','GW','GI','GL','GG','GK','RS','HQ','HL','HN','RM','HW','HZ','HG','HI','HD','UF','HB','JA','KG','HP','ON','LP','LI','LW','FA','LS','LB','LN','LY','MA','MZ','SQ','MW','XU','MP','MU','MI','MD','MB','GO','MK','HS','UV','ZM','MX','MR','HV','OL','TB','MS','ML','MT','MV','MH','NN','NT','NE','NH','NB','NV','NY','NA','ND','NP','OR','NZ','OD','OG','OS','PV','PS','RN','PC','PQ','PN','PE','PH','PF','PL','PP','PO','PR','PJ','FZ','RH','RY','17','RA','RB','RW','RG','RL','RF','CW','SE','RT','XG','SM','CH','SO','LA','SV','SG','SF','ST','TE','TO','TR','TC','US','UM','WK','WA','WG','WT','23','WM','WF','WW','WH','WR','WB','WL'];
+
+  stationInfoNamesList = ['22nd Street Station (Bayonne)','2nd Street Station (Hoboken)','34th Street Station (Bayonne)','36th Street','45th Street Station (Bayonne)','8th Street Station (Bayonne)','9th Street - Congress Street (HBLR)','Aberdeen Matawan Station','Absecon Station','Aldrich Road Park & Ride','Allendale Station','Allenhurst Station','Allwood Road Park & Ride','Anderson Street Station','Annandale Station','Aquarium Station (River Line)','Asbury Park Station','Atco Station','Atlantic City Bus Terminal','Atlantic City Rail Terminal','Atlantic Street Station Newark','Avandale Park & Ride','Avenel Station','Basking Ridge Station','Bay Head Station','Bay Street Station','Belmar Station','Bergenline Avenue Station','Berkeley Heights Station','Bernardsville Station','Beverly/Edgewater Park Station','Bloomfield Avenue Station (Newark)','Bloomfield Rail Station','Bonnel Court - Union Twp','Boonton Station','Bordentown Station','Bound Brook Station','Bradley Beach Station','Branch Brook Park Light Rail Station','Brick Church Station','Brick Twp Park & Ride','Bridgewater Station','Broad Street Light Rail Station (Newark)','Broadway Bus Terminal - Paterson','Broadway Station Fair Lawn','Burlington South Station','Burlington Towne Centre Station','Campbell Hall Station','Cape May Bus Terminal','Carteret Park & Ride','Cass Street Station Trenton','Chatham Station','Cherry Hill Station','Cinnaminson Station','Clifton Commons Park & Ride','Clifton Station','Convent Station','Cooper Street/Rutgers Station Camden','Craig Road Park & Ride','Cranford Station','Danforth Avenue Station Jersey City','Davenport Avenue Station Newark','Delanco Station','Delawanna Station','Denville Station','Dorado Park & Ride','Dover Station','Dumont A','Dumont B - West Shore','Dunellen Station','East Orange Station','Edison Station','Egg Harbor City Station','Elberon Station','Elizabeth Station','Emerson Station','Entertainment Center Station Camden','Essex Street (HBLR)','Essex Street Station (PVL)','Exchange Place Station','Fairlawn DPW','Fanwood Station','Far Hills Station','Florence Station','Fort Lee','Freehold Center','Freehold Mall','Garden State Parkway Exit 120','Garden State Parkway Exit 165 - Paramus','Garfield Avenue Station (HBLR)','Garfield Station','Garwood Station','George Washington Bridge Bus Terminal','Gillette Station','Gladstone Station','Glen Ridge Station','Glen Rock Boro Hall Station','Glen Rock Main Line Station','Greenwood Lake - NY','Greyhound Bus Terminal Philadelphia','Grove Street Light Rail Station Bloomfield','Hackensack Bus Terminal','Hackettstown Station','Hamilton Avenue Light Rail Station Trenton','Hamilton Station','Hammonton Station','Harborside Financial Center Station','Harriman Station','Harsimus Cove Station','Hawthorne Station','Hazlet Station','High Bridge Station','Highland Avenue Station','Hillsdale Station','Ho-Ho-Kus Station','Hoboken Light Rail','Hoboken Terminal','Hoboken Terminal Bus Lanes','Howell Park & Ride','Inverness Park & Ride','Irvington Bus Terminal','Jake Brown Park & Ride','Jersey Avenue Light Rail (HBLR)','Jersey Avenue Station (Northeast Corridor)','Journal Square Transportation Center','Kingsland Station','Lake Hopatcong Station','Lakewood Terminal','Lebanon Station','Liberty State Park Light Rail Station','Lincoln Harbor Station Weehawken','Lincoln Park Station','Linden Station','Lindenwold Station','Little Falls Station','Little Silver Station','Lloyd Road Park & Ride - Aberdeen','Long Branch Station','Lyndhurst Station','Lyons Station','Madison Station','Mahwah Station','Manasquan Station','Maplewood Station','Marin Boulevard Light Rail Station','Marlboro Park & Ride','Martin Luther King Drive Light Rail Station Jersey City','Meadowlands (Racetrack)','Metropark Station','Metuchen Station','Middletown New Jersey Station','Middletown New York Station','Midland Park - Wortendyke Station','Military Park Light Rail Station','Millburn Station','Millington Station','Monmouth Park Station','Montclair Heights Station','Montclair State University Station','Montvale Station','Morris Plains Station','Morristown Station','Mothers Park & Ride','Mount Arlington Station','Mount Olive Station','Mount Tabor Station','Mountain Avenue Station','Mountain Lakes Station','Mountain Station','Mountain View Station','Murray Hill Station','NJPAC/Center Street','Nanuet Station','Netcong Station','Netherwood Station','New Bridge Landing Station','New Brunswick Station','New Providence Station','New York Penn Station','Newark Airport Rail Station','Newark Broad Street Station','Newark Penn Station','Newark Penn Station Bus Lanes','Newark Penn Station Light Rail','Newfoundland Park & Ride - West Milford NJ','Newport Light Rail Station','Norfolk Street Light Rail Station','North Bergen Park & Ride','North Branch Station','North Elizabeth Station','Ocean City Transportation Center','Old Bridge Park & Ride','Oradell Station','Orange Station','Orange Street','Otisville Station','Palmyra Station','Park Avenue Light Rail Station','Park Ridge Station','Passaic Bus Terminal','Passaic Station','Paterson Station','Peapack Station','Pearl River Station','Pennsauken Transit Center Bus Stop','Pennsauken Transit Center River Line Station','Pennsauken Transit Center Station','Pennsauken/Route 73 Station','Perth Amboy Station','Philadelphia 30th Street Station','Pine Avenue - Union Twp','Plainfield Station','Plauderville Station','Point Pleasant Beach Station','Port Authority Bus Terminal','Port Imperial Station Weehawken','Port Jervis Station','Princeton Junction Station','Princeton Station','Radburn Station','Rahway Station','Ramsey Main Street Station','Ramsey Route 17 Station','Raritan Station','Red Bank Station','Richard Street Light Rail Station','Ridgewood Bus Terminal','Ridgewood Station','Ringwood Park & Ride','River Edge Station','Riverfront Stadium','Riverside Station','Riverton Station','Roebling Station','Roselle Park Station','Rutgers Lane Hospital - Union Twp','Rutherford Station','Salisbury Mills Cornwall Station','Sayreville Park & Ride','Schibanoff Park & Ride','Secaucus Junction Station','Short Hills Station','Silver Lake Light Rail Station','Sloatsburg Station','Somerville Station','South Amboy Station','South Orange Station','Spring Lake Station','Spring Valley Station','Springfield Center - Springfield Twp','Stirling Station','Stockholm Park & Ride - Hardyston','Suffern Station','Summit Station','Symmes Drive - Manalapan Mall','Teterboro Station','Texas Road Park & Ride','Toms River Park & Ride','Tonnelle Avenue Station North Bergen','Towaco Station','Trenton Transit Center','Trenton Transit Center Bus Stop','Trenton Transit Center River Line Station','Tuxedo Station','Union Center - Union Twp','Union Hill Park & Ride','Union Station','Upper Montclair Station','Vince Lombardi Park & Ride','Vineland Terminal','Waldwick Station','Walnut Street Station','Walter Rand Transportation Center','Walter Rand Transportation Center Light Rail Stop','Warren Street Light Rail Station','Warwick NY Park & Ride','Washington Park Light Rail Station','Washington Street Light Rail Station','Watchung Avenue Station','Watchung Park & Ride','Watsessing Avenue Station','Wayne/Route 23 Transit Center','Wayne/Route 23 Transit Center Rail Station','Wesmont Station','West Milford Park & Ride - Greenwood Lake NJ','West Side Avenue Station','Westfield Station','Westwood Station','White House Station','Wildwood Terminal','Willowbrook Mall','Wood Ridge Station','Woodbridge Station','Woodcliff Lake Station']; 
+  atisIdsList = ['38229','38441','37005','38306','37004','42673','38442','37169','2','38104','3','4','4098','5','6','38309','8','9','297','10','39133','1582','11','12','13','14','15','38578','17','18','38299','14984','19','4643','20','38294','21','22','26316','23','3625','24','39130','3897','25','38298','38297','26','23216','37509','38293','27','28','38302','4137','29','30','38308','27345','32','37003','6907','38300','33','34','37008','35','700','688','36','37','38','39','40','41','42','38310','36995','43','36994','850','44','45','38296','1033','9729','27394','17392','37234','36999','46','47','3512','48','49','50','51','52','3277','237','38065','1252','54','38292','32905','55','37376','57','37377','58','59','60','61','62','64','39348','63','17082','27400','27358','28555','27363','36997','32906','2916','66','67','37607','68','36998','17699','69','70','71','72','73','38455','74','75','76','77','78','79','81','36996','17360','37000','40570','83','84','85','86','29037','6900','87','88','31696','89','38081','90','91','92','38063','39472','93','94','95','96','97','98','99','39134','100','101','102','110','103','104','105','37953','106','107','2275','26326','37801','37378','6957','2935','108','109','1851','27367','111','112','14986','113','38304','6966','114','3942','115','116','117','118','43282','43288','43298','38305','119','1','4622','120','121','122','3511','9878','123','125','124','126','127','128','38417','129','130','37002','37730','131','27578','132','39131','38301','38303','38295','31','16619','134','135','40358','27344','38174','136','38064','137','138','139','140','141','142','4575','143','38360','144','145','27439','146','27354','3603','38579','147','148','25104','38291','149','4633','27427','38105','150','615','197','151','152','11519','38307','6995','27561','39132','6997','153','1813','154','39635','39635','43599','38407','37001','155','156','157','2076','3921','160','158','159'];
+ 
+  
+ //function getCollection(){
+ //	return stationNamesList;
+ //}
+ 
+  
+</script>
+
+<script type="text/javascript" src="./RailServiceStatus_files/jquery2.js.download"></script>
+<script type="text/javascript" src="./RailServiceStatus_files/jquery.bgiframe.min.js.download"></script>
+<script type="text/javascript" src="./RailServiceStatus_files/jquery.autocomplete.js.download"></script>
+<script type="text/javascript" src="./RailServiceStatus_files/date.js.download"></script>
+<script type="text/javascript" src="./RailServiceStatus_files/jquery.datePicker.js.download"></script>
+<script type="text/javascript" src="./RailServiceStatus_files/main.js.download"></script>
+
+<script type="text/javascript">
+var fadeimages=new Array();
+
+		fadeimages[0]=["https://www.njtransit.com/images-uploads/AC-Dinky-Marquee2-2-27-19.jpg", "http://www.njtransit.com/ServiceAdvisory?Id=19246 ", "_self", "ACLR resume service"];
+	
+		fadeimages[1]=["https://www.njtransit.com/images-uploads/NJTEngageMarquee.jpg", "https://www.njtransit.com/engage/njt_engage.html", "_blank", "NJT Engage"];
+	
+		fadeimages[2]=["https://www.njtransit.com/images-uploads/App-Push-Alerts-Marquee-2019-ver-6.jpg", "https://youtu.be/haBoxoNa2Ho", "_self", "Mobile App Transit Alerts 2018"];
+	
+</script>
+<script type="text/javascript" src="./RailServiceStatus_files/homepage_fadeimages1.js.download"></script>
+
+<link href="./RailServiceStatus_files/print.css" rel="stylesheet" type="text/css" media="print">
+<link href="./RailServiceStatus_files/styles_redesign.css" rel="stylesheet" type="text/css" media="screen">
+<link href="./RailServiceStatus_files/main.css" rel="stylesheet" type="text/css">
+
+<link rel="stylesheet" type="text/css" href="./RailServiceStatus_files/SpryMenuBar.css">
+<script type="text/javascript" src="./RailServiceStatus_files/SpryMenuBar.js.download"></script>
+<script language="JavaScript" src="./RailServiceStatus_files/helper.js.download"></script>
+
+<link rel="preload" href="./RailServiceStatus_files/f(6).txt" as="script"><script type="text/javascript" src="./RailServiceStatus_files/f(6).txt"></script><link rel="preload" href="https://pagead2.googlesyndication.com/pagead/js/r20190313/r20190131/show_ads_impl.js" as="script"><link type="text/css" rel="stylesheet" charset="UTF-8" href="./RailServiceStatus_files/translateelement.css"><script type="text/javascript" charset="UTF-8" src="./RailServiceStatus_files/main.js(1).download"></script><script type="text/javascript" charset="UTF-8" src="./RailServiceStatus_files/element_main.js.download"></script><script src="./RailServiceStatus_files/f(7).txt"></script><script src="./RailServiceStatus_files/f(8).txt"></script><script type="text/javascript" charset="UTF-8" src="./RailServiceStatus_files/common.js.download"></script><script type="text/javascript" charset="UTF-8" src="./RailServiceStatus_files/util.js.download"></script><script type="text/javascript" charset="UTF-8" src="./RailServiceStatus_files/geocoder.js.download"></script></head>
+
+<body onunload="GUnload()">
+<!--/**  * @ (#) header.jsp  * * Copyright (c) 2005 NJ Transit * One Penn Plaza East * Newark, NJ 06101 * THIS  UNPUBLISHED WORK,  FIRST CREATED  IN 2005  AND UPDATED THEREAFTER, * IS PROTECTED  UNDER THE  COPYRIGHT LAWS  OF THE UNITED STATES  AND OF  * OTHER COUNTRIES  THROUGHOUT THE WORLD. USE, DISASSEMBLY,  REPRODUCTION,  * DISTRIBUTION,  ETC.  WITHOUT THE   EXPRESS  WRITTEN   CONSENT   OF   * NJ TRANSIT IS PROHIBITED.   * COPYRIGHT NJ TRANSIT 2005 ALL  RIGHTS RESERVED.   * INFORMATION  CONTAINED   HEREIN  IS PROPRIETARY AND CONFIDENTIAL * AND  IMPROPER USE OR DISCLOSURE MAY RESULT IN CIVIL AND PENAL SANCTIONS * * This file contains the top level menu items and the underlying dhtml menu items. *  * @author  Arun Nunna * * @version 1.0  */ --><!-- Translate Analytics  --><script type="text/javascript" src="./RailServiceStatus_files/ga.js.download"></script><!-- ************** HOSTNAME: 221555-40.221555-40.com ************** --><!--%%%%%%%%%%%% MyCSSMenu Styles [Keep in head for full validation!] %%%%%%%%%%%--><style type="text/css">/*!!!!!!!!!!! MyCSSMenu Core CSS [Do Not Modify!] !!!!!!!!!!!!!*/.qmmc .qmdivider{display:block;font-size:1px;border-width:0px;border-style:solid;position:relative;z-index:1;}.qmmc .qmdividery{float:left;width:0px;}.qmmc .qmtitle{display:block;cursor:default;white-space:nowrap;position:relative;z-index:1;}.qmclear {font-size:1px;height:0px;width:0px;clear:left;line-height:0px;display:block;float:none !important;}.qmmc {position:relative;zoom:1;z-index:10;}.qmmc a, .qmmc li {float:left;display:block;white-space:nowrap;position:relative;z-index:1;}.qmmc div a, .qmmc ul a, .qmmc ul li {float:none;}.qmsh div a {float:left;}.qmmc div{visibility:hidden;position:absolute;}.qmmc li {z-index:auto;}.qmmc ul {left:-10000px;position:absolute;z-index:10;}.qmmc, .qmmc ul {list-style:none;padding:0px;margin:0px;}.qmmc li a {float:none}.qmmc li:hover>ul{left:auto;}#qm0 ul {top:100%;}#qm0 ul li:hover>ul{top:0px;left:100%;}/*!!!!!!!!!!! MyCSSMenu Styles !!!!!!!!!!!*/	/* MyCSSMenu 0 */	/*"""""""" (MAIN) Items""""""""*/		#qm0 a		{			padding:5px 10px 5px 10px;		color:#ffffff;		font-family:Arial;		font-size:12px;		text-decoration:none;	}	#qm0 div a		{			color:#555555;	}	/*"""""""" (SUB) Container""""""""*/		#qm0 div, #qm0 ul		{			padding:10px;		margin:-2px 0px 0px;		background-color:#FFFFFF;		border-width:1px;		border-style:solid;		border-color:#AAAAAA;	}	/*"""""""" (SUB) Items""""""""*/		#qm0 div a, #qm0 ul a		{			padding:3px 10px 3px 5px;		background-color:transparent;		font-size:11px;		border-width:0px;		border-style:none;	}	/*"""""""" (SUB) Hover State""""""""*/		#qm0 div a:hover, #qm0 ul a:hover		{			background-color:#AAAAAA;		color:#FFFFFF;	}	/*"""""""" (SUB) Active State""""""""*/		body #qm0 div .qmactive, body #qm0 div .qmactive:hover		{			background-color:#AAAAAA;		color:#FFFFFF;	}	/*"""""""" Individual Titles""""""""*/		#qm0 .qmtitle		{			cursor:default;		padding:3px 0px 3px 4px;		color:#444444;		font-family:arial;		font-size:11px;		font-weight:bold;	}	/*"""""""" Individual Horizontal Dividers""""""""*/		#qm0 .qmdividerx		{			border-top-width:1px;		margin:4px 0px;		border-color:#AAAAAA;	}	/*"""""""" Individual Vertical Dividers""""""""*/		#qm0 .qmdividery		{			border-left-width:1px;		height:15px;		margin:4px 2px 0px;		border-color:#FFFFFF;	}	/*"""""""" (main) Rounded Items""""""""*/		#qm0 .qmritem span		{			border-color:#AAAAAA;		background-color:#FFFFFF;	}	/*"""""""" (main) Rounded Items Content""""""""*/		#qm0 .qmritemcontent		{			padding:0px 0px 0px 4px;	}	/*"""""""" (sub) Rounded Items""""""""*/		#qm0 div .qmritem span		{			border-color:#666666;		background-color:#AAAAAA;	}	/*"""""""" (sub) Rounded Items Content""""""""*/		#qm0 div .qmritemcontent		{			padding:0px 0px 0px 4px;	}</style>	<style type="text/css">body{	text-align: center; /* for IE */	background-color:#fafafa;}.divCenter{	position:relative;	margin-right:auto;	margin-left:auto;	width:1000px;	background:white;}#hdr-auth {    position: absolute;    right: 2px;    top: 0;    /*z-index: 100;*/}#hdr-auth ul {    margin-top: 0;}#hdr-auth li {    border-right: 1px solid #FFFFFF;    color: #FFFFFF;    display: block;    float: left;    font-size: 12px;    padding: 7px 9px 0 9px;}#hdr-auth li a {    color: #FFFFFF;    text-decoration: none;}.no-pad-right {    padding-right: 20px !important;}.no-border {    border: 0 none !important;}div.footer{position:relative; bottom:0px; left:0px; width:1000; height:30px; background-color:#8A8A8A; overflow:visible;}div.footer2{position:relative; z-index:4; font-family: sans-serif; font-weight:bold;}div.footer2 table tr td .navDividers{	font-family: sans-serif;	font-weight:bold;}div.footer2 table tr td .navDividers a{	text-decoration: none;	color: #020167;	font-weight: 400;	}.njt_borderbottom {	position:relative;	*top: -12px;	margin-right:auto;	margin-left:auto;	width:1000px;	background: url("https://www.njtransit.com/images/BR_shadow_1000x6.gif") no-repeat scroll 100% 100% transparent;	height: 6px;}a.copyright:hover{	color: #666666;}a.copyright, a.copyright:visited{	color: #666666;}.njt_ftrlnggcntr div a, div a:visited{	text-decoration: none;	color: #666666;}#njt_ftrcntntinner {    padding-top: 3px;}#njt_ftrcntnt, #njt_ftrcntntinner {    padding-top: 5px;    position: relative;    text-align: left;    width: 1000px;}#njt_ftrcntnt {    padding-bottom: 15px;}.njt_ftrnvlnks {    color: #999999;    font: 12px/14px arial,Helvetica,Utkal,sans-serif;    padding: 10px 0 8px;    text-align: center;}.njt_ftrnvlnks div {    padding: 0 0 4px;}.njt_ftrnvlnks div a {    padding: 0 3px;}.njt_ftrnvlnks div a:link {    color: #31447d;    outline: medium none;}.njt_ftrnvlnks div a:visited {    color: #31447d;    outline: medium none;}.njt_ftrnvlnks div a:hover {    text-decoration: none;}.njt_ftrnvlnks div a {    text-decoration: none;}.njt_ftrdivl2 {    background: url("https://www.njtransit.com/images/footer-menu-links.gif") repeat-x;    height: 20px;}.njt_clear {    clear: both;    height: 1px;    overflow: hidden;}.njt_divline {    background-color: #E5E5E5;    height: 1px;    overflow: hidden;}#ftr-social {    float: right;    margin-top: 7px;    margin-bottom: 7px;}#njt_ftrcntnt #ftr-weather {    display: inline;    float: left;}#njt_ftrwthr1 {    display: inline;    float: left;    margin: 10px 12px 0 20px;    width: 65px;}#njt_ftrwthr2 {    width: 225px;}#njt_ftrwthr2 {    color: #666666;    display: inline;    float: left;    font: bold 10px/14px arial,Helvetica,Utkal,sans-serif;    margin: 13px 0 0;    /*width: 684px;*/}#njt_ftrwthr3 {    display: inline;    float: left;    font: bold 27px/30px arial,Helvetica,Utkal,sans-serif;    margin: 0;    width: 50px;}#njt_ftrwthr4 {    display: inline;    float: left;    line-height: 14px;    margin: 0;    width: 175px;}#hdr-search {	position: absolute;	visibility:visible;	display: inline;	top: 33px;	right: 20px;}.njt_hdrsearch1 {}form.hdr-njt-google-search {    display: block;    margin: 0;    text-align: left;}form.hdr-njt-google-search input.hdr-njt-google-query {    border-color: #31518c;    border-style: solid;    border-width: 1pt;    float: left;    font-size: 12px;    height: 19px;    padding-left: 10px;    *padding-top: 1px;    width: 180px;}.hdr-njt-clickable {    color: #225BD0;    cursor: pointer;    text-decoration: none;    font-size: 11px;}.hdr-wx-searchButton {    background-color: #09224b;    border-bottom: 1pt solid #31518c;    border-right: 1pt solid #31518c;    border-top: 1pt solid #31518c;    color: #FFFFFF;    float: left;    font-weight: bold;    height: 17px;    line-height: 17px;    text-align: center;    text-transform: uppercase;    width: 64px;}form.hdr-njt-google-search input.hdr-njt-google-query:-moz-placeholder {    color: #999999 !important;    font-style: italic !important;}.njt_ftrlnggcntr {    color: #666666;    display: inline;    float: right;    font: 10px/14px arial,Helvetica,Utkal,sans-serif;    text-align: right;    width: 180px;}.njt_ftrlgcpy {    color: #666666;    display: inline;    float: left;    font: 10px/14px arial,Helvetica,Utkal,sans-serif;    margin: 5px 0 0 0;    width: 565px;}div.footer2 table tr td .navDividers a:hover{	text-decoration: underline;}#wxWrap {    width: 350px;    background: #EEE; /* Old browsers */    background: -moz-linear-gradient(top, rgba(240,240,240,1) 0%, rgba(224,224,224,1) 100%); /* FF3.6+ */    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(240,240,240,1)), color-stop(100%,rgba(224,224,224,1))); /* Chrome,Safari4+ */    background: -webkit-linear-gradient(top, rgba(240,240,240,1) 0%,rgba(224,224,224,1) 100%); /* Chrome10+,Safari5.1+ */    background: -o-linear-gradient(top, rgba(240,240,240,1) 0%,rgba(224,224,224,1) 100%); /* Opera11.10+ */    background: -ms-linear-gradient(top, rgba(240,240,240,1) 0%,rgba(224,224,224,1) 100%); /* IE10+ */    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0f0f0', endColorstr='#e0e0e0',GradientType=0 ); /* IE6-9 */    background: linear-gradient(top, rgba(240,240,240,1) 0%,rgba(224,224,224,1) 100%); /* W3C */    padding: 2px 13px 2px 11px;    -webkit-border-radius: 4px;    -moz-border-radius: 4px;    border-radius: 4px;}#wxIntro {    display: inline-block;    font: 14px/20px Arial,Verdana,sans-serif;    color: #666;    vertical-align: top;    padding-top: 9px;}#wxIcon {    display: inline-block;    width: 61px;    height: 34px;    margin: 2px 0 -1px 1px;    overflow: hidden;    background: url('https://www.njtransit.com/images/weather/wicons.png') no-repeat 61px 0;}#wxIcon2 {    display: inline-block;    width: 34px;    height: 34px;    margin: 1px 6px 0 8px;    overflow: hidden;}#wxTemp {    display: inline-block;    font: 20px/28px Arial,Verdana,sans-serif;    color: #333;    vertical-align: top;    padding-top: 5px;    margin-left: 0;}#calendar {	width: 15.5em;	height: 4.5em;	float: right;	clear: right;	margin: 1em 1em 0 0;}	#calendar span {		float: left;		font-family: sans-serif;		font-weight: bold;		color: #B3B3B3;	}	#calendar .date {		font-size: 2.6em;		letter-spacing: -0.025em;		/*margin-top: -0.16em !important; IE7 and FF treat this differently*/		margin-top: -2px;	}	#calendar .day,	#calendar .month,	#calendar .year {		font-size: 1.1em;		margin-left: 0.25em;	}	#calendar .month,	#calendar .year {		margin-top: -0.1em;	}	#calendar .day {		width: 60%;	}	#calendar .monthyear {		white-space: nowrap;	}#search-main {position:relative; top: 0px; left: 0px; overflow:none;	width: 22.2em;	float: right;	clear: right;	margin: 0;}	#search-main form input.text {		float: left;		height: 1.7em;		padding: 2px 0 0 0;		font: 100% Arial, Helvetica, sans-serif; 		background-color: #1C207F;		border-color: #596278;		color: #FFFFFF;	}	#search-main form input.btn {		/*float: right;*/		width: 2.9em;		min-width: 29px;		height: 1.6em;		min-height: 16px;		margin: 0 0 0 0.3em;		font-size:11px;	}</style><div class="divCenter" style="position:relative; z-index:99;"><!-- Google Ads Div -->		<img src="./RailServiceStatus_files/spacer.gif" alt="" width="1" height="9" border="0"><br>		<div align="center">			<div id="adsenseHeader"></div>				<div id="adsenseHeader-loader" style="display:block;">				<script async="" src="./RailServiceStatus_files/f(9).txt"></script>								<ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-7698699613857784" data-ad-slot="4432826168" data-adsbygoogle-status="done"><ins id="aswift_0_expand" style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px;background-color:transparent;"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px;background-color:transparent;"><iframe width="728" height="90" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" allowfullscreen="true" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){try{h=s.upd(h,i)}catch(e){}w.location.replace(h)}}" id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;border:0px;width:728px;height:90px;" src="./RailServiceStatus_files/saved_resource(51).html"></iframe></ins></ins></ins>				<script>				(adsbygoogle = window.adsbygoogle || []).push({});				</script>			</div>			</div>	<!--<div style="position:relative; width:100%; height:90px; margin: 3px 0 3px 0; background-image:url(https://www.njtransit.com/images/amex_banner_ad2015.jpg);">	<a href="//www.americanexpress.com" target="_blank" onClick="javascript:urchinTracker('/HomePage/AmericanExpressBannerAd');"><img src="https://www.njtransit.com/images/spacer.gif" WIDTH="1000" HEIGHT="90"></a></div>	--><div class="noprint" style="position:relative; z-index:99;"><div style="position:relative; width:100%; height:65px; background-image:url(https://www.njtransit.com/images/njt_header_new.jpg);"><img src="./RailServiceStatus_files/spacer.gif" alt="" usemap="#map" width="1000" height="65"><div id="hdr-auth" style="right: 5px;">	<ul>		<li class="no-border" style="margin-top: 3px; padding: 4px; color: #FFFFFF;">			My Transit		</li>		<li>			<a href="https://www.njtransit.com/mt/mt_servlet.srv?hdnPageAction=MTRegisterTo">Sign Up</a>		</li>		<li class="no-border no-pad-right">			<a href="https://www.njtransit.com/mt/mt_servlet.srv?hdnPageAction=MyTransitTo">Log In</a>		</li>	</ul></div><div id="hdr-search">	<div class="njt_hdrsearch1">			<form name="hdrfrmSearch" id="hdrfrmSearch" class="hdr-njt-google-search" method="post" action="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=SiteSearchTo">				<input name="txtSearch" type="text" class="hdr-njt-google-query notranslate form-watermark" placeholder="Enter Search Term" title="Enter Search Term">				<div id="clicksearch" class="hdr-wx-searchButton hdr-njt-clickable">search</div>			</form>	</div></div></div><div style="position:relative; height:35px; background-image:url(https://www.njtransit.com/images/njt_top_menu_bar.jpg);"><table align="center" summary="This table is used for page layout" border="0" cellspacing="0" cellpadding="0">	<tbody><tr>		<td><div style="position:relative; top: 6px; z-index:3;"><div class="qmmc" id="qm0" style="zoom: 1; z-index: 11;"><a class="qmparent" style="padding-left: 0;" href="javascript:void(0)">Schedules &amp; Fares</a><div style="z-index: 21;"><a href="https://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TrainTo">Train</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=BusTo">Bus</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=LightRailTo">Light Rail</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TripPlannerTo">Trip Planner</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TripPlannerServiceNearTo">Service Near a Location</a></div><span class="qmdivider qmdividery"></span><a class="qmparent" href="javascript:void(0)">Alerts &amp; Advisories</a><div style="z-index: 21;"><a href="https://www.njtransit.com/sa/sa_servlet.srv?hdnPageAction=TravelAlertsTo">Current Travel Alerts</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/sa/sa_servlet.srv?hdnPageAction=CustomerNoticesTo">Customer Notices</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/mt/mt_servlet.srv?hdnPageAction=MyTransitTo">My Transit Alerts</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/var/var_servlet.srv?hdnPageAction=SocialMediaTo">Social Media</a></div><span class="qmdivider qmdividery"></span><a class="qmparent" href="javascript:void(0)">Ticket Options</a><div style="z-index: 21;"><a href="https://ww2.njtransit.com/qt/qt_servlet.srv?hdnPageAction=QuikTikTo">Quik-Tik | Tickets by Mail</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/ti/ti_servlet.srv?hdnPageAction=RailTicketsTo">Rail Tickets</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/ti/ti_servlet.srv?hdnPageAction=BusTicketsTo">Bus Tickets</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/ti/ti_servlet.srv?hdnPageAction=LightRailTicketsTo">Light Rail Tickets</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/var/var_servlet.srv?hdnPageAction=MobileTicketingTo">MyTix Mobile Ticketing</a><span class="qmdivider qmdividerx"></span><a href="https://mtix.njtransit.com/masticketing/?page=meadowlandsticketing">Meadowlands Ticketing</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/ti/ti_servlet.srv?hdnPageAction=GroupTravelTo">Group Sales</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/ti/ti_servlet.srv?hdnPageAction=StudentPassTo">Student Pass</a></div><span class="qmdivider qmdividery"></span><a class="qmparent" href="javascript:void(0)">Rider Tools</a><div style="z-index: 21; left: 343px; top: 24px;"><a href="https://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=StationParkRideTo">Station &amp; Parking Info</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=HowToRideTo">How to Ride NJ TRANSIT</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=FaqTo">Frequently Asked Questions</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/var/var_servlet.srv?hdnPageAction=BusShelterFAQTo">Bus Stops &amp; Shelters</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=AirportConnectionsTo">Newark Airport</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/var/var_servlet.srv?hdnPageAction=NJTAppTo">Mobile App</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/common/jsp/mybusnow.jsp" target="_blank">My Bus Now</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=BusServiceNearByFrom">MyBus</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=MyLightRailTo">MyLightRail</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=MyTrainTo">MyTrain &amp; DepartureVision</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/var/var_servlet.srv?hdnPageAction=CommuterToolKitTo">Commuter Tool Kit</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/var/var_servlet.srv?hdnPageAction=LanguageAssistanceTo">Language Assistance</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=ConnectionsTo">Connecting Services</a><span class="qmdivider qmdividerx"></span><a class="qmparent" href="https://accesslink.njtransit.com/hiwire?.a=pViewTrips" target="_blank">Access Link Online</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=BikeProgramTo">Bikes &amp; Other Devices </a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/var/var_servlet.srv?hdnPageAction=WiFiTo">WiFi</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=SafetyTo">Safety</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=SpTo">Deals &amp; Discounts</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=CommCalculatorTo">Commuter Calculator</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/var/var_servlet.srv?hdnPageAction=QuietCommuteTo">Quiet Commute</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=FYITo&amp;DP=3">FYI</a></div><span class="qmdivider qmdividery"></span><a class="qmparent" href="javascript:void(0);">Maps</a><div style="z-index: 21;"><a href="https://www.njtransit.com/pdf/rail/Rail_System_Map.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;Rail_System_Map.pdf&#39;);">Rail System</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/LightRail/sf_lr_hblr_map.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;sf_lr_hblr_map.pdf&#39;);">Hudson-Bergen Light Rail</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/LightRail/sf_lr_nlr_map.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;sf_lr_nlr_map.pdf&#39;);">Newark Light Rail</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/LightRail/sf_lr_rvl_map.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;sf_lr_rvl_map.pdf&#39;);">River Line</a><span class="qmdivider qmdividerx"></span><a class="qmparent" href="javascript:void(0);">Station Directories</a><div style="z-index: 31;"><a href="https://www.njtransit.com/pdf/maps/directories/Hoboken_Directory.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;Hoboken_Directory.pdf&#39;);">Hoboken</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/directories/NewarkPenn_Directory.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;NewarkPenn_Directory.pdf&#39;);">Newark Penn Station</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/directories/NewarkBroadSt_Directory.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;NewarkBroadSt_Directory.pdf&#39;);">Newark Broad Street</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/directories/NYPENN_Directory.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;NYPENN_Directory.pdf&#39;);">Penn Station New York</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/directories/Secaucus_Directory.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;Secaucus_Directory.pdf&#39;);">Secaucus Junction</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/directories/Trenton_Directory.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;Trenton_Directory.pdf&#39;);">Trenton Transit Center</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/directories/WalterRand_Transportation_Center_Directory.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;WalterRand_Transportation_Center_Directory.pdf&#39;);">Walter Rand Transportation Center</a></div><span class="qmdivider qmdividerx"></span><a class="qmparent" href="javascript:void(0);">Station Area Maps</a><div style="z-index: 31;"><a href="https://www.njtransit.com/pdf/maps/sam/10samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;10samap.pdf&#39;);">Atlantic City</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/63samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;63samap.pdf&#39;);">Hoboken</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/83samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;83samap.pdf&#39;);">Metro Park</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/92samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;92samap.pdf&#39;);">Morristown</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/103samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;103samap.pdf&#39;);">New Brunswick</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/106samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;106samap.pdf&#39;);">Newark Broad Street Station</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/107samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;107samap.pdf&#39;);">Newark Penn Station</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/105samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;105samap.pdf&#39;);">New York Penn Station</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/43298samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;43298samap.pdf&#39;);">Pennsauken Transit Center</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/121samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;121samap.pdf&#39;);">Plauderville</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/127samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;127samap.pdf&#39;);">Rahway</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/131samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;131samap.pdf&#39;);">Ridgewood</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/38174samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;38174samap.pdf&#39;);">Secaucus Junction</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/138samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;138samap.pdf&#39;);">Somerville</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/139samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;139samap.pdf&#39;);">South Amboy</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/148samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;148samap.pdf&#39;);">Trenton Transit Center</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/pdf/maps/sam/11519samap.pdf" target="_blank" onclick="javascript:urchinTracker(&#39;11519samap.pdf&#39;);">Walter Rand Transportation Center</a></div></div><span class="qmdivider qmdividery"></span><a class="qmparent" href="javascript:void(0);">Accessibility</a><div style="z-index: 21; left: 483px; top: 24px;"><a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=AccessLinkTo">Access Link, ADA Paratransit</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=RailAccessTo">Accessible Rail</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=BusAccessTo">Accessible Bus</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=LightRailTo">Accessible Light Rail</a><span class="qmdivider qmdividerx"></span><a class="qmparent" href="https://accesslink.njtransit.com/hiwire?.a=pViewTrips" target="_blank">Access Link Online</a><span class="qmdivider qmdividerx"></span><a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=ParaTransitTo">Community Transportation</a></div><span class="qmdivider qmdividery"></span><a class="qmparent" href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=ContactUsTo">Contact Us</a><div style="z-index: 21;"><a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=ContactUsTelephoneTo">Customer Service Offices</a><span class="qmdivider qmdividerx"></span><a href="https://ww3.njtransit.com/LostAndFound/resources/jsp/lf_lost_input.jsp?KeepThis=true&amp;modal=true&amp;showclose=true&amp;TB_iframe=true&amp;height=500&amp;width=900" class="thickbox">Lost &amp; Found</a><span class="qmdivider qmdividerx"></span><a href="https://njtransit.secure.force.com/customerservice/ContactUs" target="_blank">Online Contact Form</a></div><span class="qmdivider qmdividery"></span><a class="qmparent" href="https://www.njtransit.com/po/po_servlet.srv?hdnPageAction=PoliceHomeTo">Police</a><span class="qmdivider qmdividery"></span><a class="qmparent" href="https://accesslink.njtransit.com/hiwire?.a=pViewTrips" target="_blank">Access Link Online</a><span class="qmclear">&nbsp;</span></div></div>		</td>	</tr></tbody></table></div></div><map name="map">	<area shape="RECT" coords="15,7,231,59" href="https://www.njtransit.com/hp/hp_servlet.srv?hdnPageAction=HomePageTo" alt="New Jersey Transit"></map><!-- ################### BEGIN PAGE CONTENT ################### --> <div class="content" style=""><table align="center" summary="This table is used for page layout" width="100%" border="0" cellspacing="0" cellpadding="0">	<tbody><tr>		<td valign="top">
+<style>
+div#homepage-serious-adv {
+	background-color:#;
+}
+span#homepage-serious-adv-msg {
+	margin-left:3px;
+	display:block;
+}
+
+.homepage-serious-adv-msg {
+	color:#;
+}
+
+.homepage-serious-adv-msg a{
+	color:#;
+}
+
+#alerttextbox{
+	position:absolute;
+	top:300px;
+	left:300px;
+	width:300px;
+	display:none;
+	z-index:20;
+	padding:8px;
+	margin-right: 2px;
+	background:#e3f4f9;
+	border:1px solid #0cf;
+    background-color:#cff; 
+    color:black;
+}
+#alerttextbox p{
+    color:black;
+}
+.homepage-serious-adv-msg {
+    padding-left: 0;
+    padding-right: 0;
+}
+#njt_ftrcntnt, #njt_ftrcntntinner {
+    padding-top: 0px;
+}
+</style>
+
+<span id="alerttextbox">
+															
+</span>
+<map name="ddNewr">
+	<area shape="rect" coords="0,0,338,72" href="https://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=AirportConnectionsTo" alt="Newark Airport">
+	<area shape="rect" coords="0,75,338,148" href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=SpTo" alt="Deals &amp; Destinations">
+</map>
+<!-- begin content links -->
+
+
+<table align="center" cellpadding="0" cellspacing="0" border="0" width="970">
+	<tbody><tr><td colspan="3" style="height:3px"></td></tr>
+	<tr>
+	<td>
+		<table cellpadding="0" cellspacing="0" border="0">
+			
+			<tbody><tr>
+				<td valign="top" style="border: 1pt solid #DADADA; width:280px; height:200px; background-image:url(https://www.njtransit.com/images/home_box_1_new.jpg)">
+			    <div id="homepage-box1">
+					<div style="z-index:1; position:absolute;">
+					<div class="infohptp" style="margin-top: 5px;">
+						<a href="https://www.njtransit.com/hp/hp_servlet.srv?hdnPageAction=HomePageTo#" class="hptpinfo"><img src="./RailServiceStatus_files/hptp_info.gif" height="15" width="15">
+							<span>
+								The Homepage Trip Planner will find the fastest trips within a one mile walking distance of your origin and destination.<br><br>  
+								To begin, enter your starting address or boarding location (e.g. station or park &amp; ride name).  If you start typing a station name or park &amp; ride location, the Trip Planner will suggest locations.  You can select these by pressing Enter or Tab.  You can also enter any street address or intersection.  Be sure to include your city and state.  Commas are acceptable, but are not required.<br><br>
+								If you prefer to use a particular travel mode (e.g. "rail only," "bus only," etc.), simply select the appropriate button.<br><br>
+								You can adjust the date and time to plan a future trip, if desired.<br><br>
+								To plan an ADA-accessible trip, check the box next to the word "Accessible."<br><br>
+								To plan a trip using other settings, including shorter walking distances and fewer transfers, please use our Advanced Trip Planner by clicking "Advanced."
+							</span>
+						</a>
+					</div>
+					</div>
+				<div id="homepage-box1-inner" style="padding: 5px 0 0 10px;">
+				<!-- start: trip planner form -->
+				<form name="frm_trip_planner" id="frm_trip_planner" action="https://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TripPlannerItineraryFrom" method="post" title="">
+					<h1 style="color: #e28517; margin-bottom: 7px;">TRIP PLANNER</h1>
+					<div class="twocol">
+						<div class="top-left" id="tripplanner">
+							<h2><label for="StartAddress">Travel From:</label></h2>
+							<input class="notranslate form-watermark ac_input" name="starting_street_address" type="text" tabindex="1" style="width:190px;height:20px;" maxlength="200" title="Use any address or station" id="starting_street_address" onblur="checkStartCoords();" autocomplete="off">
+	                   		<h2><label for="EndAddress">Travel To:</label></h2>
+							<input class="notranslate form-watermark ac_input" name="dest_street_address" type="text" tabindex="2" style="width:190px;height:20px;" maxlength="200" title="Use any address or station" id="dest_street_address" onblur="checkEndCoords();" autocomplete="off">
+						</div>
+						<div class="top-right notranslate">
+							<h2>&nbsp;&nbsp;Using:</h2>
+							
+							<ul>
+								<li><input type="radio" name="mode" value="BX" id="bus" title="Using bus" alt="Using bus">
+								<label for="bus">Bus</label></li>
+								<li><input type="radio" name="mode" value="CTR" id="rail" title="Using rail" alt="Using rail">
+								<label for="rail">Rail</label></li>
+								<li><input type="radio" name="mode" value="L" id="lightrail" title="Using lightrail" alt="Using lightrail">
+								<label for="rail">Light Rail</label></li>
+								<li><input type="radio" name="mode" value="BCTLXR" id="all" title="Using all modes" alt="Using all modes">
+								<label for="all">All</label></li>
+							</ul>
+						</div>
+					</div>
+					<div class="departures" style="font-size:100%;height:25px;">
+						<ul>
+	                             <li><input type="radio" name="time" value="D" id="depart" title="Depart at" alt="Depart at"><label for="depart">Depart at</label></li>
+                                 <li><input type="radio" name="time" value="A" id="arrive" title="Arrive by" alt="Arrive By"><label for="arrive">Arrive by</label></li>
+    					</ul>
+					</div>
+				
+				<div class="datetime notranslate">
+				<!--  <h2><label for="datepicker">Date:</label> &nbsp;</h2> -->
+					<input name="datepicker" type="text" tabindex="3" autocomplete="on" class="datepicker dp-applied" id="datepicker" title="">
+				  	<input name="Time" type="text" tabindex="4" maxlength="5" alt="Enter travel time i.e. 03:55" class="datepicker2 form-watermark" id="Time" title="Time defaults to the current time.  If you will be traveling at another time, you can enter that time here. It should be in the following format i.e. 03:55">
+            		<select name="Suffix" tabindex="5" id="Suffix" class="ampm" onchange="document.all.AutoSuggest_Layer.style.display=&#39;none&#39;;" title="Select AM or PM">
+						<option value="AM" title="AM">AM</option>
+						<option value="PM" title="PM">PM</option>
+					</select>
+				</div>
+				
+				<div class="rightlinks">
+						<h2><label for="Accessible">Accessible:</label></h2>
+						<div style="height:20px;padding:4px;"><input type="checkbox" tabindex="6" name="Atr" id="Atr" value="Y" title="Do you want your trip to be wheelchair accessible?"><img src="./RailServiceStatus_files/accessible.gif" alt="" border="0" height="15" width="15"></div><br>
+                </div>
+                
+                <div class="submit">
+					    <div id="submit"><a href="javascript:reCheckCoords();"><img name="submitbtn" id="submitbtn" class="submit" src="./RailServiceStatus_files/home_tpsubmit.gif" height="24" width="78" onclick="document.getElementById(&#39;submit&#39;).style.visibility = &#39;hidden&#39;; document.getElementById(&#39;wait&#39;).style.visibility = &#39;visible&#39;;"></a></div>
+					    <div style="position:absolute;height:1px;"><div id="wait" style="position:relative; top:-30px; visibility:hidden;"><img class="submit" src="./RailServiceStatus_files/home_tpwait.gif" height="24" width="78"></div></div>
+  				</div>
+                <h2 class="rightlinks2"><a href="https://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TripPlannerItineraryTo">Advanced</a></h2>
+   	
+					<input type="hidden" name="min" id="min" value="T">
+					<input type="hidden" name="Walk" id="Walk" value="1.00">
+					<input type="hidden" name="Hour" id="Hour" value="">
+					<input type="hidden" name="Minute" id="Minute" value="">
+					<input type="hidden" name="TravelToLatLong" id="TravelToLatLong" value="">
+					<input type="hidden" name="TravelFromLatLong" id="TravelFromLatLong" value="">
+				</form>
+				<!-- end: trip planner form -->
+
+				</div>
+			</div>
+				</td>
+			</tr>
+			
+			
+			<tr><td><img src="./RailServiceStatus_files/spacer.gif" alt="" width="1" height="5" border="0"></td></tr>
+			
+			<tr>
+			<td width="280px">
+			<table cellpadding="0" cellspacing="0" border="0">
+			<tbody><tr>
+    			<td>
+
+			<div id="homepage-box3" style="width: 280px; *width: 282px; border: 1pt solid #DADADA; background-image: url(https://www.njtransit.com/images/home_box_3_new.jpg);">
+				<div id="homepage-box3-inner" style="padding: 5px 0 0;">
+
+					<div id="metro-status-tab1">
+					
+					<div id="service_tab1" style="margin-bottom:7px;">
+						<a name="svc_stat" href="https://www.njtransit.com/sa/sa_servlet.srv?hdnPageAction=TravelAlertsTo" class="svc_hp" style="color: #ee3a43;">SERVICE STATUS</a>
+					</div>
+
+						<!-- start: Rail tab -->
+						<div class="status-table-outer short">
+							<div class="status-table short">
+								<div class="status-table-inner">
+
+									<table width="280">
+									<tbody><tr>
+										<td class="first" width="10%">&nbsp;<img src="./RailServiceStatus_files/status_red.jpg" alt="NEC status" height="15" width="16"></td>
+										<td class="first" width="50%"><span class="notranslate">Northeast Corridor</span></td>
+
+										<td class="first" width="2%">
+										<img src="./RailServiceStatus_files/status_divider_1.jpg" alt="" height="17" width="2"></td>
+										<td class="first" width="38%">On Time</td>
+									</tr>
+									<tr>
+										<td colspan="4"><div class="tableline"></div></td>
+									</tr>
+									<tr>
+										<td>&nbsp;<img src="./RailServiceStatus_files/status_blue.jpg" alt="NJCL status" height="15" width="16"></td>
+										<td><span class="notranslate">North Jersey Coast</span></td>
+
+										<td><img src="./RailServiceStatus_files/status_divider_1.jpg" height="17" width="2" alt=""></td>
+										<td class="next"><a href="https://www.njtransit.com/sa/sa_servlet.srv?hdnPageAction=TravelAlertsTo&amp;rel=Rail&amp;selLine=NJCL" onmouseover="showAlertText(this,&#39;NJCL&#39;,1);" onmouseout="hideAlertText();">View Alert</a></td>
+									</tr>
+									<tr>
+										<td colspan="4"><div class="tableline"></div></td>
+									</tr>
+									<tr>
+										<td>&nbsp;<img src="./RailServiceStatus_files/status_orange.jpg" alt="RARV status" height="15" width="16"></td>
+										<td><span class="notranslate">Raritan Valley</span></td>
+										<td><img src="./RailServiceStatus_files/status_divider_1.jpg" height="17" width="2" alt=""></td>
+										<td class="next">On Time</td>
+									</tr>
+									<tr>
+										<td colspan="4"><div class="tableline"></div></td>
+									</tr>
+									<tr>
+										<td>&nbsp;<img src="./RailServiceStatus_files/status_green.jpg" alt="MNE status" height="15" width="16"></td>
+										<td><span class="notranslate">Morris &amp; Essex</span></td>
+										<td><img src="./RailServiceStatus_files/status_divider_1.jpg" height="17" width="2" alt=""></td>
+										<td class="next">On Time</td>
+									</tr>
+									<tr>
+										<td colspan="4"><div class="tableline"></div></td>
+									</tr>
+										<tr>
+										<td>&nbsp;<img src="./RailServiceStatus_files/status_yellow.jpg" alt="MNBN status" height="15" width="16"></td>
+										<td><span class="notranslate">Main/Bergen/Port Jervis</span></td>
+										<td><img src="./RailServiceStatus_files/status_divider_1.jpg" height="17" width="2" alt=""></td>
+										<td class="next">On Time</td>
+									</tr>									
+									<tr>
+										<td colspan="4"><div class="tableline"></div></td>
+									</tr>
+										<tr>
+										<td>&nbsp;<img src="./RailServiceStatus_files/status_brown.jpg" alt="BNTN status" height="15" width="16"></td>
+										<td><span class="notranslate">Montclair-Boonton</span></td>
+										<td><img src="./RailServiceStatus_files/status_divider_1.jpg" height="17" width="2" alt=""></td>
+										<td class="next">On Time</td>
+									</tr>									
+									<tr>
+										<td colspan="4"><div class="tableline"></div></td>
+									</tr>
+										<tr>
+										<td>&nbsp;<img src="./RailServiceStatus_files/status_purple.jpg" alt="PVL status" height="15" width="16"></td>
+										<td><span class="notranslate">Pascack Valley</span></td>
+										<td><img src="./RailServiceStatus_files/status_divider_1.jpg" height="17" width="2" alt=""></td>
+										<td class="next">On Time</td>
+									</tr>									
+									<tr>
+										<td colspan="4"><div class="tableline"></div></td>
+									</tr>
+										<tr>
+										<td>&nbsp;<img src="./RailServiceStatus_files/status_dkblue.jpg" alt="ACL status" height="15" width="16"></td>
+										<td><span class="notranslate">Atlantic City</span></td>
+										<td><img src="./RailServiceStatus_files/status_divider_1.jpg" height="17" width="2" alt=""></td>
+										<td class="next"><a href="https://www.njtransit.com/sa/sa_servlet.srv?hdnPageAction=TravelAlertsTo&amp;rel=Rail&amp;selLine=ATLC" onmouseover="showAlertText(this,&#39;ATLC&#39;,7);" onmouseout="hideAlertText();">View Alert</a></td>
+									</tr>									
+									<tr>
+										<td colspan="4"><div class="tableline"></div></td>
+									</tr>
+										<tr>
+										<td>&nbsp;<img src="./RailServiceStatus_files/status_ltgreen.jpg" alt="HBLR status" height="15" width="16"></td>
+										<td><span class="notranslate">Hudson-Bergen Light Rail</span></td>
+										<td><img src="./RailServiceStatus_files/status_divider_1.jpg" height="17" width="2" alt=""></td>
+										<td class="next">On Time</td>
+									</tr>									
+									<tr>
+										<td colspan="4"><div class="tableline"></div></td>
+									</tr>
+										<tr>
+										<td>&nbsp;<img src="./RailServiceStatus_files/status_ltgreen.jpg" alt="NLR status" height="15" width="16"></td>
+										<td><span class="notranslate">Newark Light Rail</span></td>
+										<td><img src="./RailServiceStatus_files/status_divider_1.jpg" height="17" width="2" alt=""></td>
+										<td class="next">On Time</td>
+									</tr>									
+									<tr>
+										<td colspan="4"><div class="tableline"></div></td>
+									</tr>
+										<tr>
+										<td>&nbsp;<img src="./RailServiceStatus_files/status_ltgreen.jpg" alt="RiverLINE status" height="15" width="16"></td>
+										<td><span class="notranslate">River Line</span></td>
+										<td><img src="./RailServiceStatus_files/status_divider_1.jpg" height="17" width="2" alt=""></td>
+										<td class="next">On Time</td>
+									</tr>									
+									<tr>
+										<td colspan="4"><div class="tableline"></div></td>
+									</tr>
+										<tr>
+										<td>&nbsp;<img src="./RailServiceStatus_files/status_bus.jpg" alt="Bus status" height="15" width="16"></td>
+										
+									
+										<td colspan="3"><span class="notranslate">Bus</span></td>
+
+									</tr>									
+									</tbody></table>
+								</div>
+							</div>
+						</div>
+						
+						<div class="statusbox" id="statusbox">
+
+							<div class="status">
+								<div class="status-inner" id="statusbox-sandbox">
+									<table border="0">
+										<tbody>	
+										
+										<tr><td valign="middle">
+
+			<table id="bus-table" width="240px" border="0" cellspacing="0" cellpadding="0">
+
+			<tbody><tr>
+
+ 			<td align="center"><a href="https://www.njtransit.com/sa/sa_servlet.srv?hdnPageAction=TravelAlertsTo&amp;rel=Bus#59" onmouseover="showBusAlertText(this,&#39;59&#39;,&#39;Bus Route No. 59 is on detour in Westfield. Brightwood Avenue is closed between Prospect Street and Clark Street due to construction. Bus service will operate on Brightwood Avenue, Clark Street, Effingham Place and Prospect Street in both directions.&#39;);" onmouseout="hideAlertText();">59</a></td>
+
+			</tr>
+
+			</tbody></table>
+
+										</td></tr>
+										
+										</tbody>
+									</table>
+								</div>
+
+							</div>
+							<div class="links">
+								<p class="inside-right"><a href="https://www.njtransit.com/sa/sa_servlet.srv?hdnPageAction=TravelAlertsTo&amp;rel=Rail">View All Alerts &amp; Advisories</a></p>
+								<!-- <p class="inside-right"><a href="https://www.njtransit.com/mt/mt_servlet.srv?hdnPageAction=MyTransitTo"><span class="notranslate">Sign-up for Alerts</span></a></p>-->					
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div> 
+    			</td>
+    		</tr>
+    	</tbody></table>
+				</td>
+			</tr>
+		</tbody></table>
+	</td>
+	
+    <td><img src="./RailServiceStatus_files/spacer.gif" alt="" width="5" height="1" border="0"></td>
+		
+	<!-- Nivo slider starts -->  
+
+	<td valign="top">
+		<table cellpadding="0" cellspacing="0" border="0">
+		<tbody><tr>
+			<td rowspan="3">
+			<div class="notranslate" style="position:relative; z-index:0; *z-index:0; top: 2px;">
+			
+			<div class="slider-wrapper theme-default">
+				<div id="slider" class="nivoSlider">
+					 
+							<a href="http://www.njtransit.com/ServiceAdvisory?Id=19246" target="_self" onclick="javascript:urchinTracker(&#39;/Marquee/Marquee_ACLR resume service&#39;);" class="nivo-imageLink" style="display: none;"><img src="./RailServiceStatus_files/AC-Dinky-Marquee2-2-27-19.jpg" alt="ACLR resume service" style="width: 450px; visibility: hidden;"></a>
+					 
+							<a href="https://www.njtransit.com/engage/njt_engage.html" target="_blank" onclick="javascript:urchinTracker(&#39;/Marquee/Marquee_NJT Engage&#39;);" class="nivo-imageLink" style="display: block;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" alt="NJT Engage" style="width: 450px; visibility: hidden;"></a>
+					 
+							<a href="https://youtu.be/haBoxoNa2Ho" target="_self" onclick="javascript:urchinTracker(&#39;/Marquee/Marquee_Mobile App Transit Alerts 2018&#39;);" class="nivo-imageLink" style="display: none;"><img src="./RailServiceStatus_files/App-Push-Alerts-Marquee-2019-ver-6.jpg" alt="Mobile App Transit Alerts 2018" style="width: 450px; visibility: hidden;"></a>
+					
+				<img class="nivo-main-image" src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="height: 405px; overflow: hidden; width: 450px;"><div class="nivo-caption" style="display: none;"></div><div class="nivo-directionNav" style="display: none;"><a class="nivo-prevNav">Prev</a><a class="nivo-nextNav">Next</a></div><div class="nivo-controlNav"><a class="nivo-control" rel="0">1</a><a class="nivo-control active" rel="1">2</a><a class="nivo-control" rel="2">3</a></div><div class="nivo-slice" name="0" style="left: 0px; width: 450px; height: 405px; opacity: 1; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-0px;"></div><div class="nivo-slice" name="1" style="left: 30px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-30px;"></div><div class="nivo-slice" name="2" style="left: 60px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-60px;"></div><div class="nivo-slice" name="3" style="left: 90px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-90px;"></div><div class="nivo-slice" name="4" style="left: 120px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-120px;"></div><div class="nivo-slice" name="5" style="left: 150px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-150px;"></div><div class="nivo-slice" name="6" style="left: 180px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-180px;"></div><div class="nivo-slice" name="7" style="left: 210px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-210px;"></div><div class="nivo-slice" name="8" style="left: 240px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-240px;"></div><div class="nivo-slice" name="9" style="left: 270px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-270px;"></div><div class="nivo-slice" name="10" style="left: 300px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-300px;"></div><div class="nivo-slice" name="11" style="left: 330px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-330px;"></div><div class="nivo-slice" name="12" style="left: 360px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-360px;"></div><div class="nivo-slice" name="13" style="left: 390px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-390px;"></div><div class="nivo-slice" name="14" style="left: 420px; width: 30px; height: 405px; opacity: 0; overflow: hidden;"><img src="./RailServiceStatus_files/NJTEngageMarquee.jpg" style="position:absolute; width:450px; height:auto; display:block !important; top:0; left:-420px;"></div></div>
+			 </div>
+		 </div>
+	</td>
+	<!-- Nivo slider ends -->
+			<td rowspan="3"><img src="./RailServiceStatus_files/spacer.gif" alt="" width="7" height="1" border="0"></td>
+			<td valign="top" style="border: 1pt solid #DADADA; width:225px; height:200px; background-image:url(https://www.njtransit.com/images/home_box_2_new.jpg)">
+			<div id="homepage-box5">
+				<div id="homepage-box5-inner" style="padding: 5px 8px 0 15px;">
+
+
+					<div id="news_tab1">
+						<a name="tgt_news" href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=NJTNewsTo" class="news_hp" style="color: #619748;">NEWS</a>
+						
+						<!-- start: News -->
+						
+							<ul>
+							
+								<li style="padding: 3px 0 0 10px;"><a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=PressReleaseTo&amp;PRESS_RELEASE_ID=3271" onclick="javascript:urchinTracker(&#39;/HomePageBullets/NEWSITEM_1923&#39;);">Rail Service Restoration Update</a></li>
+								
+								<li style="padding: 3px 0 0 10px;"><a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=PressReleaseTo&amp;PRESS_RELEASE_ID=3277" onclick="javascript:urchinTracker(&#39;/HomePageBullets/NEWSITEM_1929&#39;);">Atlantic City Rail Line and Princeton Dinky to Resume Service May 24</a></li>
+								
+								<li style="padding: 3px 0 0 10px;"><a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=PressReleaseTo&amp;PRESS_RELEASE_ID=3276" onclick="javascript:urchinTracker(&#39;/HomePageBullets/NEWSITEM_1928&#39;);">NJ TRANSIT Receives Approval For PTC Alternative Schedule</a></li>
+								
+								<li style="padding: 3px 0 0 10px;"><a href="http://www.northernbranchcorridor.com/" onclick="javascript:urchinTracker(&#39;/HomePageBullets/NEWSITEM_1805&#39;);">HBLR Northern Branch Expansion Website</a></li>
+								
+							</ul>
+						
+						<!-- end: News -->
+					</div>
+				</div>
+			</div>
+			</td>
+		</tr>
+		<tr>
+			<td><img src="./RailServiceStatus_files/spacer.gif" alt="" width="1" height="5" border="0"></td>
+		</tr>
+		<tr>
+			<td valign="top" style="border: 1pt solid #DADADA; width:225px; height:200px; background-image:url(https://www.njtransit.com/images/home_box_5_new.jpg)">
+			 <div id="homepage-box5">
+				<div id="homepage-box5-inner" style="padding: 5px 8px 0 15px;">
+
+
+					<div id="popdest_tab1">
+						<h1 style="color: #2a69a6;">POPULAR DESTINATIONS</h1>
+						
+						<!-- start: Popular Destinations -->
+						
+							<ul>
+							
+								<li style="*padding: 1px 0 0 10px;"><a href="http://www.njtransit.com/var/var_servlet.srv?hdnPageAction=ACRLTo">Atlantic City</a></li>
+								
+								<li style="*padding: 1px 0 0 10px;"><a href="http://www.njtransit.com/var/var_servlet.srv?hdnPageAction=BROADWAYTo">Manhattan/NYC</a></li>
+								
+								<li style="*padding: 1px 0 0 10px;"><a href="http://www.njtransit.com/meadowlands">Meadowlands Sports Complex</a></li>
+								
+								<li style="*padding: 1px 0 0 10px;"><a href="http://www.njtransit.com/ewr">Newark Liberty Airport</a></li>
+								
+								<li style="*padding: 1px 0 0 10px;"><a href="http://www.njtransit.com/var/var_servlet.srv?hdnPageAction=PhillyWhereToGoTo">Philadelphia</a></li>
+								
+							</ul>
+						
+						<!-- end: Popular Destinations -->
+					</div>
+				</div>
+			</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3"><img src="./RailServiceStatus_files/spacer.gif" alt="" width="1" height="6" border="0"></td>
+		</tr>
+		<tr>
+			<td colspan="3">
+				<table cellpadding="0" cellspacing="0" border="0">
+			<tbody><tr>
+			<td>
+    		   <div style="position:relative; border: 1pt solid #DADADA; z-index:4; left:0px; top:1px; width:262px; *width:264px; height:72px; background-image: url(https://www.njtransit.com/images/home_box_dv_new.jpg);overflow:hidden;">
+	   				<!-- departure vision -->
+	   				<div style="position:relative;width:230px;height:50px;top:12px;float:right;">
+	   						<div style="margin-bottom:6px; font-family:arial, sans-serif; font-size:120%; font-weight:bold; color:#619748;">DepartureVision <span style="font-size:6pt; font-weight:normal;">&nbsp;&nbsp;Real Time Train Status</span></div>
+    						<input class="notranslate form-watermark ac_input" name="dv_station" id="dv_station" type="text" style="width:176px;height:20px;" maxlength="200" title="ENTER STATION NAME" autocomplete="off">
+  	   						<span style="position:relative;top:4px;"><a href="https://www.njtransit.com/hp/hp_servlet.srv?hdnPageAction=HomePageTo#"><img name="gobtn" src="./RailServiceStatus_files/dv-go-arrow.png" height="16" width="17" onclick="javascript:launchDepVision();"></a></span>
+	   				</div> 
+      			</div>
+      		</td>
+
+    		<td><img src="./RailServiceStatus_files/spacer.gif" alt="" width="5" height="1" border="0"></td>
+		    		
+			<td>
+    		   <div style="position:relative; border: 1pt solid #DADADA; z-index:4; left:0px; top:1px; width:142px; *width:144px; height:72px; background-image: url(https://www.njtransit.com/images/home_box_mytix.jpg);overflow:hidden;">
+    				<!-- safety -->
+    				<a href="https://www.njtransit.com/var/var_servlet.srv?hdnPageAction=MobileTicketingTo"><img src="./RailServiceStatus_files/spacer.gif" alt="" width="142" height="72" border="0"></a>
+      			</div>
+      		</td>
+
+    		<td><img src="./RailServiceStatus_files/spacer.gif" alt="" width="5" height="1" border="0"></td>
+
+			<td>
+    		   <div style="position:relative; border: 1pt solid #DADADA; z-index:4; left:0px; top:1px; width:262px; *width:264px; height:72px; background-image: url(https://www.njtransit.com/images/home_box_spi_new.jpg);overflow:hidden;">
+    				<!-- station park and ride -->
+    				<div style="position:relative;width:230px;height:50px;top:12px;float:right;">
+	   						<div style="margin-bottom:6px; font-family:arial, sans-serif; font-size:120%; font-weight:bold; color:#e28517;">Station &amp; Parking Info</div>
+    						<input class="notranslate form-watermark ac_input" name="spnr" id="spnr" type="text" style="width:176px;height:20px;" maxlength="200" title="ENTER STATION NAME" autocomplete="off">
+	   						<span style="position:relative;top:4px;"><a href="https://www.njtransit.com/hp/hp_servlet.srv?hdnPageAction=HomePageTo#"><img name="gobtn" src="./RailServiceStatus_files/spi-go-arrow.png" height="16" width="17" onclick="javascript:redirectStationInfo();"></a></span>
+	   				</div>
+      			</div>
+      		</td>
+		    		
+			</tr>
+				</tbody></table>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3"><img src="./RailServiceStatus_files/spacer.gif" alt="" width="1" height="3" border="0"></td>
+		</tr>
+		<tr>
+			<td colspan="3">
+				<div style="position:relative; z-index:4; left:0px; top:1px; width:681px; height:72px; background-image: url(https://www.njtransit.com/images/home_box_combo_new5.jpg); overflow:hidden;">
+    		   		<div style="position:relative; z-index:5; left:0px; top:0px; width:681px; height:72px;">
+    		   			<img src="./RailServiceStatus_files/spacer.gif" usemap="#COMBOmap" width="681" height="72">
+    		   		</div>
+<!-- 	   			<div style="position:relative; z-index:4; left:0px; top:-72px; width:681px; height:72px;">
+						<table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
+							<tr>
+								<td align="center">
+					     		    <div style="position:relative; width:112px; *width:112px; height: 3px; z-index:5; top: 18px; *top: 20px; font-size:xx-small; *font-size:7pt; color:#484741;">
+				    		   			Newark Airport
+				    		   		</div>
+								</td>
+								<td align="center">
+					     		    <div style="position:relative; width:120px; *width:120px; height: 3px; z-index:5; top: 18px; *top: 20px; font-size:xx-small; *font-size:7pt; color:#484741;">
+				    		   			Deals & Discounts
+				    		   		</div>
+								</td>
+								<td align="center">
+					     		    <div style="position:relative; width:111px; *width:111px; height: 3px; z-index:5; top: 18px; *top: 20px; font-size:xx-small; *font-size:7pt; color:#484741;">
+				    		   			My Transit Alerts
+				    		   		</div>
+								</td>
+								<td align="center">
+					     		    <div style="position:relative; width:122px; *width:122px; height: 3px; z-index:5; top: 18px; *top: 20px; font-size:xx-small; *font-size:7pt; color:#484741;">
+				    		   			Twitter Feeds
+				    		   		</div>
+								</td>
+								<td>
+					     		    <div style="position:relative; text-align: right; width:148px; height: 3px; top: 10px; *top: 13px; z-index:5; font-size:xx-small; *font-size:7pt; color:#7581ad;">
+				    		   			<span class="notranslate">NJ TRANSIT warmly welcomes</span>
+				    		   		</div>
+					     		    <div style="position:relative; text-align: right; width:148px; height: 3px; top: 17px; *top: 13px; z-index:5; font-size:xx-small; *font-size:7pt; color:#7581ad;">
+				    		   			<span class="notranslate">all American Express Cards</span>
+				    		   		</div>
+								</td>
+								<td>
+					     		    <div style="position:relative; width: 66px; *width: 66px; height: 3px;">&nbsp;</div>
+								</td>
+							</tr>
+						</table>
+    		   		</div>-->
+       			</div>
+      		</td>
+    		  		  		
+		</tr>
+		</tbody></table>
+	</td>
+	</tr>
+	<tr><td colspan="3" style="height:10px"></td></tr>
+	<tr>
+		<td colspan="3">
+			<table cellpadding="0" cellspacing="0" border="0">
+				</table><table cellpadding="0" cellspacing="0" border="0">
+				<tbody><tr>
+					<td><div style="margin: 0 30px 0 31px; *margin: 0 30px 0 30px;"><a href="https://www.njtransit.com/weblibrary"><img src="./RailServiceStatus_files/web_library_logo.jpg" alt="" width="180" height="70" border="0"></a></div></td>
+					<td>
+			<script type="text/javascript"><!--
+			google_ad_client = "ca-pub-7698699613857784";
+			/* Leaderboard Homepage */
+			google_ad_slot = "8637914889";
+			google_ad_width = 728;
+			google_ad_height = 90;
+			//-->
+			</script>
+			<script type="text/javascript" src="./RailServiceStatus_files/f(10).txt"></script><ins id="aswift_1_expand" style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px;background-color:transparent;" data-ad-slot="8637914889"><ins id="aswift_1_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px;background-color:transparent;"><iframe width="728" height="90" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" allowfullscreen="true" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){try{h=s.upd(h,i)}catch(e){}w.location.replace(h)}}" id="aswift_1" name="aswift_1" style="left:0;position:absolute;top:0;border:0px;width:728px;height:90px;" src="./RailServiceStatus_files/saved_resource(52).html"></iframe></ins></ins>
+					</td>
+				</tr>
+			</tbody></table>
+		</td>
+	</tr>
+</tbody></table>
+
+<!--<MAP NAME="COMBOmap">
+	<AREA SHAPE=RECT COORDS="0,4,111,68"
+		HREF="https://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=AirportConnectionsTo"
+		ALT="Newark Liberty International Airport">
+	<AREA SHAPE=RECT COORDS="112,4,232,68"
+		HREF="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=SpTo"
+		ALT="Deals & Discounts">
+	<AREA SHAPE=RECT COORDS="233,4,344,68"
+		HREF="https://www.njtransit.com/mt/mt_servlet.srv?hdnPageAction=MyTransitTo"
+		ALT="My Transit Alerts">
+	<AREA SHAPE=RECT COORDS="345,4,467,68"
+		HREF="https://www.njtransit.com/transitarts"
+		ALT="Transit Arts">
+	<AREA SHAPE=RECT COORDS="468,4,681,68"
+		HREF="https://www.americanexpress.com/"
+		onClick="javascript:urchinTracker('/HomePage/AmericanExpress');"
+		target="_blank"
+		ALT="American Express">
+</MAP>
+
+<MAP NAME="COMBOmap">
+	<AREA SHAPE=RECT COORDS="0,4,111,68"
+		HREF="https://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=AirportConnectionsTo"
+		ALT="Newark Liberty International Airport">
+	<AREA SHAPE=RECT COORDS="112,4,232,68"
+		HREF="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=SpTo"
+		ALT="Deals & Discounts">
+	<AREA SHAPE=RECT COORDS="233,4,344,68"
+		HREF="https://www.njtransit.com/mt/mt_servlet.srv?hdnPageAction=MyTransitTo"
+		ALT="My Transit Alerts">
+	<AREA SHAPE=RECT COORDS="345,4,467,68"
+		HREF="https://www.njtransit.com/transitarts"
+		ALT="Transit Arts">
+	<AREA SHAPE=RECT COORDS="468,4,681,68"
+		HREF="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=PoliceTo"
+		ALT="Police">
+</MAP>-->
+
+
+<map name="COMBOmap">
+	<area shape="RECT" coords="0,0,151,72" href="https://www.njtransitresilienceprogram.com/" target="_blank" alt="NJT Resilience Program">
+		
+	<area shape="RECT" coords="151,0,249,72" href="https://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=AirportConnectionsTo" alt="Newark Airport">
+		
+	<area shape="RECT" coords="249,1,347,72" href="https://www.njtransit.com/mt/mt_servlet.srv?hdnPageAction=MyTransitTo" alt="My Transit Alerts">
+	
+	<area shape="RECT" coords="302,0,416,72" href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=SpTo" alt="Deals &amp; Discounts">
+			
+	<area shape="RECT" coords="448,1,524,72" href="https://www.njtransit.com/po/po_servlet.srv?hdnPageAction=PoliceHomeTo" alt="POLICE">	
+		
+	<area shape="RECT" coords="524,0,681,72" href="https://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=SafetyTo" alt="SAFETY">
+</map>
+
+<!-- end content links -->
+		</td>	</tr></tbody></table></div><!-- ######################################################################							END PAGE CONTENT######################################################################### --> <div id="njt_ftrcntnt"><div id="njt_ftrcntntinner">	<div id="ftr-weather" style="visibility:visible">	</div>	<div id="ftr-social">		<img src="./RailServiceStatus_files/social-intro.gif" alt="" border="0">		<a href="https://www.njtransit.com/var/var_servlet.srv?hdnPageAction=NJTAppTo"><img src="./RailServiceStatus_files/social_njt.gif"></a>		<img src="./RailServiceStatus_files/spacer.gif" alt="" width="10" height="5" border="0">		<a href="https://www.twitter.com/NJTRANSIT" target="_blank"><img src="./RailServiceStatus_files/social_t.gif"></a>		<img src="./RailServiceStatus_files/spacer.gif" alt="" width="10" height="5" border="0">		<a href="https://www.facebook.com/NJTRANSIT" target="_blank"><img src="./RailServiceStatus_files/social_f.gif"></a>		<img src="./RailServiceStatus_files/spacer.gif" alt="" width="7" height="5" border="0">		<a href="https://www.youtube.com/TheNewJerseyTransit" target="_blank"><img src="./RailServiceStatus_files/social_y.gif"></a>		<img src="./RailServiceStatus_files/spacer.gif" alt="" width="20" height="5" border="0">		<a href="https://www.instagram.com/njtransit/" target="_blank"><img src="./RailServiceStatus_files/social_i.png"></a>		<img src="./RailServiceStatus_files/spacer.gif" alt="" width="20" height="5" border="0">	</div>	<div class="njt_clear"></div>	<div class="njt_divline" style="background-color:#ebebeb;margin-top:3px"></div>	<div class="njt_ftrnvlnks">		<div>			<a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=CorpInfoTo">About Us</a>			|			<a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=NJTNewsTo">News</a>			|			<a href="https://www.njtransit.com/transitarts">Transit Arts</a>			|			<!-- <a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=CapProjectsTo">Capital Projects</a>			| -->			<a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=CareersTo">Careers</a>			|			<a href="https://www.njtransit.com/developer">Developers</a>			|			<a href="https://www.njtransit.com/civilrights">Civil Rights</a>			|			<a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=DoingBusinessTo">Doing Business</a>			|			<a href="https://www.njtransit.com/po/po_servlet.srv?hdnPageAction=PoliceHomeTo">Police</a>			|			<a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=SiteMapTo">Site Map</a>			|			<a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=OpraTo">OPRA</a>		</div>	</div>	<div class="njt_ftrdivl2"></div>	<div class="njt_ftrlnggcntr">		<div id="google_translate_element">			<div id="gtranslate"><a href="javascript:void(0)">Translate this Site</a><img src="./RailServiceStatus_files/spacer.gif" alt="" width="60" height="5" border="0"></div>		</div>	</div>	<div class="njt_ftrlgcpy">		<img src="./RailServiceStatus_files/spacer.gif" alt="" width="30" height="5" border="0">		<b>© 2019 NJ TRANSIT. ALL RIGHTS RESERVED. <a href="https://www.njtransit.com/tm/tm_servlet.srv?hdnPageAction=CopyrightTo" class="copyright" style="text-decoration: none;">TERMS OF USE</a></b>	</div>	<div class="njt_clear"></div></div></div></div><div class="njt_borderbottom"></div><script type="text/javascript">var MenuBar1 = new Spry.Widget.MenuBar("MenuBar1");var MenuBar2 = new Spry.Widget.MenuBar("MenuBar2");var MenuBar3 = new Spry.Widget.MenuBar("MenuBar3");var MenuBar4 = new Spry.Widget.MenuBar("MenuBar4");var MenuBar5 = new Spry.Widget.MenuBar("MenuBar5");var MenuBar6 = new Spry.Widget.MenuBar("MenuBar6");</script><script src="./RailServiceStatus_files/urchin.js.download" type="text/javascript"></script><script type="text/javascript">_uacct = "UA-3154326-1";urchinTracker();</script><script type="text/javascript" src="./RailServiceStatus_files/jquery-1.7.1.min.js.download"></script><script type="text/javascript" src="./RailServiceStatus_files/jquery.simpleWeatherSecure.js.download"></script><script>window.hasOwnProperty = window.hasOwnProperty || Object.prototype.hasOwnProperty;function googleTranslateElementInitS() {  new google.translate.TranslateElement({    pageLanguage: 'en',    includedLanguages: 'ar,zh-TW,en,fr,de,hi,it,ko,es,ja,pl,gu,te,fr,ru,,fr,vi',    autoDisplay: false,    gaTrack: true,    gaId: 'UA-3154326-1',    layout: google.translate.TranslateElement.InlineLayout.SIMPLE  }, 'google_translate_element');}function googleTranslateElementInitV() {  new google.translate.TranslateElement({    pageLanguage: 'en',    includedLanguages: 'ar,zh-TW,en,fr,de,hi,it,ko,es,ja,pl,gu,te,fr,ru,fr,vi',    autoDisplay: false,    gaTrack: true,    gaId: 'UA-3154326-1',    layout: google.translate.TranslateElement.InlineLayout.VERTICAL  }, 'google_translate_element');}function getCookie(c_name){var i,x,y,ARRcookies=document.cookie.split(";");for (i=0;i<ARRcookies.length;i++){  x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));  y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);  x=x.replace(/^\s+|\s+$/g,"");  if (x==c_name)    {    return unescape(y);    }  }}var $j = jQuery.noConflict();$j(document).ready(function(){		var googtrans = getCookie("googtrans");	if (googtrans != null && googtrans != "/en/en") {		$j.getScript(window.location.protocol + '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInitV');		$j('#gtranslate').hide();	}	$j('#gtranslate').click(function() {	       	$j.getScript(window.location.protocol + '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInitV');		$j('#gtranslate').hide();	});	$j('#clicksearch').click(function() {				$j('#hdrfrmSearch').submit();	});    /*	$j.simpleWeather({        zipcode: '07105',        unit: 'f',        success: function(weather) {                html = '<div id="njt_ftrwthr1"><img src="'+weather.thumbnail+'"></div><div id="njt_ftrwthr2"><div id="njt_ftrwthr3"><span class="notranslate">'+weather.temp+'&deg;</span></div><div id="njt_ftrwthr4"><div><span class="notranslate">HI '+weather.high+'&deg;<span style="padding-left:7px">LO '+weather.low+'&deg;</span></span></div><div style="clear:left; line-height: 13px"><span style="padding-right:6px">'+weather.city+', '+weather.region+'</span><a href="//www.weather.com/weather/tenday/40.735657,-74.172367" target="_blank" style="text-decoration: none; color: #2A69A6;">Weather forecast</a></div></div></div>';                $j("#ftr-weather").html(html);        },        error: function(error) {                $j("#ftr-weather").html("");        }	});	*/});</script><script type="text/javascript" src="./RailServiceStatus_files/f(11).txt"></script><script type="text/javascript" src="./RailServiceStatus_files/qm.js.download"></script><script type="text/javascript" src="./RailServiceStatus_files/qm_pure_css.js.download"></script><script type="text/javascript">qm_create(0,false,0,250,false,false,false,false);</script><style>.goog-te-balloon-frame{display: none !important;  box-shadow: none !important; -moz-box-shadow: none !important; -webkit-box-shadow none !important;}font{background: transparent !important;}.goog-te-balloon{display: none !important;}#goog-gt-tt{display: none !important; text-decoration:none; box-shadow: none !important; -moz-box-shadow: none !important; -webkit-box-shadow none !important;}font{background: transparent !important;}#goog-gt-tt .status-message {text-shadow: none !important;}#goog-gt-tt .alt-menu, .goog-text-highlight, #goog-gt-tt .trans-target-highlight, #alt-input-text:hover, #alt-input-text:focus {box-shadow: none !important; -moz-box-shadow: none !important; -webkit-box-shadow none !important;}body {top: 0px !important; position: static !important; }.goog-te-banner-frame{display: none !important;}.goog-logo-link{display: none !important;}.goog-te-gadget{height: 24px !important; *height: 20px !important; width:154px; *width:168px; overflow: hidden; background:#ffffff url(https://www.njtransit.com/images/gtranslate_select.gif) no-repeat left top; font-size: 10pt !important; background-position: 2px 2px; *background-position: 2px 0px;}.goog-te-combo{height: 22px !important; width:130px; *width:145px; margin: 1px 0 1px 0 !important; *margin: 0 0 0 0 !important; padding: 2px; *padding: 0 0 0 0; font-size: 10pt !important; border: 0 none !important; *position: relative; *top: -1px;}a.goog-te-menu-value{    text-decoration: none;}#gtranslate{ 	margin: 5px 0 0 0;	font-weight: bold;	font-size: 10pt !important;}html{	background: none;}</style><!-- MNI Retargeting Pixel June 2017--><script src="./RailServiceStatus_files/739541"></script><iframe id="google_osd_static_frame_3458390016690" name="google_osd_static_frame" style="display: none; width: 0px; height: 0px;" src="./RailServiceStatus_files/saved_resource(53).html"></iframe><!-- Google Code for retargeting_pixel: 246691 Conversion Page -->
+<!-- Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. For instructions on adding this tag and more information on the above requirements, read the setup guide: google.com/ads/remarketingsetup -->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 935145102;
+var google_conversion_label = "cQzuCJqQ12kQjt30vQM";
+var google_custom_params = window.google_tag_params;
+var google_remarketing_only = true;
+/* ]]> */
+</script>
+<script type="text/javascript" src="./RailServiceStatus_files/f(12).txt">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/935145102/?value=1.00&amp;currency_code=USD&amp;label=cQzuCJqQ12kQjt30vQM&amp;guid=ON&amp;script=0"/>
+</div>
+</noscript>
+<img src="./RailServiceStatus_files/seg" width="1" height="1">
+<img src="https://a.adready.com/beacon.php?r=70151" height="1" width="1" border="0" alt="">
+<!-- MNI Retargeting Pixel Homeland Retargeting Pixel Dec 2017--><script src="./RailServiceStatus_files/739541(1)"></script><!-- Google Code for retargeting_pixel: 257731 Conversion Page -->
+<!-- Google Code for Remarketing Tag -->
+<!--------------------------------------------------
+Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. See more information and instructions on how to setup the tag on: https://google.com/ads/remarketingsetup
+--------------------------------------------------->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 935145102;
+var google_conversion_label = "EpWECO212nkQjt30vQM";
+var google_custom_params = window.google_tag_params;
+var google_remarketing_only = true;
+/* ]]> */
+</script>
+<script type="text/javascript" src="./RailServiceStatus_files/f(12).txt">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/935145102/?label=EpWECO212nkQjt30vQM&amp;guid=ON&amp;script=0"/>
+</div>
+</noscript>
+<img src="./RailServiceStatus_files/seg(1)" width="1" height="1">
+<img src="https://a.adready.com/beacon.php?r=75741" height="1" width="1" border="0" alt="">
+
+<script src="./RailServiceStatus_files/js"></script>
+<script type="text/javascript" src="./RailServiceStatus_files/homepage_gvalidationsV3.js.download"></script>
+<script type="text/javascript" src="./RailServiceStatus_files/thickbox.js.download"></script>
+
+<script type="text/javascript" src="./RailServiceStatus_files/jquery-1.7.1.min.js(1).download"></script>
+
+<script type="text/javascript" src="./RailServiceStatus_files/jquery.nivo.slider.js.download"></script> 
+
+<!--<script type="text/javascript" src="http://10.20.72.128:8080/hp/javascript/jquery.nivo.slider.js"></script>
+
+--><script type="text/javascript">
+    jQuery.noConflict();
+    jQuery(document).ready(function() {
+ 	   jQuery('#slider').nivoSlider();
+ 	//  showTP();
+
+ 	 $('#busRouteId').click( function() {
+ 		    window.open($(this).attr('href') + '' + document.getElementById("routeSelect").value);
+	       return false;
+	    });
+	    
+    });
+</script>
+
+
+<script>
+	function showAlertText(parentcontainer,alertline,alertno){
+	    var alerttext;
+	    var containerpos;
+        containerpos = $(parentcontainer).position();
+        //alert(containerpos.top);
+	    switch (alertline){
+			case 'NEC': 
+				alerttext = "null";    	
+			    break;
+			case 'NJCL': 
+				alerttext = "NJCL train #3508, the 9:15am from South Amboy, is subject to up to a 15 min. delay due to a mechanical problem. An update will follow.";    	
+			    break;
+			case 'RARV': 
+				alerttext = "null";    	
+			    break;
+			case 'MNE': 
+				alerttext = "null";    	
+			    break;
+			case 'MNBN': 
+				alerttext = "null";    	
+			    break;
+			case 'BNTN': 
+				alerttext = "null";    	
+			    break;
+			case 'PASC': 
+				alerttext = "null";    	
+			    break;
+			case 'ATLC': 
+				alerttext = "Beginning Friday, May 24, the Atlantic City Rail Line (ACRL) and the Princeton Branch (Dinky) will resume full service.All alternate service options will remain in effect until that time.";    	
+			    break;
+			case 'HBLR': 
+				alerttext = "null";    	
+			    break;
+			case 'NLR': 
+				alerttext = "null";    	
+			    break;
+			case 'RVR': 
+				alerttext = "null";    	
+			    break;
+			
+		}
+	    //var alerttop = 300 + alertno * 21;
+		document.getElementById('alerttextbox').innerHTML = alerttext;
+		document.getElementById('alerttextbox').style.top = containerpos.top - 5;
+		document.getElementById('alerttextbox').style.display = "block";
+	 
+	}
+	function showBusAlertText(parentcontainer,busno,alerttext){
+	    //var alerttop = 300 + 235;
+	    var containerpos;
+        containerpos = $(parentcontainer).position();
+	    document.getElementById('alerttextbox').innerHTML = alerttext;
+		document.getElementById('alerttextbox').style.top = containerpos.top - 30;
+		document.getElementById('alerttextbox').style.display = "block";
+	 
+	}
+	function hideAlertText(){
+		document.getElementById('alerttextbox').style.display = "none";
+	}
+</script>
+</body><iframe id="google_shimpl" style="display: none;" src="./RailServiceStatus_files/saved_resource(54).html"></iframe><iframe id="google_esf" name="google_esf" src="./RailServiceStatus_files/zrt_lookup.html" data-ad-client="ca-pub-7698699613857784" style="display: none;"></iframe></html>

@@ -1,0 +1,497 @@
+/*
+
+ * Filnet, Inc.
+
+ * by Giovanni Glass (http://www.giovanniglass.com)
+
+ * momendo at yahoo dot com
+
+ * 
+
+ */
+
+
+
+$(document).ready(function() {
+
+	findAndSetWatermarks();
+
+	// if homepage
+
+	try {
+		// set calendar object
+
+		Date.firstDayOfWeek = 7;
+
+		Date.format = 'mm/dd/yyyy';
+
+		$('.datepicker')
+
+			.datePicker({createButton:false})
+
+			.dpSetOffset(20, 0)
+
+			.val(new Date().asString())
+
+			.bind('click',
+
+				function()
+
+				{
+
+					$(this).dpDisplay();
+
+					this.blur();
+
+					return false;
+
+				}
+
+			);
+
+		$('.datepicker1')
+
+			.datePicker({createButton:false})
+
+			.dpSetOffset(20, 0)
+
+			.bind('click',
+
+				function()
+
+				{
+
+					$(this).dpDisplay();
+
+					this.blur();
+
+					return false;
+
+				}
+
+			);
+
+		// load cities into autocomplete
+
+		var Cities = getCollection();
+
+	} catch(err) {};
+
+
+
+	if (document.getElementById('tripplanner')) {
+		window.scroll(0,0); // scroll top
+		setTime(); // set time
+		$('input#travelfrom').focus(); // focus on from field first
+	}
+
+
+	// add top menu image toggles, we don't use this currently
+
+
+	// prevent selection
+
+	deselectList = 'div#header img, div#header input[type=image], div#homepage-box1 h1, div#homepage-box1 h2, div#homepage-box1 li, div#homepage-box1 img, div#homepage-box1 .departures, div#homepage-box1 input[type=image], div#homepage-box3, div#homepage-col2, div#internal-col1, div#footer, div#footer2';
+
+	$(deselectList).each(function(i) {
+
+		noSelect(this);
+
+	});
+	
+	/*
+	if (document.getElementById('map')) {
+
+		load(''); // load map
+
+	}
+	*/
+	
+	var links = $('.tabs_news a');
+	var tabs = $('#news_tab1, #news_tab2');
+	links.click(function(){
+		var clicked = $(this);
+		tabs.css('display', 'none');
+		$('.tabs_news a').removeClass().each(function(i){
+			if(clicked.text() == $(this).text())
+			tabs.eq(i).css('display', 'block');
+		});
+	$(this).addClass('on');
+	return false;
+	});
+	
+	})
+	
+.unload(function() {
+
+	if ($('div.internal-box2-inner div#map')) GUnload();
+
+})
+
+.resize(function() {
+
+	if ($('div.internal-box2-inner div#map')) resizeMapDiv();
+
+});
+
+
+// make zebra stripes in a table
+
+function zebra(element) {
+
+	$(this).parent().find('tr:even').attr('className', 'even');
+
+	$(this).parent().find('tr:odd').attr('className', 'odd');
+
+}
+
+
+
+function findAndSetWatermarks() {
+
+	$("input[title!='']").each(function() { setFieldWatermark(this) });
+
+}
+
+
+
+function setFieldWatermark(obj) {
+
+	$(obj).bind("focus click blur", function(e) {waterMarkHelpToggle(this, e)});
+
+	$(obj).trigger("blur");
+
+}
+
+
+
+function waterMarkHelpToggle(obj, event) {
+
+	// if empty
+
+//	console.log(event);
+
+	if ($(obj).val() == '' && event.type == 'blur') {
+
+		$(obj).val($(obj).attr('title'));
+
+		$(obj).addClass('form-watermark');
+
+	}
+
+	// if watermark
+
+	else if ($(obj).val() == $(obj).attr('title')) {
+
+		$(obj).val('');
+
+		$(obj).removeClass('form-watermark');
+
+	}
+
+}
+
+
+
+function noSelect(element) {
+
+	if (typeof element.onselectstart != "undefined") {
+
+		element.onselectstart = function() {return false};
+
+	}
+
+	else if (typeof element.style.MozUserSelect != "undefined") {
+
+		element.style.MozUserSelect = "none";
+
+	} else {
+
+		element.onmousedown = function() {return false};
+
+		element.style.cursor = "default";
+
+	}
+
+}
+
+
+
+function getHour() {
+
+	dateTime = new Date();
+
+	hours = dateTime.getHours();
+
+
+
+	if (hours >= 12) {
+
+		hours = hours - 12;
+
+	}
+
+	if (hours == 0) {
+
+		hours = 12;
+
+	}
+
+	return hours;
+
+}
+
+
+
+function getMins() {
+
+	dateTime = new Date();
+
+	mins  = dateTime.getMinutes();
+
+	if (mins < 10) mins = '0' + mins;
+
+	return mins;
+
+}
+
+
+
+function getAMPM() {
+
+	dateTime = new Date();
+
+	hours = dateTime.getHours();
+
+
+
+	var suffix = 0;
+
+	if (hours >= 12) {
+
+		suffix = 1;
+
+	}
+
+	return suffix;
+
+}
+
+
+
+function setTime() {
+
+	var timeVal = getHour() + ':' + getMins();
+
+	$('input#Time').val(timeVal);
+
+	//$('input#timeHours').trigger('focus').val(getHour());
+
+	//$('input#timeMins').trigger('focus').val(getMins());
+
+	$('select#Suffix').attr('selectedIndex', (getAMPM()) ? 1 : 0);
+
+}
+
+
+function flipTab(id) {
+
+	if (!id) return;
+
+	
+
+	tabImgId    = 'tabs-3';
+
+	tabsDivsIds = {
+
+		tab1: ['metro-status-tab1', 'img/box-3-tabs-1.gif'],
+
+		tab2: ['metro-status-tab2', 'img/box-3-tabs-2.gif'],
+
+		tab3: ['metro-status-tab3', 'img/box-3-tabs-3.gif']
+
+	}
+
+	
+
+	if (id) {
+
+		$('div.' + tabImgId + ' img').attr('src', eval('tabsDivsIds.' + id + '[1]'));
+
+		$.each(
+
+			tabsDivsIds,
+
+			function(i, n) {
+
+				if (id == i) {
+
+					$('div#' + n[0]).show();
+
+				} else {
+
+					$('div#' + n[0]).hide();
+
+				}
+
+			}
+
+		);
+
+
+
+		return false;
+
+	}
+
+	return false;
+
+}
+
+
+
+/**
+
+ * Scroll the status box
+
+ * string obj
+
+ * string direction
+
+ *
+
+ */
+
+function scrollStatus(obj, direction, command) {
+
+	offset  = 0;
+
+	pointer = 0;
+
+	height  = 34;
+
+	if (!obj) {
+
+		return false;
+
+	} else {
+
+		obj = 'div#' + obj;
+
+	}
+
+	if (direction) {
+
+		if (direction == 'up') {
+
+			offset = 0;
+
+		} else if (direction == 'down') {
+
+			offset = 1;
+
+		}
+
+	} else {
+
+		return false;
+
+	}
+
+
+
+	// count p tags for quantity
+
+	quantity = parseInt($(obj + ' tr').length);
+
+
+
+	// create and store the pointer if it doesn't exist
+
+	if ($(obj).attr('pointer') == undefined) {
+
+		$(obj).attr('pointer', 0);
+
+	} else {
+
+		pointer = parseInt($(obj).attr('pointer'));
+
+	}
+
+	
+
+	if (command != 'reset') {
+
+		if (offset == 1) {
+
+			// go down
+
+			if (pointer + 1 > quantity - 1) {
+
+				pointer = 0;
+
+			} else {
+
+				pointer++;
+
+			}
+
+		} else {
+
+			if (pointer - 1 < 0) {
+
+				pointer = quantity - 1;
+
+			} else {
+
+				pointer--;
+
+			}
+
+		}
+
+	}
+
+	$(obj).attr('pointer', pointer); // update pointer
+
+	$(obj).animate({scrollTop: (pointer * height) + 'px'}, 'normal');
+
+	return true;
+
+}
+
+
+
+function animateThis(action, timer, hotspot) {
+
+	if (action != '' && timer > 0) {
+
+		animateThisInterval = setInterval(action, timer);
+
+		if (hotspot) {
+
+			$('div#' + hotspot)
+
+				.hover(
+
+					function() {
+
+						if (animateThisInterval) clearInterval(animateThisInterval);
+
+					},
+
+					function() {
+
+						if (animateThisInterval) clearInterval(animateThisInterval);
+
+						animateThisInterval = setInterval(action, timer);
+
+					}
+
+				)
+
+		}
+
+	}
+
+}
