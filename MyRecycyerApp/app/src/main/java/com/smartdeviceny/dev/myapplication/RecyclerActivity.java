@@ -14,6 +14,7 @@ public class RecyclerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+     //  setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recycler_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_rv);
