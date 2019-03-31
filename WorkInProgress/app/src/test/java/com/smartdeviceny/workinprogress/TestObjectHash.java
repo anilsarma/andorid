@@ -11,28 +11,12 @@ import java.util.Date;
 
 import androidx.annotation.NonNull;
 
-class TestObject {
-    @Persist
-    Date date;
+class TestObjectHash {
 
     @Persist
-    Double class_double = new Double(100);
+    HashMap<String, String> tos = new HashMap<tring, String>();
 
-    @Persist
-    double primitive_double;
-
-    @Persist
-    Integer class_integer;
-
-    @Persist
-    int primitive_integer = 12;
-
-   // @Persist
-    ArrayList<Integer> ids = new ArrayList<Integer>();
-    @Persist
-    ArrayList<TestObject> tos = new ArrayList<TestObject>();
-
-    public TestObject() {
+    public TestObjectHash() {
 
     }
 

@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void setTheme(int resid) {
        super.setTheme(resid);
-       super.setTheme(R.style.AppThemeDark);
+       //super.setTheme(R.style.AppThemeDark);
     }
 
     @Override

@@ -1,4 +1,6 @@
-package com.smartdeviceny.njts;
+package com.smartdeviceny.njts.annotations;
+
+import android.os.Build;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -9,7 +11,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class JSONObjectSerializer {
 
@@ -64,10 +68,10 @@ public class JSONObjectSerializer {
         return obj;
     }
 
-    static public Object unmarshall(Class<?> type, JSONObject jsonObject) throws Exception {
-        Constructor<?> constructor = type.getConstructor();
+    static public <T> T unmarshall(Class<T> type, JSONObject jsonObject) throws Exception {
+        Constructor<T> constructor = type.getConstructor();
         constructor.setAccessible(true);
-        Object object = constructor.newInstance(); //(new Class[]{}).newInstance();
+        T object = constructor.newInstance(); //(new Class[]{}).newInstance();
 
         Field fields[] = object.getClass().getDeclaredFields();
         for (Field fld : fields) {
@@ -143,6 +147,9 @@ public class JSONObjectSerializer {
         if (type.isAssignableFrom(ArrayList.class)) {
             return true;
         }
+        if (type.isAssignableFrom(HashMap.class)) {
+            return true;
+        }
         return false;
     }
 
@@ -165,7 +172,22 @@ public class JSONObjectSerializer {
             }
             return array;
         }
-
+        if (object.getClass().isAssignableFrom(HashMap.class)) {
+            JSONObject dict = new JSONObject();
+            int i = 0;
+            HashMap hash = (HashMap)object;
+            for (Object tmp : ((HashMap) object).keySet()) {
+                if (isSpecial(tmp.getClass())) {
+                    dict.put((String)tmp, hash.get(tmp) );
+                }
+                if (primitiveType(tmp.getClass())) {
+                    dict.put((String)tmp, hash.get(tmp) );
+                } else {
+                    dict.put((String)tmp, marshall(hash.get(tmp)));
+                }
+            }
+            return dict;
+        }
         return object;
     }
 
@@ -186,8 +208,13 @@ public class JSONObjectSerializer {
             for (int i = 0; i < array.length(); i++) {
                 Object obj = array.get(i);
                 if (fld.getGenericType() instanceof ParameterizedType) {
+                    Class ptype = null;
                     ParameterizedType gtype = (ParameterizedType) fld.getGenericType();
-                    Class ptype = Class.forName(gtype.getActualTypeArguments()[0].getTypeName());
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        ptype = Class.forName(gtype.getActualTypeArguments()[0].getTypeName());
+                    } else { // older versions
+                        ptype = Class.forName(gtype.getActualTypeArguments()[0].toString().substring("class ".length()));
+                    }
                     System.out.println(gtype);
                     try {
                         if (primitiveType(ptype)) {
@@ -200,22 +227,52 @@ public class JSONObjectSerializer {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-//                    if (primitiveType(tmp.getClass())) {
-//                        array.put(i++, tmp);
-//                    } else {
-//                        array.put(i++, marshall(tmp));
-//                    }
                 }
             }
             return data;
         }
+        if (fld.getType().isAssignableFrom(HashMap.class)) {
+            return _unmarshall_hashmap(fld, object);
+        }
         return object;
     }
-
+private static Object _unmarshall_hashmap(Field fld, Object object) throws Exception {
+    if (fld.getType().isAssignableFrom(ArrayList.class)) {
+        JSONObject array = (JSONObject) object;
+        HashMap data = new HashMap();
+        for (Object key0: ((HashMap)object).keySet()) {
+            String key = (String)key0;
+            Object obj = array.get(key);
+            if (fld.getGenericType() instanceof ParameterizedType) {
+                Class ptype = null;
+                ParameterizedType gtype = (ParameterizedType) fld.getGenericType();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    ptype = Class.forName(gtype.getActualTypeArguments()[0].getTypeName());
+                } else { // older versions
+                    ptype = Class.forName(gtype.getActualTypeArguments()[0].toString().substring("class ".length()));
+                }
+                System.out.println(gtype);
+                try {
+                    if (primitiveType(ptype)) {
+                        data.put(key, obj);
+                    } else if (isSpecial(ptype)) {
+                        data.put(key, _unmarshall(ptype, obj));
+                    } else {
+                        data.put(key, unmarshall(ptype, (JSONObject) obj));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return data;
+    }
+    return new HashMap<>();
+}
 
     public static String stringify(Object obj) {
         StringBuffer str = new StringBuffer();
-        str.append("[" + obj.getClass().getName() + " ");
+        str.append("[" + obj.getClass().getSimpleName() + " ");
         Field fields[] = obj.getClass().getDeclaredFields();
         for (Field fld : fields) {
             fld.setAccessible(true);

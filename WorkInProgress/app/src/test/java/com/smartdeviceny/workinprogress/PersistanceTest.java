@@ -44,4 +44,8 @@ public class PersistanceTest {
 
 
     }
+    @Test
+    public void marshallHashTest() throws Exception {
+        TestObjectHash to = new TestObjectHash();
+    }
 }

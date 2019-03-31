@@ -8,4 +8,40 @@
     <color name="colorPrimary_dark">#313535</color>
     <color name="colorPrimaryDark_dark">#242525</color>
     <color name="colorAccent_dark">#D81B60</color>
+
+
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <color name="gray_light">#CCCCCC</color>
+    <color name="gray_very_light">#E0E0E0</color>
+    <color name="gray_deep">#666666</color>
+    <color name="transparent">#00000000</color>
+
+
+    <!-- Google Apps Color -->
+    <color name="app_blue">#4285F4</color>
+    <color name="app_blue_dark">#3367D6</color>
+    <color name="app_green">#0F9D58</color>
+    <color name="app_green_dark">#0B8043</color>
+    <color name="app_yellow">#F4B400</color>
+    <color name="app_yellow_dark">#F09300</color>
+    <color name="app_red">#DB4437</color>
+
+    <!-- Google Logo Color -->
+    <color name="google_blue">#4285F4</color>
+    <color name="sapphire_blue">#2554C7</color>
+    <color name="orchid_blue"> #00007A</color>
+    <color name="blue_jay_darker">#032C56</color>
+    <color name="blue_jay">#095DE4</color>
+    <color name="blue_light">#01579C</color>
+
+    <color name="google_green">#34a853</color>
+    <color name="google_yellow">#FBBC05</color>
+    <color name="google_red">#EA4335</color>
+
+    <color name="main_background">#EEEEEE</color>
+    <color name="activity_background">#EEEEEE</color>
+
 </resources>
